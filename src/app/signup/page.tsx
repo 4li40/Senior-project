@@ -31,34 +31,24 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Navigation */}
-      <NavBar />
+    <div className="min-h-screen">
 
       {/* Main Content */}
       <main className="max-w-2xl mx-auto px-6 py-12">
         <div className="space-y-8">
           {/* Back Button and Title */}
           <div className="space-y-4">
-            <button className="flex items-center text-gray-600 hover:text-gray-900">
+            <Link href="/" className="flex items-center text-gray-600 hover:text-gray-900">
               <ArrowLeft className="w-4 h-4 mr-2" />
-            </button>
+              Back to Home
+            </Link>
             <h1 className="text-2xl font-semibold">Join Study Buddy</h1>
-          </div>
-
-          {/* Progress Steps */}
-          <div className="space-y-4">
-            <h2 className="text-sm font-medium text-gray-500">Account Type</h2>
-            <RadioGroup defaultValue="personal" className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="personal" id="personal" />
-                <Label htmlFor="personal">Personal Info</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="confirmation" id="confirmation" />
-                <Label htmlFor="confirmation">Confirmation</Label>
-              </div>
-            </RadioGroup>
+            <p className="text-gray-600">
+              Already have an account?{" "}
+              <Link href="/login" className="text-blue-600 hover:text-blue-800 font-medium">
+                Sign in
+              </Link>
+            </p>
           </div>
 
           {/* Role Selection Cards */}
@@ -113,7 +103,7 @@ export default function OnboardingPage() {
 
           {/* Continue Button */}
           <Button
-            className="w-full bg-gray-900 hover:bg-gray-800"
+            className="w-full"
             disabled={!selectedRole}
             onClick={handleContinue}
           >
