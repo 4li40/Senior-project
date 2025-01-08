@@ -8,7 +8,7 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import NavBar from "@/components/NavBar";
+import NavBar from "@/components/teacherNavBar";
 
 export default function OnboardingPage() {
   // State and hooks

@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { BarChartComponent } from "@/components/ui/bar-chart";
 import { UserCircle2, CheckCircle2, Clock } from "lucide-react";
-import NavBar from '@/components/NavBar';
+import TeacherNavBar from '@/components/teacherNavBar';
 
 const data = [
   {
@@ -58,7 +58,7 @@ export default function Dashboard() {
 
   return (
     <>
-      <NavBar />
+      <TeacherNavBar />
       <div className="p-6 max-w-7xl mx-auto space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Earnings Section */}

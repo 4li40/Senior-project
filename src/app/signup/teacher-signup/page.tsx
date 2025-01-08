@@ -290,7 +290,7 @@ const TeacherSignup = () => {
               <Button type="button" variant="outline" onClick={handleBack}>
                 Back
               </Button>
-              <Link href="/dashboard">
+              <Link href="/tutor-dashboard">
                 <Button type="submit">Register as Tutor</Button>
               </Link>
             </div>

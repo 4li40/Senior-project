@@ -3,12 +3,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { BookOpen, Users, Code, Layout } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import MainNavBar from "@/components/MainNavBar";
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen">
       {/* Navigation */}
-      <nav className="border-b">
+      {/* <nav className="border-b">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <BookOpen className="h-6 w-6" />
@@ -34,7 +35,9 @@ export default function LandingPage() {
             </Link>
           </div>
         </div>
-      </nav>
+      </nav> */}
+
+      <MainNavBar />
 
       {/* Hero Section */}
       <div className="relative h-[500px]">

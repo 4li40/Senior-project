@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import Link from 'next/link';
 
 interface StudentFormData {
   firstName: string;
@@ -206,7 +207,9 @@ export default function StudentSignupPage() {
           >
             Back
           </Button>
-          <Button type="submit">Register as Student</Button>
+          <Link href={"/student-dashboard"}>
+            <Button type="submit">Register as Student</Button>
+          </Link>
         </div>
       </form>
     </div>
