@@ -12,6 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import Link from "next/link";
 
 interface TeacherFormData {
   firstName: string;
@@ -289,7 +290,9 @@ const TeacherSignup = () => {
               <Button type="button" variant="outline" onClick={handleBack}>
                 Back
               </Button>
-              <Button type="submit">Register as Tutor</Button>
+              <Link href="/dashboard">
+                <Button type="submit">Register as Tutor</Button>
+              </Link>
             </div>
           </form>
         </CardContent>
