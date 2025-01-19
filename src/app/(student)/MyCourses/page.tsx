@@ -2,59 +2,22 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Clock, GraduationCap, Calendar, MessageSquare } from "lucide-react";
+import { GraduationCap, BookOpen, Clock, Calendar } from "lucide-react";
 import StudentNavBar from "@/components/StudentNavBar";
-import { useRouter } from "next/navigation"; // Import useRouter
+import { useRouter } from "next/navigation";
 
-export default function StudentDashboard() {
-  const router = useRouter(); // Initialize the router
+export default function MyCoursesPage() {
+  const router = useRouter();
 
   return (
     <>
       <StudentNavBar />
       <div className="p-6 max-w-7xl mx-auto space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Upcoming Sessions */}
+          {/* Course Progress */}
           <Card>
             <CardHeader>
-              <CardTitle>Upcoming Sessions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-primary/10 rounded-full">
-                  <Clock className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <p className="font-medium">Advanced Mathematics</p>
-                  <p className="text-sm text-muted-foreground">
-                    Today at 3:00 PM
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    with Prof. Smith
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-primary/10 rounded-full">
-                  <Clock className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <p className="font-medium">Physics 101</p>
-                  <p className="text-sm text-muted-foreground">
-                    Tomorrow at 2:00 PM
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    with Dr. Johnson
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* My Courses */}
-          <Card>
-            <CardHeader>
-              <CardTitle>My Courses</CardTitle>
+              <CardTitle>Course Progress</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-start gap-3">
@@ -91,21 +54,117 @@ export default function StudentDashboard() {
                   </div>
                 </div>
               </div>
-              {/* Add a button to navigate to the My Courses page */}
+            </CardContent>
+          </Card>
 
+          {/* Upcoming Assignments */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Upcoming Assignments</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-primary/10 rounded-full">
+                  <BookOpen className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <p className="font-medium">Advanced Mathematics</p>
+                  <p className="text-sm text-muted-foreground">
+                    Assignment 3 due tomorrow
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-primary/10 rounded-full">
+                  <BookOpen className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <p className="font-medium">Physics 101</p>
+                  <p className="text-sm text-muted-foreground">
+                    Lab report due in 3 days
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Course Schedule */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Course Schedule</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-primary/10 rounded-full">
+                  <Clock className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <p className="font-medium">Advanced Mathematics</p>
+                  <p className="text-sm text-muted-foreground">
+                    Next session: Today at 3:00 PM
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-primary/10 rounded-full">
+                  <Clock className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <p className="font-medium">Physics 101</p>
+                  <p className="text-sm text-muted-foreground">
+                    Next session: Tomorrow at 2:00 PM
+                  </p>
+                </div>
+              </div>
               <Button
                 className="w-full"
-                onClick={() => router.push("/MyCourses")} // Include the route group
+                onClick={() => router.push("/Schedule")}
               >
-                View All Courses
+                View Full Schedule
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Course Materials */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Course Materials</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-primary/10 rounded-full">
+                  <BookOpen className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <p className="font-medium">Advanced Mathematics</p>
+                  <p className="text-sm text-muted-foreground">
+                    Chapter 5: Differential Equations
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-primary/10 rounded-full">
+                  <BookOpen className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <p className="font-medium">Physics 101</p>
+                  <p className="text-sm text-muted-foreground">
+                    Chapter 3: Kinematics
+                  </p>
+                </div>
+              </div>
+              <Button variant="outline" className="w-full">
+                View All Materials
               </Button>
             </CardContent>
           </Card>
 
-          {/* Schedule Overview */}
+          {/* Course Announcements */}
           <Card>
             <CardHeader>
-              <CardTitle>Schedule Overview</CardTitle>
+              <CardTitle>Course Announcements</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-start gap-3">
@@ -113,78 +172,26 @@ export default function StudentDashboard() {
                   <Calendar className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="font-medium">This Week</p>
+                  <p className="font-medium">Advanced Mathematics</p>
                   <p className="text-sm text-muted-foreground">
-                    5 upcoming sessions
+                    Midterm exam scheduled for next week
                   </p>
-                  <p className="text-sm text-muted-foreground">
-                    2 assignments due
-                  </p>
-                </div>
-              </div>
-              <Button className="w-full">View Full Schedule</Button>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Recent Messages */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Messages</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-primary/10 rounded-full">
-                  <MessageSquare className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <p className="font-medium">Prof. Smith</p>
-                  <p className="text-sm text-muted-foreground">
-                    Regarding next week's session...
-                  </p>
-                  <p className="text-xs text-muted-foreground">2 hours ago</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <div className="p-2 bg-primary/10 rounded-full">
-                  <MessageSquare className="w-5 h-5 text-primary" />
+                  <Calendar className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="font-medium">Dr. Johnson</p>
+                  <p className="font-medium">Physics 101</p>
                   <p className="text-sm text-muted-foreground">
-                    Here's the study material for...
+                    Guest lecture on Quantum Mechanics
                   </p>
-                  <p className="text-xs text-muted-foreground">Yesterday</p>
                 </div>
               </div>
               <Button variant="outline" className="w-full">
-                View All Messages
+                View All Announcements
               </Button>
-            </CardContent>
-          </Card>
-
-          {/* Find Tutors */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Find Tutors</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Connect with expert tutors in your field of study. Get
-                personalized help and improve your understanding.
-              </p>
-              <div className="grid grid-cols-2 gap-4">
-                <Button
-                  className="w-full"
-                  onClick={() => router.push("/FindTutorPage")}
-                >
-                  Browse Tutors
-                </Button>
-                <Button variant="outline" className="w-full">
-                  Quick Match
-                </Button>
-              </div>
             </CardContent>
           </Card>
         </div>
