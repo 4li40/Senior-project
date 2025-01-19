@@ -1,7 +1,6 @@
 'use client';
 
-import React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -15,7 +14,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import Link from 'next/link';
 
 interface StudentFormData {
   firstName: string;
@@ -52,18 +50,6 @@ export default function StudentSignupPage() {
     agreedToTerms: false,
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    try {
-      // TODO: Implement API call to register student
-      console.log('Form submitted:', formData);
-      router.push('/dashboard'); // Redirect after successful registration
-    } catch (error) {
-      console.error('Registration failed:', error);
-    }
-  };
-
   const handleSubjectToggle = (subject: string) => {
     setFormData(prev => ({
       ...prev,
@@ -72,6 +58,38 @@ export default function StudentSignupPage() {
         : [...prev.subjects, subject],
     }));
   };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+  
+    try {
+      const response = await fetch('http://localhost:5001/api/students', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      
+  
+      if (!response.ok) {
+        const contentType = response.headers.get('Content-Type');
+      
+        if (contentType?.includes('application/json')) {
+          const errorData = await response.json();
+          console.error('Registration failed (JSON):', errorData);
+          alert(errorData.message || 'Failed to register. Please try again.');
+        } else {
+          const errorText = await response.text();
+          console.error('Registration failed (Text):', errorText);
+          alert(errorText || 'Failed to register. Please try again.');
+        }
+      }
+      
+    } catch (error) {
+      console.error('Error occurred while submitting the form:', error);
+      alert('An error occurred. Please try again.');
+    }
+  };
+  
 
   return (
     <div className="max-w-2xl mx-auto p-6">
@@ -129,8 +147,7 @@ export default function StudentSignupPage() {
               <Label htmlFor="educationLevel">Current Education Level</Label>
               <Select
                 value={formData.educationLevel}
-                onValueChange={value => setFormData(prev => ({ ...prev, educationLevel: value }))}
-              >
+                onValueChange={value => setFormData(prev => ({ ...prev, educationLevel: value }))}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select education level" />
                 </SelectTrigger>
@@ -156,22 +173,19 @@ export default function StudentSignupPage() {
 
         <div className="space-y-4">
           <h2 className="text-xl font-semibold">Tutoring Goals</h2>
-          <div className="space-y-4">
-            <Label>Subjects of Interest (Select all that apply)</Label>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {subjects.map(subject => (
-                <div key={subject} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={subject}
-                    checked={formData.subjects.includes(subject)}
-                    onCheckedChange={() => handleSubjectToggle(subject)}
-                  />
-                  <Label htmlFor={subject}>{subject}</Label>
-                </div>
-              ))}
-            </div>
+          <Label>Subjects of Interest (Select all that apply)</Label>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {subjects.map(subject => (
+              <div key={subject} className="flex items-center space-x-2">
+                <Checkbox
+                  id={subject}
+                  checked={formData.subjects.includes(subject)}
+                  onCheckedChange={() => handleSubjectToggle(subject)}
+                />
+                <Label htmlFor={subject}>{subject}</Label>
+              </div>
+            ))}
           </div>
-          
           <div className="space-y-2">
             <Label htmlFor="goals">What are your main tutoring goals?</Label>
             <Textarea
@@ -189,7 +203,7 @@ export default function StudentSignupPage() {
           <Checkbox
             id="terms"
             checked={formData.agreedToTerms}
-            onCheckedChange={(checked) => 
+            onCheckedChange={(checked) =>
               setFormData(prev => ({ ...prev, agreedToTerms: checked as boolean }))
             }
             required
@@ -200,16 +214,10 @@ export default function StudentSignupPage() {
         </div>
 
         <div className="flex justify-between">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => router.back()}
-          >
+          <Button type="button" variant="outline" onClick={() => router.back()}>
             Back
           </Button>
-          <Link href={"/student-dashboard"}>
-            <Button type="submit">Register as Student</Button>
-          </Link>
+          <Button type="submit">Register as Student</Button>
         </div>
       </form>
     </div>
