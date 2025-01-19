@@ -14,34 +14,34 @@ const StudentNavBar = () => {
         {/* Navigation Links - Centered */}
         <nav className="flex items-center mx-auto space-x-6 text-sm font-medium">
           <Link
-            href="/student/dashboard"
-            className="transition-colors hover:text-foreground/80 text-foreground"
+            href="/student-dashboard"
+            className="text-foreground/60 transition-colors hover:text-foreground/80"
           >
             Dashboard
           </Link>
           <Link
-            href="/student/courses"
+            href="/MyCourses"
             className="text-foreground/60 transition-colors hover:text-foreground/80"
           >
             My Courses
           </Link>
           <Link
-            href="/student/tutors"
+            href="/FindTutorPage"
             className="text-foreground/60 transition-colors hover:text-foreground/80"
           >
             Find Tutors
           </Link>
           <Link
-            href="/student/schedule"
+            href="/Schedule"
             className="text-foreground/60 transition-colors hover:text-foreground/80"
           >
             Schedule
           </Link>
           <Link
-            href="/student/messages"
+            href="/ratings-reviews"
             className="text-foreground/60 transition-colors hover:text-foreground/80"
           >
-            Messages
+            Ratings/Reviews
           </Link>
         </nav>
 

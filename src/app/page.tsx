@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { BookOpen, Users, Code, Layout } from "lucide-react";
@@ -5,38 +6,16 @@ import Image from "next/image";
 import Link from "next/link";
 import MainNavBar from "@/components/MainNavBar";
 
+// Add metadata here
+export const metadata: Metadata = {
+  title: "Study Buddy - Master Tech Skills", // Change this to your desired title
+  description: "Learn tech skills with expert tutors and interactive courses.",
+};
+
 export default function LandingPage() {
   return (
     <div className="min-h-screen">
       {/* Navigation */}
-      {/* <nav className="border-b">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <BookOpen className="h-6 w-6" />
-            <span className="font-semibold text-lg">Study Buddy</span>
-          </div>
-          <div className="hidden md:flex items-center space-x-6">
-            <a href="#" className="text-sm font-medium">
-              About Us
-            </a>
-            <a href="#" className="text-sm font-medium">
-              Features
-            </a>
-            <a href="#" className="text-sm font-medium">
-              Pricing
-            </a>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Link href={"/login"}>
-              <Button variant="outline">Login</Button>
-            </Link>
-            <Link href={"/signup"}>
-              <Button>Sign Up</Button>
-            </Link>
-          </div>
-        </div>
-      </nav> */}
-
       <MainNavBar />
 
       {/* Hero Section */}
@@ -178,14 +157,14 @@ function TestimonialCard({ name, text }: { name: string; text: string }) {
 const testimonials = [
   {
     name: "Karim Karoum",
-    text: "I'm so glad I found Study buddy. The tutors are really helpful, and the live classes are great for learning new concepts. I've already made a lot of progress in just a few weeks.",
+    text: "I'm so glad I found Study Buddy. The tutors are really helpful, and the live classes are great for learning new concepts. I've already made a lot of progress in just a few weeks.",
   },
   {
     name: "Ahmad Ahmadani",
     text: "Study Buddy is amazing! I love that I can get help whenever I need it. The tutors are friendly and knowledgeable, and the platform is easy to use. I've learned a lot and feel more confident in my coding skills.",
   },
   {
-    name: "Ahmad Ahmadani",
+    name: "Lina Ali",
     text: "Study Buddy has been a game changer for me. The 1:1 tutoring is invaluable, and the projects are a fun way to apply what I've learned. I've been able to learn at my own pace and get the support I need to succeed.",
   },
   {
