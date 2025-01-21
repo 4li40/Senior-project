@@ -14,25 +14,25 @@ const TeacherNavBar = () => {
         {/* Navigation Links - Centered */}
         <nav className="flex items-center mx-auto space-x-6 text-sm font-medium">
           <Link
-            href="/teacher/dashboard"
+            href="/tutor-dashboard"
             className="transition-colors hover:text-foreground/80 text-foreground"
           >
             Dashboard
           </Link>
           <Link
-            href="/teacher/courses"
+            href="/mycourses"
             className="text-foreground/60 transition-colors hover:text-foreground/80"
           >
             My Courses
           </Link>
           <Link
-            href="/teacher/schedule"
+            href="/schedule"
             className="text-foreground/60 transition-colors hover:text-foreground/80"
           >
             Schedule
           </Link>
           <Link
-            href="/teacher/earnings"
+            href="/earnings"
             className="text-foreground/60 transition-colors hover:text-foreground/80"
           >
             Earnings
