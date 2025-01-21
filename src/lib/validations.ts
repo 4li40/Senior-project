@@ -22,7 +22,7 @@ export const studentSignupSchema = z.object({
     phoneNumber: z
     .string()
     .regex(
-      /^(?:3|7[0-9]|1|4|5|6|8|9)\d{6}$/,
+      /^(?:3|7|8[0-9]|1|4|5|6|8|9)\d{6}$/,
       "Phone number must be a valid Lebanese number"
     ),
   educationLevel: z.string().min(1, "Education level is required"),
