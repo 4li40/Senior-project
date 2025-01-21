@@ -58,6 +58,8 @@ export default function StudentSignupPage() {
   });
 
   const onSubmit = async (data: StudentSignupFormData) => {
+    console.log("Payload being sent:", data); // Log payload for debugging
+
     try {
       const response = await fetch("http://localhost:5003/api/students", {
         method: "POST",
@@ -70,6 +72,7 @@ export default function StudentSignupPage() {
         router.push("/student-dashboard");
       } else {
         const errorData = await response.json();
+        console.error("Backend responded with error:", errorData);
         alert(errorData.message || "Failed to register. Please try again.");
       }
     } catch (error) {
