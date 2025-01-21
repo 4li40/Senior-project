@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { BarChartComponent } from "@/components/ui/bar-chart";
 import { UserCircle2, CheckCircle2, Clock } from "lucide-react";
 import TeacherNavBar from '@/components/teacherNavBar';
+import { useRouter } from 'next/navigation'; // for navigation
+import ScheduleTable from '@/components/scheduleTabel';
 
 const data = [
   {
@@ -31,7 +33,7 @@ const data = [
     name: "Fri",
     total: 500,
   },
-]
+];
 
 const StarRating = ({ rating }: { rating: number }) => {
   return (
@@ -52,9 +54,56 @@ const StarRating = ({ rating }: { rating: number }) => {
   );
 };
 
+interface ScheduleItem {
+  title: string;
+  instructor: string;
+  time: string;
+  day: string; // Day of the week (e.g., "Mon", "Tue")
+}
+
 export default function Dashboard() {
   const [courseTitle, setCourseTitle] = useState('');
   const [courseDescription, setCourseDescription] = useState('');
+  const router = useRouter(); // Initialize the router
+
+  // State to manage courses
+  const [coursesData, setCoursesData] = useState<ScheduleItem[]>([
+    {
+      title: "Intro to AI",
+      instructor: "David Brown",
+      time: "3:00 PM",
+      day: "Mon",
+    },
+    {
+      title: "Machine Learning",
+      instructor: "Emily White",
+      time: "10:00 AM",
+      day: "Tue",
+    },
+    {
+      title: "What is an API?",
+      instructor: "Frank Green",
+      time: "2:30 PM",
+      day: "Wed",
+    },
+  ]);
+
+  // Function to add a new course
+  const addCourse = () => {
+    const newCourse: ScheduleItem = {
+      title: courseTitle,
+      instructor: "Tutor Name", // Replace with dynamic instructor name if needed
+      time: "12:00 PM", // Replace with dynamic time if needed
+      day: "Thu", // Replace with dynamic day if needed
+    };
+    setCoursesData([...coursesData, newCourse]); // Update the state
+    setCourseTitle(''); // Clear the input field
+    setCourseDescription(''); // Clear the input field
+  };
+
+  const handleMyCoursesClick = () => {
+    router.push('/teacher/mycourses'); // Navigate to the My Courses page
+  };
 
   return (
     <>
@@ -121,13 +170,20 @@ export default function Dashboard() {
               <CardTitle>Upload Courses</CardTitle>
             </CardHeader>
             <CardContent>
-              <form className="space-y-4">
+              <form
+                className="space-y-4"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  addCourse();
+                }}
+              >
                 <div className="space-y-2">
                   <Label htmlFor="title">Course Title</Label>
                   <Input
                     id="title"
                     value={courseTitle}
                     onChange={(e) => setCourseTitle(e.target.value)}
+                    required
                   />
                 </div>
                 <div className="space-y-2">
@@ -197,36 +253,7 @@ export default function Dashboard() {
               <CardTitle>Upcoming Sessions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="font-medium">Intro to AI</p>
-                  <p className="text-sm text-muted-foreground">with David Brown</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-medium">Today</p>
-                  <p className="text-sm text-muted-foreground">3:00 PM</p>
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="font-medium">Machine learning</p>
-                  <p className="text-sm text-muted-foreground">with Emily White</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-medium">Tomorrow</p>
-                  <p className="text-sm text-muted-foreground">10:00 AM</p>
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="font-medium">What is an API?</p>
-                  <p className="text-sm text-muted-foreground">with Frank Green</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-medium">May 15, 2025</p>
-                  <p className="text-sm text-muted-foreground">2:30 PM</p>
-                </div>
-              </div>
+              <ScheduleTable courses={coursesData} />
             </CardContent>
           </Card>
         </div>
