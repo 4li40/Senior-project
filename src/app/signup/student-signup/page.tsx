@@ -67,7 +67,7 @@ export default function StudentSignupPage() {
 
       if (response.ok) {
         alert("Registration successful!");
-        router.push("/success");
+        router.push("/student-dashboard");
       } else {
         const errorData = await response.json();
         alert(errorData.message || "Failed to register. Please try again.");
