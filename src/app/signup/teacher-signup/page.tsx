@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -6,12 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 
 interface TeacherFormData {
@@ -98,9 +93,45 @@ const TeacherSignup = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement form submission logic
-    console.log(formData);
-    // router.push('/dashboard');
+
+    // Ensure the payload matches the backend expectations
+    const payload = {
+      ...formData,
+      phone: formData.phone, // Map 'phone' correctly
+      password: "examplePassword123", // Add a default password for testing
+      experience: parseInt(formData.experience, 10), // Ensure 'experience' is a number
+      availability: {
+        ...formData.availability,
+        days: formData.availability.days, // Ensure 'days' is an array
+        startTime: formData.availability.startTime, // Ensure valid time format
+        endTime: formData.availability.endTime,
+      },
+    };
+
+    console.log("Payload being sent to the API:", payload);
+
+    try {
+      const response = await fetch("http://localhost:5003/api/tutors", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const responseData = await response.json();
+      console.log("Backend response:", responseData);
+
+      if (!response.ok) {
+        console.error("Registration failed:", responseData);
+        alert(responseData.message || "Failed to register.");
+        return;
+      }
+
+      alert("Tutor registered successfully!");
+      router.push("/tutor-dashboard");
+    } catch (error) {
+      console.error("Error during registration:", error);
+      alert("An error occurred. Please try again.");
+    }
   };
 
   const handleBack = () => {
@@ -111,7 +142,9 @@ const TeacherSignup = () => {
     <div className="container mx-auto px-4 py-8 max-w-3xl">
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl text-center">Tutor Registration</CardTitle>
+          <CardTitle className="text-2xl text-center">
+            Tutor Registration
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-8">
@@ -188,7 +221,9 @@ const TeacherSignup = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="experience">Years of Teaching Experience</Label>
+                    <Label htmlFor="experience">
+                      Years of Teaching Experience
+                    </Label>
                     <Input
                       id="experience"
                       name="experience"
@@ -205,7 +240,10 @@ const TeacherSignup = () => {
                 <h3 className="text-lg font-medium">Subjects You Can Teach</h3>
                 <div className="mt-4 space-y-4">
                   {subjects.map((subject) => (
-                    <div key={subject.id} className="flex items-center space-x-2">
+                    <div
+                      key={subject.id}
+                      className="flex items-center space-x-2"
+                    >
                       <Checkbox
                         id={subject.id}
                         checked={formData.subjects.includes(subject.id)}
@@ -290,9 +328,8 @@ const TeacherSignup = () => {
               <Button type="button" variant="outline" onClick={handleBack}>
                 Back
               </Button>
-              <Link href="/tutor-dashboard">
-                <Button type="submit">Register as Tutor</Button>
-              </Link>
+
+              <Button type="submit">Register</Button>
             </div>
           </form>
         </CardContent>
