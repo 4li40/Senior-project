@@ -26,6 +26,12 @@ const StudentNavBar = () => {
             My Courses
           </Link>
           <Link
+            href="/roadmap"
+            className="text-foreground/60 transition-colors hover:text-foreground/80"
+          >
+            Roadmap
+          </Link>
+          <Link
             href="/FindTutorPage"
             className="text-foreground/60 transition-colors hover:text-foreground/80"
           >
