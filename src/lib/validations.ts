@@ -20,15 +20,8 @@ export const studentSignupSchema = z.object({
     .min(6, "Password must be at least 6 characters long")
     .max(50, "Password must be less than 50 characters"),
     phoneNumber: z
-    .string()
-    .regex(
-<<<<<<< HEAD
-      /^(?:3|7[0-9]|1|4|5|6|8|9|81)\d{6}$/,
-=======
-      /^(03|70|71|76|78|79|81)\d{6}$/,
->>>>>>> ali-validation-form
-      "Phone number must be a valid Lebanese number"
-    ),
+  .string()
+  .regex(/^(?:3|7[0-9]|1|4|5|6|8|9|81|03|70|71|76|78|79)\d{6}$/),
   
   educationLevel: z.string().min(1, "Education level is required"),
   school: z
