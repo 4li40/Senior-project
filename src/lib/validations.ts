@@ -65,6 +65,10 @@ export const teacherSignupSchema = z.object({
       /^(03|70|71|76|78|79|81)\d{6}$/,
       "Phone number must be a valid Lebanese number"
     ),
+  password: z
+    .string()
+    .min(6, "Password must be at least 6 characters long")
+    .max(50, "Password must be less than 50 characters"),
   education: z
     .string()
     .min(1, "Education level is required")
