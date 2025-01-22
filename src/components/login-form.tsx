@@ -92,9 +92,12 @@ export function LoginForm({
                   required
                 />
               </div>
-              <Button type="submit" className="w-full">
-                Login
-              </Button>
+              <Button
+  type="submit"
+  className="w-full bg-black text-white border border-black hover:bg-white hover:text-black transition-all duration-200"
+>
+  Login
+</Button>
             </div>
             <div className="mt-4 text-center text-sm">
               Don&apos;t have an account?{" "}
