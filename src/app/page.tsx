@@ -20,13 +20,14 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <div className="relative h-[500px]">
-        <Image
-          src="/placeholder.svg?height=500&width=1920"
-          alt="Student studying on laptop"
-          width={1920}
-          height={500}
-          className="object-cover"
-        />
+      <Image
+  src="/images/student-laptop.jpg" // Relative to public/
+  alt="Student studying on laptop"
+  layout="fill"
+    objectFit="cover" // Ensures the image covers the container
+  className="object-cover"
+/>
+
         <div className="absolute inset-0 bg-black/50">
           <div className="container mx-auto px-4 h-full flex items-center">
             <h1 className="text-4xl md:text-6xl font-bold text-white max-w-2xl">
