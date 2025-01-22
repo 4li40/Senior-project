@@ -1,35 +1,18 @@
-'use client';
+"use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { teacherSignupSchema } from "@/lib/validations";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import Link from "next/link";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-interface TeacherFormData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  education: string;
-  certifications: string;
-  experience: string;
-  subjects: string[];
-  otherSubjects: string;
-  availability: {
-    days: string[];
-    startTime: string;
-    endTime: string;
-  };
-}
+type TeacherFormData = z.infer<typeof teacherSignupSchema>;
 
 const subjects = [
   { id: "cybersecurity", label: "Cybersecurity" },
@@ -50,71 +33,70 @@ const days = [
 
 const TeacherSignup = () => {
   const router = useRouter();
-  const [formData, setFormData] = useState<TeacherFormData>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    education: "",
-    certifications: "",
-    experience: "",
-    subjects: [],
-    otherSubjects: "",
-    availability: {
-      days: [],
-      startTime: "",
-      endTime: "",
+  const form = useForm<TeacherFormData>({
+    resolver: zodResolver(teacherSignupSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      education: "",
+      certifications: "",
+      experience: "",
+      subjects: [],
+      otherSubjects: "",
+      availability: {
+        days: [],
+        startTime: "",
+        endTime: "",
+      },
     },
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    watch,
+  } = form;
 
   const handleSubjectToggle = (subject: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      subjects: prev.subjects.includes(subject)
-        ? prev.subjects.filter((s) => s !== subject)
-        : [...prev.subjects, subject],
-    }));
+    const currentSubjects = watch("subjects");
+    const updatedSubjects = currentSubjects.includes(subject)
+      ? currentSubjects.filter((s) => s !== subject)
+      : [...currentSubjects, subject];
+    setValue("subjects", updatedSubjects);
   };
 
   const handleDayToggle = (day: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      availability: {
-        ...prev.availability,
-        days: prev.availability.days.includes(day)
-          ? prev.availability.days.filter((d) => d !== day)
-          : [...prev.availability.days, day],
-      },
-    }));
+    const currentDays = watch("availability.days");
+    const updatedDays = currentDays.includes(day)
+      ? currentDays.filter((d) => d !== day)
+      : [...currentDays, day];
+    setValue("availability.days", updatedDays);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: Implement form submission logic
-    console.log(formData);
-    // router.push('/dashboard');
-  };
-
-  const handleBack = () => {
-    router.back();
+  const onSubmit = async (data: TeacherFormData) => {
+    try {
+      // TODO: Implement form submission logic
+      console.log(data);
+      router.push("/tutor-dashboard");
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
   };
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-3xl">
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl text-center">Tutor Registration</CardTitle>
+          <CardTitle className="text-2xl text-center">
+            Tutor Registration
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
             <div className="space-y-6">
               <div>
                 <h3 className="text-lg font-medium">Personal Information</h3>
@@ -123,43 +105,60 @@ const TeacherSignup = () => {
                     <Label htmlFor="firstName">First Name</Label>
                     <Input
                       id="firstName"
-                      name="firstName"
-                      value={formData.firstName}
-                      onChange={handleInputChange}
-                      required
+                      placeholder="Enter your first name"
+                      {...register("firstName")}
                     />
+                    {errors.firstName && (
+                      <p className="text-red-500 text-sm">
+                        {errors.firstName.message}
+                      </p>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="lastName">Last Name</Label>
                     <Input
                       id="lastName"
-                      name="lastName"
-                      value={formData.lastName}
-                      onChange={handleInputChange}
-                      required
+                      placeholder="Enter your last name"
+                      {...register("lastName")}
                     />
+                    {errors.lastName && (
+                      <p className="text-red-500 text-sm">
+                        {errors.lastName.message}
+                      </p>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
                     <Input
                       id="email"
-                      name="email"
                       type="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      required
+                      placeholder="Enter your email address"
+                      {...register("email")}
                     />
+                    {errors.email && (
+                      <p className="text-red-500 text-sm">
+                        {errors.email.message}
+                      </p>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="phone">Phone</Label>
-                    <Input
-                      id="phone"
-                      name="phone"
-                      type="tel"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      required
-                    />
+                    <div className="flex">
+                      <span className="px-3 py-2 border border-gray-300 bg-gray-100 rounded-l-md">
+                        +961
+                      </span>
+                      <Input
+                        id="phone"
+                        placeholder="e.g., 71234567"
+                        className="rounded-l-none"
+                        {...register("phone")}
+                      />
+                    </div>
+                    {errors.phone && (
+                      <p className="text-red-500 text-sm">
+                        {errors.phone.message}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -171,32 +170,42 @@ const TeacherSignup = () => {
                     <Label htmlFor="education">Highest Education Level</Label>
                     <Input
                       id="education"
-                      name="education"
-                      value={formData.education}
-                      onChange={handleInputChange}
-                      required
+                      placeholder="e.g., Master's in Computer Science"
+                      {...register("education")}
                     />
+                    {errors.education && (
+                      <p className="text-red-500 text-sm">
+                        {errors.education.message}
+                      </p>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="certifications">Certifications</Label>
                     <Input
                       id="certifications"
-                      name="certifications"
-                      placeholder="List any relevant certifications"
-                      value={formData.certifications}
-                      onChange={handleInputChange}
+                      placeholder="e.g., AWS Certified, Microsoft Certified Trainer"
+                      {...register("certifications")}
                     />
+                    {errors.certifications && (
+                      <p className="text-red-500 text-sm">
+                        {errors.certifications.message}
+                      </p>
+                    )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="experience">Years of Teaching Experience</Label>
+                    <Label htmlFor="experience">
+                      Years of Teaching Experience
+                    </Label>
                     <Input
                       id="experience"
-                      name="experience"
-                      type="number"
-                      value={formData.experience}
-                      onChange={handleInputChange}
-                      required
+                      placeholder="Enter number of years"
+                      {...register("experience")}
                     />
+                    {errors.experience && (
+                      <p className="text-red-500 text-sm">
+                        {errors.experience.message}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -205,23 +214,29 @@ const TeacherSignup = () => {
                 <h3 className="text-lg font-medium">Subjects You Can Teach</h3>
                 <div className="mt-4 space-y-4">
                   {subjects.map((subject) => (
-                    <div key={subject.id} className="flex items-center space-x-2">
+                    <div
+                      key={subject.id}
+                      className="flex items-center space-x-2"
+                    >
                       <Checkbox
                         id={subject.id}
-                        checked={formData.subjects.includes(subject.id)}
+                        checked={watch("subjects").includes(subject.id)}
                         onCheckedChange={() => handleSubjectToggle(subject.id)}
                       />
                       <Label htmlFor={subject.id}>{subject.label}</Label>
                     </div>
                   ))}
+                  {errors.subjects && (
+                    <p className="text-red-500 text-sm">
+                      {errors.subjects.message}
+                    </p>
+                  )}
                   <div className="space-y-2">
                     <Label htmlFor="otherSubjects">Other Subjects</Label>
                     <Input
                       id="otherSubjects"
-                      name="otherSubjects"
-                      placeholder="Enter other subjects you can teach"
-                      value={formData.otherSubjects}
-                      onChange={handleInputChange}
+                      placeholder="e.g., Web Development, Mobile App Development"
+                      {...register("otherSubjects")}
                     />
                   </div>
                 </div>
@@ -235,51 +250,46 @@ const TeacherSignup = () => {
                       <div key={day.id} className="flex items-center space-x-2">
                         <Checkbox
                           id={day.id}
-                          checked={formData.availability.days.includes(day.id)}
+                          checked={watch("availability.days").includes(day.id)}
                           onCheckedChange={() => handleDayToggle(day.id)}
                         />
                         <Label htmlFor={day.id}>{day.label}</Label>
                       </div>
                     ))}
                   </div>
+                  {errors.availability?.days && (
+                    <p className="text-red-500 text-sm">
+                      {errors.availability.days.message}
+                    </p>
+                  )}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="startTime">Start Time</Label>
                       <Input
                         id="startTime"
-                        name="startTime"
                         type="time"
-                        value={formData.availability.startTime}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            availability: {
-                              ...prev.availability,
-                              startTime: e.target.value,
-                            },
-                          }))
-                        }
-                        required
+                        placeholder="Select start time"
+                        {...register("availability.startTime")}
                       />
+                      {errors.availability?.startTime && (
+                        <p className="text-red-500 text-sm">
+                          {errors.availability.startTime.message}
+                        </p>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="endTime">End Time</Label>
                       <Input
                         id="endTime"
-                        name="endTime"
                         type="time"
-                        value={formData.availability.endTime}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            availability: {
-                              ...prev.availability,
-                              endTime: e.target.value,
-                            },
-                          }))
-                        }
-                        required
+                        placeholder="Select end time"
+                        {...register("availability.endTime")}
                       />
+                      {errors.availability?.endTime && (
+                        <p className="text-red-500 text-sm">
+                          {errors.availability.endTime.message}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -287,12 +297,14 @@ const TeacherSignup = () => {
             </div>
 
             <div className="flex justify-between">
-              <Button type="button" variant="outline" onClick={handleBack}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => router.back()}
+              >
                 Back
               </Button>
-              <Link href="/tutor-dashboard">
-                <Button type="submit">Register as Tutor</Button>
-              </Link>
+              <Button type="submit">Register as Tutor</Button>
             </div>
           </form>
         </CardContent>
