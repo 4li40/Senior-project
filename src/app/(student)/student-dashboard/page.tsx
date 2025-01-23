@@ -5,9 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Clock, GraduationCap, Calendar, Activity } from "lucide-react";
 import StudentNavBar from "@/components/StudentNavBar";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function StudentDashboard() {
   const router = useRouter();
+  const [chatOpen, setChatOpen] = useState(false);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -153,7 +155,7 @@ export default function StudentDashboard() {
                 <div>
                   <p className="font-medium">Submitted Assignment</p>
                   <p className="text-sm text-muted-foreground">
-                    Submitted "Physics Lab Report".
+                    Submitted &quot;Physics Lab Report&quot;.
                   </p>
                   <p className="text-xs text-muted-foreground">Yesterday</p>
                 </div>
@@ -188,6 +190,41 @@ export default function StudentDashboard() {
             </CardContent>
           </Card>
         </div>
+      </div>
+
+      {/* Chat Popup */}
+      <div className="fixed bottom-4 right-4">
+        {chatOpen ? (
+          <div className="w-80 bg-white shadow-lg rounded-lg border p-4">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-bold">Chat with us!</h3>
+              <button
+                onClick={() => setChatOpen(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                ✖
+              </button>
+            </div>
+            <div className="mt-4 text-sm text-gray-600">
+              Hello! Nice to see you here! Press "Start chat" to proceed.
+            </div>
+            <div className="mt-4">
+              <Button
+                className="w-full"
+                onClick={() => console.log("Chat started")}
+              >
+                Start Chat
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={() => setChatOpen(true)}
+            className="w-16 h-16 bg-blue-500 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-blue-600"
+          >
+            💬
+          </button>
+        )}
       </div>
     </div>
   );

@@ -1,55 +1,72 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Bell } from "lucide-react";
+import { SearchBar } from "@/components/SeachBar";
+import { usePathname } from 'next/navigation';
 
 const StudentNavBar = () => {
+  const pathname = usePathname();
+
+  const isActive = (path: string) => {
+    return pathname === path ? "text-black font-semibold" : "text-foreground/60 hover:text-foreground/80";
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="flex h-14 items-center px-4 lg:px-8">
+      <div className="flex h-14 items-center px-4 lg:px-8 mx-4 my-1">
         {/* Logo */}
         <Link href="/student/dashboard" className="flex items-center">
           <span className="text-xl font-bold">Study Buddy</span>
         </Link>
 
-        {/* Navigation Links - Centered */}
-        <nav className="flex items-center mx-auto space-x-6 text-sm font-medium">
-          <Link
-            href="/student-dashboard"
-            className="text-foreground/60 transition-colors hover:text-foreground/80"
-          >
-            Dashboard
-          </Link>
-          <Link
-            href="/MyCourses"
-            className="text-foreground/60 transition-colors hover:text-foreground/80"
-          >
-            My Courses
-          </Link>
-          <Link
-            href="/roadmap"
-            className="text-foreground/60 transition-colors hover:text-foreground/80"
-          >
-            Roadmap
-          </Link>
-          <Link
-            href="/FindTutorPage"
-            className="text-foreground/60 transition-colors hover:text-foreground/80"
-          >
-            Find Tutors
-          </Link>
-          <Link
-            href="/Schedule"
-            className="text-foreground/60 transition-colors hover:text-foreground/80"
-          >
-            Schedule
-          </Link>
-          <Link
-            href="/ratings-reviews"
-            className="text-foreground/60 transition-colors hover:text-foreground/80"
-          >
-            Ratings/Reviews
-          </Link>
-        </nav>
+        {/* Navigation Links and Search Bar - Centered */}
+        <div className="flex flex-1 items-center justify-center mx-auto max-w-6xl px-6">
+          <nav className="flex items-center gap-8 text-sm font-medium mr-16">
+            <Link
+              href="/student-dashboard"
+              className={`${isActive('/student-dashboard')} transition-colors whitespace-nowrap`}
+            >
+              Dashboard
+            </Link>
+            <Link
+              href="/MyCourses"
+              className={`${isActive('/MyCourses')} transition-colors whitespace-nowrap text-black`}
+            >
+              My Courses
+            </Link>
+            <Link
+              href="/roadmap"
+              className={`${isActive('/roadmap')} transition-colors whitespace-nowrap`}
+            >
+              Roadmap
+            </Link>
+            <Link
+              href="/FindTutorPage"
+              className={`${isActive('/FindTutorPage')} transition-colors whitespace-nowrap`}
+            >
+              Find Tutors
+            </Link>
+            <Link
+              href="/Schedule"
+              className={`${isActive('/Schedule')} transition-colors whitespace-nowrap`}
+            >
+              Schedule
+            </Link>
+            <Link
+              href="/ratings-reviews"
+              className={`${isActive('/ratings-reviews')} transition-colors whitespace-nowrap`}
+            >
+              Ratings/Reviews
+            </Link>
+          </nav>
+          <SearchBar 
+            placeholder="Search courses..." 
+            className="w-[280px] lg:w-[320px]"
+            onChange={(value) => {
+              console.log('Searching:', value);
+            }}
+          />
+        </div>
 
         {/* Right Side Actions */}
         <div className="flex items-center space-x-4">
