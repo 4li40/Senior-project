@@ -153,7 +153,7 @@ export default function StudentDashboard() {
                 <div>
                   <p className="font-medium">Submitted Assignment</p>
                   <p className="text-sm text-muted-foreground">
-                    Submitted "Physics Lab Report".
+                    Submitted &quot;Physics Lab Report&quot;.
                   </p>
                   <p className="text-xs text-muted-foreground">Yesterday</p>
                 </div>
