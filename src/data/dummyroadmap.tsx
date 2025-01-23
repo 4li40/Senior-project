@@ -1,38 +1,26 @@
-// data/dummyRoadmap.ts
-import { RoadmapNode } from "../types/roadmap";
-
-export const dummyRoadmap: RoadmapNode[] = [
+export const dummyRoadmap = [
   {
     id: 1,
-    title: "HTML Fundamentals",
+    label: "HTML Fundamentals",
     description: "Master the basics of HTML5 and semantic markup",
+    completed: true,
     progress: 100,
-    locked: false,
-    children: []
+    children: [],
   },
   {
     id: 2,
-    title: "CSS & Styling",
+    label: "CSS & Styling",
     description: "Learn CSS fundamentals and modern layout techniques",
+    completed: false,
     progress: 45,
-    locked: false,
-    children: [
-      {
-        id: 3,
-        title: "CSS Layout",
-        description: "Master layouts with Flexbox & Grid",
-        progress: 0,
-        locked: true,
-        children: []
-      }
-    ]
+    children: [],
   },
   {
-    id: 4,
-    title: "JavaScript Basics",
+    id: 3,
+    label: "JavaScript Basics",
     description: "Introduction to JavaScript programming",
+    completed: false,
     progress: 0,
-    locked: true,
-    children: []
-  }
+    children: [],
+  },
 ];
