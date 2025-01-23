@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -6,13 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 interface TeacherFormData {
   firstName: string;
@@ -22,6 +18,7 @@ interface TeacherFormData {
   education: string;
   certifications: string;
   experience: string;
+  password: string; // Add password field
   subjects: string[];
   otherSubjects: string;
   availability: {
@@ -58,14 +55,17 @@ const TeacherSignup = () => {
     education: "",
     certifications: "",
     experience: "",
-    subjects: [],
+    password: "",
+    subjects: [], // Ensure at least one subject is selected
     otherSubjects: "",
     availability: {
-      days: [],
+      days: [], // Ensure at least one day is selected
       startTime: "",
       endTime: "",
     },
   });
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -98,20 +98,44 @@ const TeacherSignup = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement form submission logic
-    console.log(formData);
-    // router.push('/dashboard');
+    console.log("Payload to be sent:", formData); // Log form data before sending
+
+    try {
+      const response = await fetch("http://localhost:5003/api/tutors", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData), // Ensure formData is properly structured
+      });
+
+      console.log("Server response:", response);
+
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log("Parsed server response:", responseData);
+
+        alert("Tutor registered successfully!");
+        router.push("/tutor-dashboard"); // Redirect only after successful registration
+      } else {
+        const errorData = await response.json();
+        console.error("Error from backend:", errorData);
+        alert(errorData.message || "Failed to register. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error during registration:", error);
+      alert("An error occurred. Please try again.");
+    }
   };
 
   const handleBack = () => {
     router.back();
   };
-
   return (
     <div className="container mx-auto px-4 py-8 max-w-3xl">
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl text-center">Tutor Registration</CardTitle>
+          <CardTitle className="text-2xl text-center">
+            Tutor Registration
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-8">
@@ -182,13 +206,14 @@ const TeacherSignup = () => {
                     <Input
                       id="certifications"
                       name="certifications"
-                      placeholder="List any relevant certifications"
                       value={formData.certifications}
                       onChange={handleInputChange}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="experience">Years of Teaching Experience</Label>
+                    <Label htmlFor="experience">
+                      Years of Teaching Experience
+                    </Label>
                     <Input
                       id="experience"
                       name="experience"
@@ -201,11 +226,38 @@ const TeacherSignup = () => {
                 </div>
               </div>
 
+              {/* Add Password Field */}
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Create a password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    required
+                    className="pr-10"
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-3 flex items-center text-gray-500"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
+              </div>
+
               <div>
                 <h3 className="text-lg font-medium">Subjects You Can Teach</h3>
                 <div className="mt-4 space-y-4">
                   {subjects.map((subject) => (
-                    <div key={subject.id} className="flex items-center space-x-2">
+                    <div
+                      key={subject.id}
+                      className="flex items-center space-x-2"
+                    >
                       <Checkbox
                         id={subject.id}
                         checked={formData.subjects.includes(subject.id)}
@@ -219,7 +271,6 @@ const TeacherSignup = () => {
                     <Input
                       id="otherSubjects"
                       name="otherSubjects"
-                      placeholder="Enter other subjects you can teach"
                       value={formData.otherSubjects}
                       onChange={handleInputChange}
                     />
@@ -290,9 +341,8 @@ const TeacherSignup = () => {
               <Button type="button" variant="outline" onClick={handleBack}>
                 Back
               </Button>
-              <Link href="/tutor-dashboard">
-                <Button type="submit">Register as Tutor</Button>
-              </Link>
+
+              <Button type="submit">Register as Tutor</Button>
             </div>
           </form>
         </CardContent>

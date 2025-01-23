@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import TeacherNavBar from '@/components/teacherNavBar';
-import ScheduleTable from '@/components/scheduleTabel'; 
+import StudentNavBar from "@/components/StudentNavBar";
+import ScheduleTable from "@/components/scheduleTabel";
 
 // Fetch data (you can replace this with an API call or database query)
 const coursesData = [
@@ -40,10 +40,14 @@ const coursesData = [
 export default function SchedulePage() {
   return (
     <>
+      <StudentNavBar />
+
       {/* Add the TeacherNavBar /}
-      <TeacherNavBar />
+
+      
 
       {/ Main Content */}
+
       <div className="p-6 max-w-7xl mx-auto">
         <h1 className="text-2xl font-bold mb-6">Weekly Schedule</h1>
         <ScheduleTable courses={coursesData} />
