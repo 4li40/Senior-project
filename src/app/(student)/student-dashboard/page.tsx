@@ -2,20 +2,21 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Clock, GraduationCap, Calendar, MessageSquare } from "lucide-react";
+import { Clock, GraduationCap, Calendar, Activity } from "lucide-react";
 import StudentNavBar from "@/components/StudentNavBar";
-import { useRouter } from "next/navigation"; // Import useRouter
+import { useRouter } from "next/navigation";
 
 export default function StudentDashboard() {
-  const router = useRouter(); // Initialize the router
+  const router = useRouter();
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <StudentNavBar />
-      <div className="p-6 max-w-7xl mx-auto space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="flex-grow px-4 md:px-8 lg:px-12 space-y-8 mt-8">
+        {/* Top Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* Upcoming Sessions */}
-          <Card>
+          <Card className="h-full">
             <CardHeader>
               <CardTitle>Upcoming Sessions</CardTitle>
             </CardHeader>
@@ -52,7 +53,7 @@ export default function StudentDashboard() {
           </Card>
 
           {/* My Courses */}
-          <Card>
+          <Card className="h-full">
             <CardHeader>
               <CardTitle>My Courses</CardTitle>
             </CardHeader>
@@ -91,11 +92,9 @@ export default function StudentDashboard() {
                   </div>
                 </div>
               </div>
-              {/* Add a button to navigate to the My Courses page */}
-
               <Button
                 className="w-full"
-                onClick={() => router.push("/MyCourses")} // Include the route group
+                onClick={() => router.push("/MyCourses")}
               >
                 View All Courses
               </Button>
@@ -103,7 +102,7 @@ export default function StudentDashboard() {
           </Card>
 
           {/* Schedule Overview */}
-          <Card>
+          <Card className="h-full">
             <CardHeader>
               <CardTitle>Schedule Overview</CardTitle>
             </CardHeader>
@@ -127,39 +126,40 @@ export default function StudentDashboard() {
           </Card>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Recent Messages */}
+        {/* Bottom Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Recent Activities */}
           <Card>
             <CardHeader>
-              <CardTitle>Recent Messages</CardTitle>
+              <CardTitle>Recent Activities</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-start gap-3">
                 <div className="p-2 bg-primary/10 rounded-full">
-                  <MessageSquare className="w-5 h-5 text-primary" />
+                  <Activity className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="font-medium">Prof. Smith</p>
+                  <p className="font-medium">Completed Quiz on AI</p>
                   <p className="text-sm text-muted-foreground">
-                    Regarding next week's session...
+                    Scored 85% on the AI quiz.
                   </p>
                   <p className="text-xs text-muted-foreground">2 hours ago</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <div className="p-2 bg-primary/10 rounded-full">
-                  <MessageSquare className="w-5 h-5 text-primary" />
+                  <Activity className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="font-medium">Dr. Johnson</p>
+                  <p className="font-medium">Submitted Assignment</p>
                   <p className="text-sm text-muted-foreground">
-                    Here's the study material for...
+                    Submitted "Physics Lab Report".
                   </p>
                   <p className="text-xs text-muted-foreground">Yesterday</p>
                 </div>
               </div>
               <Button variant="outline" className="w-full">
-                View All Messages
+                View All Activities
               </Button>
             </CardContent>
           </Card>
@@ -189,6 +189,6 @@ export default function StudentDashboard() {
           </Card>
         </div>
       </div>
-    </>
+    </div>
   );
 }
