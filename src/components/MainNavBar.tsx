@@ -19,7 +19,7 @@ const MainNavBar = () => {
         <div className="flex flex-1 items-center justify-center gap-16 max-w-3xl">
           <nav className="hidden md:flex items-center gap-8 whitespace-nowrap">
             <Link
-              href="/about"
+              href="/aboutUs"
               className="text-sm font-medium text-foreground/60 hover:text-foreground/80"
             >
               About Us

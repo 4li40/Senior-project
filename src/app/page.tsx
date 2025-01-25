@@ -84,7 +84,7 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-black text-white py-12">
+      <footer className="bg-gray-900 text-white py-12">
         <div className="container mx-auto px-4 grid md:grid-cols-3 gap-8">
           <div>
             <h3 className="font-semibold text-white mb-4">About Study Buddy</h3>
