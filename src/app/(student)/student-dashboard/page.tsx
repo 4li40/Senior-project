@@ -6,6 +6,7 @@ import { Clock, GraduationCap, Calendar, Activity } from "lucide-react";
 import StudentNavBar from "@/components/StudentNavBar";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import ChatPopup from "@/components/chatpopup";
 
 export default function StudentDashboard() {
   const router = useRouter();
@@ -192,31 +193,10 @@ export default function StudentDashboard() {
         </div>
       </div>
 
-      {/* Chat Popup */}
+      {/* Chat Widget */}
       <div className="fixed bottom-4 right-4">
         {chatOpen ? (
-          <div className="w-80 bg-white shadow-lg rounded-lg border p-4">
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-bold">Chat with us!</h3>
-              <button
-                onClick={() => setChatOpen(false)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                ✖
-              </button>
-            </div>
-            <div className="mt-4 text-sm text-gray-600">
-              Hello! Nice to see you here! Press "Start chat" to proceed.
-            </div>
-            <div className="mt-4">
-              <Button
-                className="w-full"
-                onClick={() => console.log("Chat started")}
-              >
-                Start Chat
-              </Button>
-            </div>
-          </div>
+          <ChatPopup /> // Replace with your functional ChatWidget component
         ) : (
           <button
             onClick={() => setChatOpen(true)}
