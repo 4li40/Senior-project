@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 type StudentSignupFormData = z.infer<typeof studentSignupSchema>;
 
@@ -82,211 +83,216 @@ export default function StudentSignupPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      <h1 className="text-2xl font-bold text-center mb-6">
-        Student Registration
-      </h1>
+    <div className="container mx-auto px-4 py-8 max-w-3xl">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-2xl text-center">
+            Student Registration
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* Personal Information */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Personal Information</h2>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {/* Personal Information */}
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold">Personal Information</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="firstName">First Name</Label>
+                  <Input
+                    id="firstName"
+                    placeholder="Enter your first name"
+                    {...register("firstName")}
+                  />
+                  {errors.firstName && (
+                    <p className="text-red-500 text-sm">
+                      {errors.firstName.message}
+                    </p>
+                  )}
+                </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="firstName">First Name</Label>
-              <Input
-                id="firstName"
-                placeholder="Enter your first name"
-                {...register("firstName")}
-              />
-              {errors.firstName && (
-                <p className="text-red-500 text-sm">
-                  {errors.firstName.message}
-                </p>
-              )}
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="lastName">Last Name</Label>
+                  <Input
+                    id="lastName"
+                    placeholder="Enter your last name"
+                    {...register("lastName")}
+                  />
+                  {errors.lastName && (
+                    <p className="text-red-500 text-sm">
+                      {errors.lastName.message}
+                    </p>
+                  )}
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="lastName">Last Name</Label>
-              <Input
-                id="lastName"
-                placeholder="Enter your last name"
-                {...register("lastName")}
-              />
-              {errors.lastName && (
-                <p className="text-red-500 text-sm">
-                  {errors.lastName.message}
-                </p>
-              )}
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Enter your email address"
+                    {...register("email")}
+                  />
+                  {errors.email && (
+                    <p className="text-red-500 text-sm">{errors.email.message}</p>
+                  )}
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Enter your email address"
-                {...register("email")}
-              />
-              {errors.email && (
-                <p className="text-red-500 text-sm">{errors.email.message}</p>
-              )}
-            </div>
+                <div className="space-y-2 relative">
+                  <Label htmlFor="password">Password</Label>
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Create a password"
+                      {...register("password")}
+                      className="pr-10"
+                    />
+                    <button
+                      type="button"
+                      className="absolute inset-y-0 right-3 flex items-center text-gray-500"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                    >
+                      {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </div>
+                  {errors.password && (
+                    <p className="text-red-500 text-sm">
+                      {errors.password.message}
+                    </p>
+                  )}
+                </div>
 
-            <div className="space-y-2 relative">
-              <Label htmlFor="password">Password</Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Create a password"
-                  {...register("password")}
-                  className="pr-10"
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-3 flex items-center text-gray-500"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                >
-                  {showPassword ? <FaEyeSlash /> : <FaEye />}
-                </button>
+                <div className="space-y-2">
+                  <Label htmlFor="phoneNumber">Phone Number</Label>
+                  <div className="flex items-center">
+                    <span className="px-3 py-2 border border-gray-300 bg-gray-100 rounded-l-md">
+                      +961
+                    </span>
+                    <Input
+                      id="phoneNumber"
+                      placeholder="e.g., 71234567"
+                      {...register("phoneNumber")}
+                      className="rounded-l-none"
+                    />
+                  </div>
+                  {errors.phoneNumber && (
+                    <p className="text-red-500 text-sm">
+                      {errors.phoneNumber.message}
+                    </p>
+                  )}
+                </div>
               </div>
-              {errors.password && (
-                <p className="text-red-500 text-sm">
-                  {errors.password.message}
-                </p>
-              )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="phoneNumber">Phone Number</Label>
-              <div className="flex items-center">
-                <span className="px-3 py-2 border border-gray-300 bg-gray-100 rounded-l-md">
-                  +961
-                </span>
-                <Input
-                  id="phoneNumber"
-                  placeholder="e.g., 71234567"
-                  {...register("phoneNumber")}
-                  className="rounded-l-none"
-                />
+            {/* Educational Background */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Educational Background</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="educationLevel">Education Level</Label>
+                  <Select
+                    onValueChange={(value) => setValue("educationLevel", value)}
+                    defaultValue={watch("educationLevel")}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select your education level" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="high-school">High School</SelectItem>
+                      <SelectItem value="undergraduate">Undergraduate</SelectItem>
+                      <SelectItem value="graduate">Graduate</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {errors.educationLevel && (
+                    <p className="text-red-500 text-sm">
+                      {errors.educationLevel.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="school">School/Institution</Label>
+                  <Input
+                    id="school"
+                    placeholder="Enter your school name"
+                    {...register("school")}
+                  />
+                  {errors.school && (
+                    <p className="text-red-500 text-sm">{errors.school.message}</p>
+                  )}
+                </div>
               </div>
-              {errors.phoneNumber && (
-                <p className="text-red-500 text-sm">
-                  {errors.phoneNumber.message}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Educational Background */}
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold">Educational Background</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="educationLevel">Education Level</Label>
-              <Select
-                onValueChange={(value) => setValue("educationLevel", value)}
-                defaultValue={watch("educationLevel")}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select your education level" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="high-school">High School</SelectItem>
-                  <SelectItem value="undergraduate">Undergraduate</SelectItem>
-                  <SelectItem value="graduate">Graduate</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-              {errors.educationLevel && (
-                <p className="text-red-500 text-sm">
-                  {errors.educationLevel.message}
-                </p>
-              )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="school">School/Institution</Label>
-              <Input
-                id="school"
-                placeholder="Enter your school name"
-                {...register("school")}
+            {/* Tutoring Goals */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Tutoring Goals</h2>
+              <Label>Subjects of Interest</Label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {subjects.map((subject) => (
+                  <div key={subject} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={subject}
+                      checked={watch("subjects").includes(subject)}
+                      onCheckedChange={(checked) => {
+                        const updatedSubjects = checked
+                          ? [...watch("subjects"), subject]
+                          : watch("subjects").filter((s) => s !== subject);
+                        setValue("subjects", updatedSubjects);
+                      }}
+                    />
+                    <Label htmlFor={subject}>{subject}</Label>
+                  </div>
+                ))}
+              </div>
+              {errors.subjects && (
+                <p className="text-red-500 text-sm">{errors.subjects.message}</p>
+              )}
+
+              <div className="space-y-2">
+                <Label htmlFor="goals">Goals</Label>
+                <Textarea
+                  id="goals"
+                  placeholder="e.g., Improve grades, prepare for exams, learn new skills"
+                  {...register("goals")}
+                  className="h-32"
+                />
+                {errors.goals && (
+                  <p className="text-red-500 text-sm">{errors.goals.message}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Terms of Service */}
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="terms"
+                checked={watch("agreedToTerms")}
+                onCheckedChange={(checked) =>
+                  setValue("agreedToTerms", checked === true)
+                }
               />
-              {errors.school && (
-                <p className="text-red-500 text-sm">{errors.school.message}</p>
+              <Label htmlFor="terms">
+                I agree to the Terms of Service and Privacy Policy
+              </Label>
+              {errors.agreedToTerms && (
+                <p className="text-red-500 text-sm">
+                  {errors.agreedToTerms.message}
+                </p>
               )}
             </div>
-          </div>
-        </div>
 
-        {/* Tutoring Goals */}
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold">Tutoring Goals</h2>
-          <Label>Subjects of Interest</Label>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {subjects.map((subject) => (
-              <div key={subject} className="flex items-center space-x-2">
-                <Checkbox
-                  id={subject}
-                  checked={watch("subjects").includes(subject)}
-                  onCheckedChange={(checked) => {
-                    const updatedSubjects = checked
-                      ? [...watch("subjects"), subject]
-                      : watch("subjects").filter((s) => s !== subject);
-                    setValue("subjects", updatedSubjects);
-                  }}
-                />
-                <Label htmlFor={subject}>{subject}</Label>
-              </div>
-            ))}
-          </div>
-          {errors.subjects && (
-            <p className="text-red-500 text-sm">{errors.subjects.message}</p>
-          )}
-
-          <div className="space-y-2">
-            <Label htmlFor="goals">Goals</Label>
-            <Textarea
-              id="goals"
-              placeholder="e.g., Improve grades, prepare for exams, learn new skills"
-              {...register("goals")}
-              className="h-32"
-            />
-            {errors.goals && (
-              <p className="text-red-500 text-sm">{errors.goals.message}</p>
-            )}
-          </div>
-        </div>
-
-        {/* Terms of Service */}
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="terms"
-            checked={watch("agreedToTerms")}
-            onCheckedChange={(checked) =>
-              setValue("agreedToTerms", checked === true)
-            }
-          />
-          <Label htmlFor="terms">
-            I agree to the Terms of Service and Privacy Policy
-          </Label>
-          {errors.agreedToTerms && (
-            <p className="text-red-500 text-sm">
-              {errors.agreedToTerms.message}
-            </p>
-          )}
-        </div>
-
-        <div className="flex justify-between">
-          <Button type="button" variant="outline" onClick={() => router.back()}>
-            Back
-          </Button>
-          <Button type="submit">Register</Button>
-        </div>
-      </form>
+            <div className="flex justify-between">
+              <Button type="button" variant="outline" onClick={() => router.back()}>
+                Back
+              </Button>
+              <Button type="submit">Register</Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 }

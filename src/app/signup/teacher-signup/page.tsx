@@ -1,32 +1,27 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useRouter } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import Link from "next/link";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { teacherSignupSchema } from "@/lib/validations";
+import { useState } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
 
-interface TeacherFormData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  education: string;
-  certifications: string;
-  experience: string;
-  password: string; // Add password field
-  subjects: string[];
-  otherSubjects: string;
-  availability: {
-    days: string[];
-    startTime: string;
-    endTime: string;
-  };
-}
+type FormData = z.infer<typeof teacherSignupSchema>;
 
 const subjects = [
   { id: "cybersecurity", label: "Cybersecurity" },
@@ -47,88 +42,50 @@ const days = [
 
 const TeacherSignup = () => {
   const router = useRouter();
-  const [formData, setFormData] = useState<TeacherFormData>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    education: "",
-    certifications: "",
-    experience: "",
-    password: "",
-    subjects: [], // Ensure at least one subject is selected
-    otherSubjects: "",
-    availability: {
-      days: [], // Ensure at least one day is selected
-      startTime: "",
-      endTime: "",
+  const [showPassword, setShowPassword] = useState(false);
+
+  const form = useForm<FormData>({
+    resolver: zodResolver(teacherSignupSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      education: "",
+      certifications: "",
+      experience: "",
+      password: "",
+      subjects: [],
+      otherSubjects: "",
+      availability: {
+        days: [],
+        startTime: "",
+        endTime: "",
+      },
     },
   });
 
-  const [showPassword, setShowPassword] = useState(false);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubjectToggle = (subject: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      subjects: prev.subjects.includes(subject)
-        ? prev.subjects.filter((s) => s !== subject)
-        : [...prev.subjects, subject],
-    }));
-  };
-
-  const handleDayToggle = (day: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      availability: {
-        ...prev.availability,
-        days: prev.availability.days.includes(day)
-          ? prev.availability.days.filter((d) => d !== day)
-          : [...prev.availability.days, day],
-      },
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Payload to be sent:", formData); // Log form data before sending
-
+  const onSubmit = async (data: FormData) => {
     try {
-      const response = await fetch("http://localhost:5003/api/tutors", {
+      const response = await fetch("/api/auth/signup/teacher", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData), // Ensure formData is properly structured
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
       });
 
-      console.log("Server response:", response);
-
       if (response.ok) {
-        const responseData = await response.json();
-        console.log("Parsed server response:", responseData);
-
-        alert("Tutor registered successfully!");
-        router.push("/tutor-dashboard"); // Redirect only after successful registration
+        router.push("/login");
       } else {
-        const errorData = await response.json();
-        console.error("Error from backend:", errorData);
-        alert(errorData.message || "Failed to register. Please try again.");
+        const error = await response.json();
+        console.error("Signup failed:", error);
       }
     } catch (error) {
-      console.error("Error during registration:", error);
-      alert("An error occurred. Please try again.");
+      console.error("An unexpected error occurred:", error);
     }
   };
 
-  const handleBack = () => {
-    router.back();
-  };
   return (
     <div className="container mx-auto px-4 py-8 max-w-3xl">
       <Card>
@@ -138,213 +95,321 @@ const TeacherSignup = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-8">
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-lg font-medium">Personal Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">First Name</Label>
-                    <Input
-                      id="firstName"
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-medium">Personal Information</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <FormField
+                      control={form.control}
                       name="firstName"
-                      value={formData.firstName}
-                      onChange={handleInputChange}
-                      required
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>First Name</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">Last Name</Label>
-                    <Input
-                      id="lastName"
+
+                    <FormField
+                      control={form.control}
                       name="lastName"
-                      value={formData.lastName}
-                      onChange={handleInputChange}
-                      required
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Last Name</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
+
+                    <FormField
+                      control={form.control}
                       name="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      required
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email</FormLabel>
+                          <FormControl>
+                            <Input type="email" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Phone</Label>
-                    <Input
-                      id="phone"
+
+                    <FormField
+                      control={form.control}
                       name="phone"
-                      type="tel"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      required
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Phone</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                                +961
+                              </span>
+                              <Input
+                                {...field}
+                                className="pl-14"
+                                onChange={(e) => {
+                                  // Remove any non-digit characters
+                                  const value = e.target.value.replace(
+                                    /\D/g,
+                                    ""
+                                  );
+                                  // Update the field with the cleaned value
+                                  field.onChange(value);
+                                }}
+                                placeholder="3 123456"
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
                   </div>
                 </div>
-              </div>
 
-              <div>
-                <h3 className="text-lg font-medium">Qualifications</h3>
-                <div className="space-y-4 mt-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="education">Highest Education Level</Label>
-                    <Input
-                      id="education"
+                <div>
+                  <h3 className="text-lg font-medium">Qualifications</h3>
+                  <div className="space-y-4 mt-4">
+                    <FormField
+                      control={form.control}
                       name="education"
-                      value={formData.education}
-                      onChange={handleInputChange}
-                      required
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Highest Education Level</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="certifications">Certifications</Label>
-                    <Input
-                      id="certifications"
+
+                    <FormField
+                      control={form.control}
                       name="certifications"
-                      value={formData.certifications}
-                      onChange={handleInputChange}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Certifications</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="experience">
-                      Years of Teaching Experience
-                    </Label>
-                    <Input
-                      id="experience"
+
+                    <FormField
+                      control={form.control}
                       name="experience"
-                      type="number"
-                      value={formData.experience}
-                      onChange={handleInputChange}
-                      required
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Years of Teaching Experience</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              min="0"
+                              onKeyDown={(e) => {
+                                if (e.key === "-" || e.key === "e") {
+                                  e.preventDefault();
+                                }
+                              }}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
                   </div>
                 </div>
-              </div>
 
-              {/* Add Password Field */}
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <div className="relative">
-                  <Input
-                    id="password"
+                <div className="space-y-2">
+                  <h3 className="text-lg font-medium">Password</h3>
+                  <FormField
+                    control={form.control}
                     name="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Create a password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    required
-                    className="pr-10"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Input
+                              type={showPassword ? "text" : "password"}
+                              className="pr-10"
+                              {...field}
+                            />
+                            <button
+                              type="button"
+                              className="absolute inset-y-0 right-3 flex items-center text-gray-500"
+                              onClick={() => setShowPassword(!showPassword)}
+                            >
+                              {showPassword ? <FaEyeSlash /> : <FaEye />}
+                            </button>
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-3 flex items-center text-gray-500"
-                    onClick={() => setShowPassword((prev) => !prev)}
-                  >
-                    {showPassword ? <FaEyeSlash /> : <FaEye />}
-                  </button>
                 </div>
-              </div>
 
-              <div>
-                <h3 className="text-lg font-medium">Subjects You Can Teach</h3>
-                <div className="mt-4 space-y-4">
-                  {subjects.map((subject) => (
-                    <div
-                      key={subject.id}
-                      className="flex items-center space-x-2"
-                    >
-                      <Checkbox
-                        id={subject.id}
-                        checked={formData.subjects.includes(subject.id)}
-                        onCheckedChange={() => handleSubjectToggle(subject.id)}
-                      />
-                      <Label htmlFor={subject.id}>{subject.label}</Label>
-                    </div>
-                  ))}
-                  <div className="space-y-2">
-                    <Label htmlFor="otherSubjects">Other Subjects</Label>
-                    <Input
-                      id="otherSubjects"
+                <div>
+                  <h3 className="text-lg font-medium">
+                    Subjects You Can Teach
+                  </h3>
+                  <div className="mt-4 space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="subjects"
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="space-y-4">
+                            {subjects.map((subject) => (
+                              <div
+                                key={subject.id}
+                                className="flex items-center space-x-2"
+                              >
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value?.includes(subject.id)}
+                                    onCheckedChange={(checked) => {
+                                      return checked
+                                        ? field.onChange([
+                                            ...field.value,
+                                            subject.id,
+                                          ])
+                                        : field.onChange(
+                                            field.value?.filter(
+                                              (value) => value !== subject.id
+                                            )
+                                          );
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormLabel className="font-normal">
+                                  {subject.label}
+                                </FormLabel>
+                              </div>
+                            ))}
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
                       name="otherSubjects"
-                      value={formData.otherSubjects}
-                      onChange={handleInputChange}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Other Subjects</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
                   </div>
                 </div>
-              </div>
 
-              <div>
-                <h3 className="text-lg font-medium">Availability</h3>
-                <div className="mt-4 space-y-4">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {days.map((day) => (
-                      <div key={day.id} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={day.id}
-                          checked={formData.availability.days.includes(day.id)}
-                          onCheckedChange={() => handleDayToggle(day.id)}
-                        />
-                        <Label htmlFor={day.id}>{day.label}</Label>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="startTime">Start Time</Label>
-                      <Input
-                        id="startTime"
-                        name="startTime"
-                        type="time"
-                        value={formData.availability.startTime}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            availability: {
-                              ...prev.availability,
-                              startTime: e.target.value,
-                            },
-                          }))
-                        }
-                        required
+                <div>
+                  <h3 className="text-lg font-medium">Availability</h3>
+                  <div className="mt-4 space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="availability.days"
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            {days.map((day) => (
+                              <div
+                                key={day.id}
+                                className="flex items-center space-x-2"
+                              >
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value?.includes(day.id)}
+                                    onCheckedChange={(checked) => {
+                                      return checked
+                                        ? field.onChange([
+                                            ...field.value,
+                                            day.id,
+                                          ])
+                                        : field.onChange(
+                                            field.value?.filter(
+                                              (value) => value !== day.id
+                                            )
+                                          );
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormLabel className="font-normal">
+                                  {day.label}
+                                </FormLabel>
+                              </div>
+                            ))}
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="availability.startTime"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Start Time</FormLabel>
+                            <FormControl>
+                              <Input type="time" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="endTime">End Time</Label>
-                      <Input
-                        id="endTime"
-                        name="endTime"
-                        type="time"
-                        value={formData.availability.endTime}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            availability: {
-                              ...prev.availability,
-                              endTime: e.target.value,
-                            },
-                          }))
-                        }
-                        required
+
+                      <FormField
+                        control={form.control}
+                        name="availability.endTime"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>End Time</FormLabel>
+                            <FormControl>
+                              <Input type="time" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div className="flex justify-between">
-              <Button type="button" variant="outline" onClick={handleBack}>
-                Back
-              </Button>
-
-              <Button type="submit">Register as Tutor</Button>
-            </div>
-          </form>
+              <div className="flex justify-between">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => router.back()}
+                >
+                  Back
+                </Button>
+                <Button type="submit">Register as Tutor</Button>
+              </div>
+            </form>
+          </Form>
         </CardContent>
       </Card>
     </div>

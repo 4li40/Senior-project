@@ -1,92 +1,117 @@
 import { z } from "zod";
 
-export const studentSignupSchema = z.object({
-  firstName: z
-    .string()
-    .min(1, "First name is required")
-    .max(20, "First name must be less than 20 characters")
-    .regex(/^[a-zA-Z]+$/, "First name can only contain alphabets"),
-  lastName: z
-    .string()
-    .min(1, "Last name is required")
-    .max(20, "Last name must be less than 20 characters")
-    .regex(/^[a-zA-Z]+$/, "Last name can only contain alphabets"),
-  email: z
-    .string()
-    .email("Invalid email address")
-    .max(50, "Email must be less than 50 characters"),
-  password: z
-    .string()
-    .min(6, "Password must be at least 6 characters long")
-    .max(50, "Password must be less than 50 characters"),
-    phoneNumber: z
+// Common validation rules that can be reused
+const nameSchema = z
   .string()
-  .regex(/^(?:3|7[0-9]|1|4|5|6|8|9|81|03|70|71|76|78|79)\d{6}$/),
-  
-  educationLevel: z.string().min(1, "Education level is required"),
+  .min(1, "Name is required")
+  .max(20, "Name must be less than 20 characters")
+  .regex(/^[a-zA-Z\s-]+$/, "Name can only contain letters, spaces, and hyphens");
+
+const emailSchema = z
+  .string()
+  .email("Invalid email address")
+  .max(50, "Email must be less than 50 characters")
+  .refine((email) => email.endsWith("@gmail.com") || email.endsWith("@hotmail.com") || email.endsWith("@outlook.com") || email.endsWith("@yahoo.com"), {
+    message: "Please use a valid email provider (gmail.com, hotmail.com, outlook.com, yahoo.com)",
+  });
+
+const passwordSchema = z
+  .string()
+  .min(8, "Password must be at least 8 characters long")
+  .max(50, "Password must be less than 50 characters")
+  .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/, 
+    "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character");
+
+const phoneSchema = z
+  .string()
+  .regex(
+    /^(3|70|71|76|78|79|81)\d{6}$/,
+    "Please enter a valid Lebanese phone number (e.g., 3 123456)"
+  );
+
+const subjectsSchema = z
+  .array(z.string())
+  .min(1, "Select at least one subject")
+  .max(5, "You can select up to 5 subjects");
+
+const availabilitySchema = z.object({
+  days: z.array(z.string()).min(1, "Select at least one day"),
+  startTime: z.string().min(1, "Start time is required"),
+  endTime: z.string().min(1, "End time is required"),
+}).refine(
+  (data) => {
+    if (!data.startTime || !data.endTime) return true;
+    return data.startTime < data.endTime;
+  },
+  {
+    message: "End time must be after start time",
+    path: ["endTime"],
+  }
+);
+
+export const studentSignupSchema = z.object({
+  firstName: nameSchema,
+  lastName: nameSchema,
+  email: emailSchema,
+  password: passwordSchema,
+  phoneNumber: phoneSchema,
+  educationLevel: z
+    .string()
+    .min(1, "Education level is required")
+    .refine(
+      (val) => ["High School", "University", "Graduate"].includes(val),
+      "Please select a valid education level"
+    ),
   school: z
     .string()
     .min(1, "School/Institution is required")
     .max(50, "School name must be less than 50 characters"),
-  subjects: z
-    .array(z.string())
-    .min(1, "Select at least one subject")
-    .max(5, "You can select up to 5 subjects"),
-  goals: z.string().optional(),
+  subjects: subjectsSchema,
+  goals: z
+    .string()
+    .min(10, "Please provide at least 10 characters describing your goals")
+    .max(500, "Goals description must be less than 500 characters")
+    .optional(),
   agreedToTerms: z
-  .boolean({
-    required_error: "You must agree to the Terms of Service",
-  })
-  .refine((val) => val === true, {
-    message: "You must agree to the Terms of Service",
-  }),
+    .boolean({
+      required_error: "You must agree to the Terms of Service",
+    })
+    .refine((val) => val === true, {
+      message: "You must agree to the Terms of Service",
+    }),
 });
 
 export const teacherSignupSchema = z.object({
-  firstName: z
-    .string()
-    .min(1, "First name is required")
-    .max(20, "First name must be less than 20 characters")
-    .regex(/^[a-zA-Z]+$/, "First name can only contain alphabets"),
-  lastName: z
-    .string()
-    .min(1, "Last name is required")
-    .max(20, "Last name must be less than 20 characters")
-    .regex(/^[a-zA-Z]+$/, "Last name can only contain alphabets"),
-  email: z
-    .string()
-    .email("Invalid email address")
-    .max(50, "Email must be less than 50 characters"),
-  phone: z
-    .string()
-    .regex(
-      /^(03|70|71|76|78|79|81)\d{6}$/,
-      "Phone number must be a valid Lebanese number"
-    ),
-  password: z
-    .string()
-    .min(6, "Password must be at least 6 characters long")
-    .max(50, "Password must be less than 50 characters"),
+  firstName: nameSchema,
+  lastName: nameSchema,
+  email: emailSchema,
+  phone: phoneSchema,
+  password: passwordSchema,
   education: z
     .string()
     .min(1, "Education level is required")
-    .max(100, "Education details must be less than 100 characters"),
+    .max(100, "Education details must be less than 100 characters")
+    .refine(
+      (val) => ["Bachelor's", "Master's", "PhD", "Other"].includes(val),
+      "Please select a valid education level"
+    ),
   certifications: z
     .string()
     .max(200, "Certifications must be less than 200 characters")
-    .optional(),
+    .optional()
+    .transform((val) => val || undefined),
   experience: z
     .string()
-    .min(1, "Years of experience is required")
-    .regex(/^\d+$/, "Experience must be a number"),
-  subjects: z
-    .array(z.string())
-    .min(1, "Select at least one subject")
-    .max(5, "You can select up to 5 subjects"),
-  otherSubjects: z.string().optional(),
-  availability: z.object({
-    days: z.array(z.string()).min(1, "Select at least one day"),
-    startTime: z.string().min(1, "Start time is required"),
-    endTime: z.string().min(1, "End time is required"),
-  }),
+    .regex(/^\d+$/, "Experience must be a number")
+    .refine(
+      (val) => parseInt(val) >= 0 && parseInt(val) <= 50,
+      "Experience must be between 0 and 50 years"
+    ),
+  subjects: subjectsSchema,
+  otherSubjects: z
+    .string()
+    .max(100, "Other subjects must be less than 100 characters")
+    .optional()
+    .transform((val) => val || undefined),
+  availability: availabilitySchema,
 });
