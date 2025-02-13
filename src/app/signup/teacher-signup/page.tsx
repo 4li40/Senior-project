@@ -67,16 +67,14 @@ const TeacherSignup = () => {
 
   const onSubmit = async (data: FormData) => {
     try {
-      const response = await fetch("/api/auth/signup/teacher", {
+      const response = await fetch("http://localhost:5003/api/tutors", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
 
       if (response.ok) {
-        router.push("/login");
+        router.push("/tutor-dashboard");
       } else {
         const error = await response.json();
         console.error("Signup failed:", error);

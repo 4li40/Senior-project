@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import TeacherNavBar from '@/components/teacherNavBar';
-import ScheduleTable from '@/components/scheduleTabel'; // Import the ScheduleTable component
+import TeacherNavBar from "@/components/teacherNavBar";
+import ScheduleTable from "@/components/scheduleTabel"; // Import the ScheduleTable component
 
 const StarRating = ({ rating }: { rating: number }) => {
   return (
@@ -12,7 +12,7 @@ const StarRating = ({ rating }: { rating: number }) => {
         <svg
           key={star}
           className={`w-5 h-5 ${
-            star <= rating ? 'text-primary' : 'text-muted'
+            star <= rating ? "text-primary" : "text-muted"
           }`}
           fill="currentColor"
           viewBox="0 0 20 20"
@@ -103,7 +103,6 @@ export default function MyCoursesPage() {
           </Card>
         </div>
 
-
         {/* Additional Section (if needed) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card>
@@ -111,8 +110,12 @@ export default function MyCoursesPage() {
               <CardTitle>Course Statistics</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">Total Enrollments: 120</p>
-              <p className="text-sm text-muted-foreground">Average Rating: 4.5</p>
+              <p className="text-sm text-muted-foreground">
+                Total Enrollments: 120
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Average Rating: 4.5
+              </p>
             </CardContent>
           </Card>
 
@@ -121,8 +124,12 @@ export default function MyCoursesPage() {
               <CardTitle>Recent Activity</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">New review received for Intro to AI</p>
-              <p className="text-sm text-muted-foreground">5 new enrollments in Machine Learning</p>
+              <p className="text-sm text-muted-foreground">
+                New review received for Intro to AI
+              </p>
+              <p className="text-sm text-muted-foreground">
+                5 new enrollments in Machine Learning
+              </p>
             </CardContent>
           </Card>
         </div>
