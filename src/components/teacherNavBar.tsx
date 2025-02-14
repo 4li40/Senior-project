@@ -23,7 +23,9 @@ const TeacherNavBar = () => {
             <Link
               href="/tutor-dashboard"
               className={`transition-colors hover:text-foreground/80 whitespace-nowrap ${
-                pathname === "/tutor-dashboard" ? "text-foreground font-semibold" : "text-foreground/60"
+                pathname === "/tutor-dashboard"
+                  ? "text-foreground font-semibold"
+                  : "text-foreground/60"
               }`}
             >
               Dashboard
@@ -31,7 +33,9 @@ const TeacherNavBar = () => {
             <Link
               href="/mycourses"
               className={`transition-colors hover:text-foreground/80 whitespace-nowrap ${
-                pathname === "/mycourses" ? "text-foreground font-semibold" : "text-foreground/60"
+                pathname === "/mycourses"
+                  ? "text-foreground font-semibold"
+                  : "text-foreground/60"
               }`}
             >
               My Courses
@@ -39,7 +43,9 @@ const TeacherNavBar = () => {
             <Link
               href="/schedule"
               className={`transition-colors hover:text-foreground/80 whitespace-nowrap ${
-                pathname === "/schedule" ? "text-foreground font-semibold" : "text-foreground/60"
+                pathname === "/schedule"
+                  ? "text-foreground font-semibold"
+                  : "text-foreground/60"
               }`}
             >
               Schedule
@@ -47,25 +53,29 @@ const TeacherNavBar = () => {
             <Link
               href="/earnings"
               className={`transition-colors hover:text-foreground/80 whitespace-nowrap ${
-                pathname === "/earnings" ? "text-foreground font-semibold" : "text-foreground/60"
+                pathname === "/earnings"
+                  ? "text-foreground font-semibold"
+                  : "text-foreground/60"
               }`}
             >
               Earnings
             </Link>
             <Link
-              href="/teacher/messages"
+              href="/messages"
               className={`transition-colors hover:text-foreground/80 whitespace-nowrap ${
-                pathname === "/teacher/messages" ? "text-foreground font-semibold" : "text-foreground/60"
+                pathname === "/teacher/messages"
+                  ? "text-foreground font-semibold"
+                  : "text-foreground/60"
               }`}
             >
               Messages
             </Link>
           </nav>
-          <SearchBar 
-            placeholder="Search courses..." 
+          <SearchBar
+            placeholder="Search courses..."
             className="w-[280px] lg:w-[320px]"
             onChange={(value) => {
-              console.log('Searching:', value);
+              console.log("Searching:", value);
             }}
           />
         </div>

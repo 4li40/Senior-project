@@ -1,102 +1,95 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Clock, GraduationCap, Calendar, Activity } from "lucide-react";
+import { GraduationCap } from "lucide-react";
 import StudentNavBar from "@/components/StudentNavBar";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import ChatPopup from "@/components/chatpopup";
 
+// Define Course interface
+interface Course {
+  id: number;
+  title: string;
+  description: string;
+  price: string;
+}
+
 export default function StudentDashboard() {
-  const router = useRouter();
+  const [courses, setCourses] = useState<Course[]>([]);
   const [chatOpen, setChatOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  // Fetch courses from the backend
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const response = await fetch("http://localhost:5003/api/courses");
+        if (!response.ok) {
+          throw new Error("Failed to fetch courses");
+        }
+        const data = await response.json();
+        setCourses(data);
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCourses();
+  }, []);
 
   return (
     <div className="flex flex-col min-h-screen">
       <StudentNavBar />
-      <div className="flex-grow px-4 md:px-8 lg:px-12 space-y-8 mt-8">
-        {/* Top Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {/* Upcoming Sessions */}
-          <Card className="h-full">
-            <CardHeader>
-              <CardTitle>Upcoming Sessions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-primary/10 rounded-full">
-                  <Clock className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <p className="font-medium">Advanced Mathematics</p>
-                  <p className="text-sm text-muted-foreground">
-                    Today at 3:00 PM
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    with Prof. Smith
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-primary/10 rounded-full">
-                  <Clock className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <p className="font-medium">Physics 101</p>
-                  <p className="text-sm text-muted-foreground">
-                    Tomorrow at 2:00 PM
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    with Dr. Johnson
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
 
-          {/* My Courses */}
-          <Card className="h-full">
+      <div className="flex-grow px-4 md:px-8 lg:px-12 space-y-8 mt-8">
+        <h2 className="text-center text-2xl font-bold text-blue-700 mb-6">
+          Welcome to Your Dashboard
+        </h2>
+
+        {/* My Courses Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <Card className="w-full">
             <CardHeader>
-              <CardTitle>My Courses</CardTitle>
+              <CardTitle className="text-center text-purple-700">
+                My Courses
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-primary/10 rounded-full">
-                  <GraduationCap className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <p className="font-medium">Advanced Mathematics</p>
-                  <p className="text-sm text-muted-foreground">
-                    8 lessons completed
-                  </p>
-                  <div className="w-full bg-muted h-2 rounded-full mt-2">
-                    <div
-                      className="bg-primary h-2 rounded-full"
-                      style={{ width: "60%" }}
-                    ></div>
+              {loading ? (
+                <p className="text-center text-gray-500">Loading courses...</p>
+              ) : courses.length > 0 ? (
+                courses.map((course) => (
+                  <div
+                    key={course.id}
+                    className="flex items-start gap-4 border-b pb-4"
+                  >
+                    <div className="p-2 bg-purple-100 rounded-full">
+                      <GraduationCap className="w-6 h-6 text-purple-700" />
+                    </div>
+                    <div className="flex-grow">
+                      <h3 className="font-semibold text-lg text-gray-800">
+                        {course.title}
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        {course.description}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        Price: ${course.price}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-primary/10 rounded-full">
-                  <GraduationCap className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <p className="font-medium">Physics 101</p>
-                  <p className="text-sm text-muted-foreground">
-                    4 lessons completed
-                  </p>
-                  <div className="w-full bg-muted h-2 rounded-full mt-2">
-                    <div
-                      className="bg-primary h-2 rounded-full"
-                      style={{ width: "30%" }}
-                    ></div>
-                  </div>
-                </div>
-              </div>
+                ))
+              ) : (
+                <p className="text-center text-gray-500">
+                  No courses available.
+                </p>
+              )}
               <Button
-                className="w-full"
+                className="w-full mt-4"
                 onClick={() => router.push("/MyCourses")}
               >
                 View All Courses
@@ -104,107 +97,65 @@ export default function StudentDashboard() {
             </CardContent>
           </Card>
 
-          {/* Schedule Overview */}
-          <Card className="h-full">
+          {/* Placeholder Sections for Upcoming Sessions and Schedule */}
+          <Card className="w-full">
             <CardHeader>
-              <CardTitle>Schedule Overview</CardTitle>
+              <CardTitle className="text-center text-gray-400">
+                Upcoming Sessions
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-primary/10 rounded-full">
-                  <Calendar className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <p className="font-medium">This Week</p>
-                  <p className="text-sm text-muted-foreground">
-                    5 upcoming sessions
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    2 assignments due
-                  </p>
-                </div>
-              </div>
-              <Button className="w-full">View Full Schedule</Button>
+            <CardContent className="text-center text-gray-500">
+              Coming Soon...
+            </CardContent>
+          </Card>
+
+          <Card className="w-full">
+            <CardHeader>
+              <CardTitle className="text-center text-gray-400">
+                Schedule Overview
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-center text-gray-500">
+              Coming Soon...
             </CardContent>
           </Card>
         </div>
 
         {/* Bottom Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Recent Activities */}
-          <Card>
+          <Card className="w-full">
             <CardHeader>
-              <CardTitle>Recent Activities</CardTitle>
+              <CardTitle className="text-center text-gray-400">
+                Recent Activities
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-primary/10 rounded-full">
-                  <Activity className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <p className="font-medium">Completed Quiz on AI</p>
-                  <p className="text-sm text-muted-foreground">
-                    Scored 85% on the AI quiz.
-                  </p>
-                  <p className="text-xs text-muted-foreground">2 hours ago</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-primary/10 rounded-full">
-                  <Activity className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <p className="font-medium">Submitted Assignment</p>
-                  <p className="text-sm text-muted-foreground">
-                    Submitted &quot;Physics Lab Report&quot;.
-                  </p>
-                  <p className="text-xs text-muted-foreground">Yesterday</p>
-                </div>
-              </div>
-              <Button variant="outline" className="w-full">
-                View All Activities
-              </Button>
+            <CardContent className="text-center text-gray-500">
+              Coming Soon...
             </CardContent>
           </Card>
 
-          {/* Find Tutors */}
-          <Card>
+          <Card className="w-full">
             <CardHeader>
-              <CardTitle>Find Tutors</CardTitle>
+              <CardTitle className="text-center text-gray-400">
+                Find Tutors
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Connect with expert tutors in your field of study. Get
-                personalized help and improve your understanding.
-              </p>
-              <div className="grid grid-cols-2 gap-4">
-                <Button
-                  className="w-full"
-                  onClick={() => router.push("/FindTutorPage")}
-                >
-                  Browse Tutors
-                </Button>
-                <Button variant="outline" className="w-full">
-                  Quick Match
-                </Button>
-              </div>
+            <CardContent className="text-center text-gray-500">
+              Coming Soon...
             </CardContent>
           </Card>
         </div>
       </div>
 
       {/* Chat Widget */}
-      <div className="fixed bottom-4 right-4">
-        {chatOpen ? (
-          <ChatPopup /> // Replace with your functional ChatWidget component
-        ) : (
-          <button
-            onClick={() => setChatOpen(true)}
-            className="w-16 h-16 bg-blue-500 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-blue-600"
-          >
-            💬
-          </button>
-        )}
+      <div className="fixed bottom-4 right-4 z-50">
+        <button
+          onClick={() => setChatOpen(!chatOpen)}
+          className="w-16 h-16 bg-blue-500 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-blue-600"
+        >
+          💬
+        </button>
+        {chatOpen && <ChatPopup />}
       </div>
     </div>
   );

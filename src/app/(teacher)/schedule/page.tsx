@@ -1,6 +1,9 @@
-import ScheduleTable from '@/components/scheduleTabel'; // Adjust the import path if needed
+"use client";
 
-// Fetch data (you can replace this with an API call or database query)
+import { useRouter } from "next/navigation";
+import ScheduleTable from "@/components/scheduleTabel";
+
+// Sample static data (replace with real API data later)
 const coursesData = [
   {
     title: "Intro to AI",
@@ -35,9 +38,23 @@ const coursesData = [
 ];
 
 export default function SchedulePage() {
+  const router = useRouter();
+
+  const handleBack = () => {
+    router.push("/tutor-dashboard");
+  };
+
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Weekly Schedule</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-3xl font-bold text-blue-700">Weekly Schedule</h1>
+        <button
+          onClick={handleBack}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition duration-300"
+        >
+          ← Back
+        </button>
+      </div>
       <ScheduleTable courses={coursesData} />
     </div>
   );

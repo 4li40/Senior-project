@@ -20,13 +20,13 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <div className="relative h-[500px]">
-      <Image
-  src="/images/student-laptop.jpg" // Relative to public/
-  alt="Student studying on laptop"
-  layout="fill"
-    objectFit="cover" // Ensures the image covers the container
-  className="object-cover"
-/>
+        <Image
+          src="/images/student-laptop.jpg" // Relative to public/
+          alt="Student studying on laptop"
+          layout="fill"
+          objectFit="cover" // Ensures the image covers the container
+          className="object-cover"
+        />
 
         <div className="absolute inset-0 bg-black/50">
           <div className="container mx-auto px-4 h-full flex items-center">
@@ -47,28 +47,27 @@ export default function LandingPage() {
         </p>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-  <FeatureCard
-    icon={<Users className="h-6 w-6 text-black" />}
-    title="Expert-Led Live Classes"
-    description="Our instructors are industry professionals from top tech companies. They're experts in the skills you need to learn."
-  />
-  <FeatureCard
-    icon={<BookOpen className="h-6 w-6 text-black" />}
-    title="Unlimited 1:1 Tutoring"
-    description="Book a session with a tutor anytime, 24/7. Get help with your code, work through problems, or ask questions about the course material."
-  />
-  <FeatureCard
-    icon={<Code className="h-6 w-6 text-black" />}
-    title="Real-World Projects"
-    description="Build a professional portfolio with real-world projects. Get hands-on experience and practice with the tools and technologies used in the tech industry."
-  />
-  <FeatureCard
-    icon={<Layout className="h-6 w-6 text-black" />}
-    title="Interactive Learning Platform"
-    description="Our platform makes it easy to learn. You can take notes, ask questions, and collaborate with other students."
-  />
-</div>
-
+          <FeatureCard
+            icon={<Users className="h-6 w-6 text-black" />}
+            title="Expert-Led Live Classes"
+            description="Our instructors are industry professionals from top tech companies. They're experts in the skills you need to learn."
+          />
+          <FeatureCard
+            icon={<BookOpen className="h-6 w-6 text-black" />}
+            title="Unlimited 1:1 Tutoring"
+            description="Book a session with a tutor anytime, 24/7. Get help with your code, work through problems, or ask questions about the course material."
+          />
+          <FeatureCard
+            icon={<Code className="h-6 w-6 text-black" />}
+            title="Real-World Projects"
+            description="Build a professional portfolio with real-world projects. Get hands-on experience and practice with the tools and technologies used in the tech industry."
+          />
+          <FeatureCard
+            icon={<Layout className="h-6 w-6 text-black" />}
+            title="Interactive Learning Platform"
+            description="Our platform makes it easy to learn. You can take notes, ask questions, and collaborate with other students."
+          />
+        </div>
       </section>
 
       {/* Testimonials Section */}

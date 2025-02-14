@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
+  CardDescription,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,38 +24,42 @@ export function LoginForm({
   const [error, setError] = useState("");
   const router = useRouter();
 
+  // 🛠️ Handle Login
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-  
+
     try {
       const response = await fetch("http://localhost:5003/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include", // Important for cookies
         body: JSON.stringify({ email, password }),
       });
-  
+
       if (!response.ok) {
-        const contentType = response.headers.get("Content-Type");
-  
-        if (contentType?.includes("application/json")) {
-          const errorData = await response.json();
-          setError(errorData.message || "Login failed. Please try again.");
-        } else {
-          const errorText = await response.text(); // Handle plain text responses
-          setError(errorText || "An unexpected error occurred.");
-        }
+        const errorData = await response.json();
+        setError(errorData.message || "Login failed");
         return;
       }
-  
-      const { token } = await response.json();
-      localStorage.setItem("authToken", token);
-      router.push("/student-dashboard");
+
+      const { userType } = await response.json();
+      console.log("🚀 UserType:", userType);
+
+      // 🌐 Route based on userType
+      if (userType === "tutor") {
+        router.push("/tutor-dashboard");
+      } else if (userType === "student") {
+        router.push("/student-dashboard");
+      } else {
+        router.push("/");
+      }
     } catch (error) {
       console.error("Login error:", error);
-      setError("An error occurred. Please try again.");
+      setError("An unexpected error occurred. Please try again.");
     }
   };
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -81,9 +85,7 @@ export function LoginForm({
                 />
               </div>
               <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                </div>
+                <Label htmlFor="password">Password</Label>
                 <Input
                   id="password"
                   type="password"
@@ -93,11 +95,11 @@ export function LoginForm({
                 />
               </div>
               <Button
-  type="submit"
-  className="w-full bg-black text-white border border-black hover:bg-white hover:text-black transition-all duration-200"
->
-  Login
-</Button>
+                type="submit"
+                className="w-full bg-black text-white border border-black hover:bg-white hover:text-black transition-all duration-200"
+              >
+                Login
+              </Button>
             </div>
             <div className="mt-4 text-center text-sm">
               Don&apos;t have an account?{" "}

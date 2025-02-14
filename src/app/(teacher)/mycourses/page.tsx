@@ -1,139 +1,127 @@
 "use client";
 
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { useEffect, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import TeacherNavBar from "@/components/teacherNavBar";
-import ScheduleTable from "@/components/scheduleTabel"; // Import the ScheduleTable component
+import { Star, BarChart, Users, Clock } from "lucide-react";
 
-const StarRating = ({ rating }: { rating: number }) => {
-  return (
-    <div className="flex">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <svg
-          key={star}
-          className={`w-5 h-5 ${
-            star <= rating ? "text-primary" : "text-muted"
-          }`}
-          fill="currentColor"
-          viewBox="0 0 20 20"
-        >
-          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-        </svg>
-      ))}
-    </div>
-  );
-};
-
-// Sample data for courses
-const coursesData = [
-  {
-    title: "Intro to AI",
-    instructor: "David Brown",
-    time: "3:00 PM",
-    day: "Mon", // Add the `day` property
-  },
-  {
-    title: "Machine Learning",
-    instructor: "Emily White",
-    time: "10:00 AM",
-    day: "Tue", // Add the `day` property
-  },
-  {
-    title: "What is an API?",
-    instructor: "Frank Green",
-    time: "2:30 PM",
-    day: "Wed", // Add the `day` property
-  },
-];
+interface Course {
+  id: number;
+  title: string;
+  description: string;
+  price: string;
+  created_at: string;
+  first_name: string;
+  last_name: string;
+}
 
 export default function MyCoursesPage() {
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const response = await fetch("http://localhost:5003/api/courses");
+        if (!response.ok) throw new Error("Failed to fetch courses");
+
+        const data = await response.json();
+        setCourses(data);
+      } catch (err) {
+        setError("Failed to load courses.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourses();
+  }, []);
+
   return (
-    <>
+    <div className="min-h-screen bg-gray-100">
       <TeacherNavBar />
       <div className="p-6 max-w-7xl mx-auto space-y-6">
-        <h2 className="text-2xl font-semibold">My Courses</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Example Course Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Intro to AI</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="font-medium">Course Description...</p>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                  <StarRating rating={4} />
-                  <span className="text-muted-foreground">4.0</span>
-                </div>
-                <Button variant="outline">Edit Course</Button>
-              </div>
-            </CardContent>
-          </Card>
+        <h2 className="text-3xl font-bold text-blue-700 text-center mb-6">
+          My Courses
+        </h2>
+        {loading && (
+          <p className="text-gray-600 text-center">Loading courses...</p>
+        )}
+        {error && <p className="text-red-500 text-center">{error}</p>}
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Machine Learning</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="font-medium">Course Description...</p>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                  <StarRating rating={5} />
-                  <span className="text-muted-foreground">5.0</span>
-                </div>
-                <Button variant="outline">Edit Course</Button>
-              </div>
-            </CardContent>
-          </Card>
+        {!loading && !error && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {courses.map((course) => (
+              <Card
+                key={course.id}
+                className="hover:shadow-lg transition duration-300"
+              >
+                <CardHeader>
+                  <CardTitle className="text-xl font-semibold text-gray-800">
+                    {course.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <p className="text-gray-700">{course.description}</p>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Users className="w-4 h-4" />
+                    <span>
+                      Instructor: {course.first_name} {course.last_name}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <BarChart className="w-4 h-4" />
+                    <span>Price: ${parseFloat(course.price).toFixed(2)}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Clock className="w-4 h-4" />
+                    <span>
+                      Created on:{" "}
+                      {new Date(course.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <Button
+                    variant="outline"
+                    className="w-full mt-4 hover:bg-blue-500 hover:text-white"
+                  >
+                    ✏️ Edit Course
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
 
-          <Card>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          <Card className="hover:shadow-lg">
             <CardHeader>
-              <CardTitle>What is an API?</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="font-medium">Course Description...</p>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                  <StarRating rating={3} />
-                  <span className="text-muted-foreground">3.0</span>
-                </div>
-                <Button variant="outline">Edit Course</Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Additional Section (if needed) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Course Statistics</CardTitle>
+              <CardTitle className="text-xl font-medium text-gray-800">
+                📊 Course Insights
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Total Enrollments: 120
-              </p>
-              <p className="text-sm text-muted-foreground">
-                Average Rating: 4.5
-              </p>
+              <ul className="text-gray-700 list-disc list-inside space-y-2">
+                Coming soon...
+              </ul>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="hover:shadow-lg">
             <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
+              <CardTitle className="text-xl font-medium text-gray-800">
+                🆕 Suggestions
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">
-                New review received for Intro to AI
-              </p>
-              <p className="text-sm text-muted-foreground">
-                5 new enrollments in Machine Learning
-              </p>
+              <ul className="text-gray-700 list-disc list-inside space-y-2">
+                Coming soon...
+              </ul>
             </CardContent>
           </Card>
         </div>
       </div>
-    </>
+    </div>
   );
 }

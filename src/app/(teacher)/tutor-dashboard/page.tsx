@@ -1,192 +1,154 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BarChartComponent } from "@/components/ui/bar-chart";
-import { UserCircle2, CheckCircle2, Clock } from "lucide-react";
-import TeacherNavBar from '@/components/teacherNavBar';
-import { useRouter } from 'next/navigation'; 
-import ScheduleTable from '@/components/scheduleTabel';
+import TeacherNavBar from "@/components/teacherNavBar";
+import { BarChart, Activity, Users, BookOpen, Calendar } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-// Dummy bar chart data
-const data = [
-  { name: "Mon", total: 700 },
-  { name: "Tue", total: 1500 },
-  { name: "Wed", total: 1700 },
-  { name: "Thu", total: 1000 },
-  { name: "Fri", total: 500 }
-];
-
-// ⭐ Star Rating Component
-const StarRating = ({ rating }: { rating: number }) => {
-  return (
-    <div className="flex">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <svg
-          key={star}
-          className={`w-5 h-5 ${star <= rating ? 'text-primary' : 'text-muted'}`}
-          fill="currentColor"
-          viewBox="0 0 20 20"
-        >
-          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-        </svg>
-      ))}
-    </div>
-  );
-};
-
-// 🗓️ Schedule Item Interface
-interface Course {
-  id: number;
-  title: string;
-  description: string;
-  price: string;
-  created_at: string;
-  first_name: string;
-  last_name: string;
-}
-
-export default function Dashboard() {
-  const [courseTitle, setCourseTitle] = useState('');
-  const [courseDescription, setCourseDescription] = useState('');
-  const [coursesData, setCoursesData] = useState<Course[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+export default function TutorDashboard() {
   const router = useRouter();
+  const [stats, setStats] = useState({
+    totalEarnings: 0,
+    totalCourses: 0,
+    activeStudents: 0,
+    sessionsCompleted: 0,
+  });
 
-  // 🔍 Fetch courses from the backend
   useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const response = await fetch('http://localhost:5003/api/courses');
-        if (!response.ok) throw new Error('Failed to fetch courses');
-
-        const data = await response.json();
-        console.log('📡 Courses fetched:', data);
-        setCoursesData(data);
-      } catch (err) {
-        console.error('❌ Error fetching courses:', err);
-        setError('Failed to load courses.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCourses();
+    // Simulate fetching data
+    setStats({
+      totalEarnings: 4500,
+      totalCourses: 12,
+      activeStudents: 150,
+      sessionsCompleted: 85,
+    });
   }, []);
 
-  // 🆕 Add New Course (Client-side only)
-  const addCourse = () => {
-    const newCourse: Course = {
-      id: Date.now(),
-      title: courseTitle,
-      description: courseDescription,
-      price: "0.00",
-      created_at: new Date().toISOString(),
-      first_name: "Tutor",
-      last_name: "Name",
-    };
-    setCoursesData((prev) => [...prev, newCourse]);
-    setCourseTitle('');
-    setCourseDescription('');
-  };
-
-  const handleMyCoursesClick = () => router.push('/teacher/mycourses');
-
   return (
-    <>
+    <div className="flex flex-col min-h-screen bg-gradient-to-r from-blue-50 to-indigo-50">
       <TeacherNavBar />
-      <div className="p-6 max-w-7xl mx-auto space-y-6">
-        {/* Display Loading/Error Messages */}
-        {loading && <p className="text-gray-500">Loading courses...</p>}
-        {error && <p className="text-red-500">{error}</p>}
+      <div className="flex-grow px-6 md:px-12 space-y-10 mt-10">
+        <h1 className="text-4xl font-bold text-center text-blue-700 mb-6">
+          Welcome to Your Tutor Dashboard
+        </h1>
 
-        {/* Display Courses if Available */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {coursesData.map((course) => (
-            <Card key={course.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <CardTitle>{course.title}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-gray-600">{course.description}</p>
-                <div className="flex items-center gap-2">
-                  <UserCircle2 className="text-primary" />
-                  <span>{course.first_name} {course.last_name}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  💲 Price: ${parseFloat(course.price).toFixed(2)}
-                </div>
-                <div className="flex items-center gap-2">
-                  📅 Created: {new Date(course.created_at).toLocaleDateString()}
-                </div>
-                <Button variant="outline" className="w-full">
-                  Edit Course
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Upload Courses */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Upload New Course</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form
-                className="space-y-4"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  addCourse();
-                }}
-              >
-                <div className="space-y-2">
-                  <Label htmlFor="title">Course Title</Label>
-                  <Input
-                    id="title"
-                    value={courseTitle}
-                    onChange={(e) => setCourseTitle(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea
-                    id="description"
-                    value={courseDescription}
-                    onChange={(e) => setCourseDescription(e.target.value)}
-                    rows={3}
-                  />
-                </div>
-                <Button className="w-full" type="submit">
-                  Upload Course
-                </Button>
-              </form>
+        {/* Top Stats Section */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <Card className="bg-white shadow-lg hover:shadow-xl transition">
+            <CardContent className="flex flex-col items-center justify-center p-6">
+              <BarChart className="w-10 h-10 text-indigo-500 mb-3" />
+              <h2 className="text-xl font-semibold">${stats.totalEarnings}</h2>
+              <p className="text-sm text-muted-foreground">Total Earnings</p>
             </CardContent>
           </Card>
+          <Card className="bg-white shadow-lg hover:shadow-xl transition">
+            <CardContent className="flex flex-col items-center justify-center p-6">
+              <BookOpen className="w-10 h-10 text-indigo-500 mb-3" />
+              <h2 className="text-xl font-semibold">{stats.totalCourses}</h2>
+              <p className="text-sm text-muted-foreground">Courses Created</p>
+            </CardContent>
+          </Card>
+          <Card className="bg-white shadow-lg hover:shadow-xl transition">
+            <CardContent className="flex flex-col items-center justify-center p-6">
+              <Users className="w-10 h-10 text-indigo-500 mb-3" />
+              <h2 className="text-xl font-semibold">{stats.activeStudents}</h2>
+              <p className="text-sm text-muted-foreground">Active Students</p>
+            </CardContent>
+          </Card>
+          <Card className="bg-white shadow-lg hover:shadow-xl transition">
+            <CardContent className="flex flex-col items-center justify-center p-6">
+              <Activity className="w-10 h-10 text-indigo-500 mb-3" />
+              <h2 className="text-xl font-semibold">
+                {stats.sessionsCompleted}
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Sessions Completed
+              </p>
+            </CardContent>
+          </Card>
+        </div>
 
-          {/* 📅 Upcoming Sessions */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Upcoming Sessions</CardTitle>
+        {/* Navigation Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <Card
+            className="text-center bg-white hover:shadow-xl transition cursor-pointer"
+            onClick={() => router.push("/mycourses")}
+          >
+            <CardHeader className="p-4">
+              <CardTitle className="text-xl font-semibold text-indigo-700">
+                📖 My Courses
+              </CardTitle>
             </CardHeader>
-            <CardContent>
-              <ScheduleTable courses={coursesData.map(course => ({
-                title: course.title,
-                instructor: `${course.first_name} ${course.last_name}`,
-                time: 'TBD',
-                day: 'TBD'
-              }))} />
+            <CardContent className="text-muted-foreground">
+              Manage and track the courses you offer.
+            </CardContent>
+            <Button className="m-4">Go to My Courses</Button>
+          </Card>
+
+          <Card
+            className="text-center bg-white hover:shadow-xl transition cursor-pointer"
+            onClick={() => router.push("/schedule")}
+          >
+            <CardHeader className="p-4">
+              <CardTitle className="text-xl font-semibold text-indigo-700">
+                📆 Schedule
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-muted-foreground">
+              View and manage your tutoring schedule.
+            </CardContent>
+            <Button className="m-4">Go to Schedule</Button>
+          </Card>
+
+          <Card
+            className="text-center bg-white hover:shadow-xl transition cursor-pointer"
+            onClick={() => router.push("/earnings")}
+          >
+            <CardHeader className="p-4">
+              <CardTitle className="text-xl font-semibold text-indigo-700">
+                💲 Earnings
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-muted-foreground">
+              Track your earnings and payment history.
+            </CardContent>
+            <Button className="m-4">Go to Earnings</Button>
+          </Card>
+
+          <Card
+            className="text-center bg-white hover:shadow-xl transition cursor-pointer"
+            onClick={() => router.push("/messages")}
+          >
+            <CardHeader className="p-4">
+              <CardTitle className="text-xl font-semibold text-indigo-700">
+                💬 Messages
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-muted-foreground">
+              Communicate with students and respond to inquiries.
+            </CardContent>
+            <Button className="m-4">Go to Messages</Button>
+          </Card>
+        </div>
+
+        {/* Recent Activity Placeholder */}
+        <div className="mt-10">
+          <Card className="bg-white shadow-lg">
+            <CardHeader>
+              <CardTitle className="text-indigo-700">Recent Activity</CardTitle>
+            </CardHeader>
+            <CardContent className="text-muted-foreground">
+              <ul className="list-disc ml-6 space-y-3">
+                <li>🎉 New student enrolled in "Advanced React"</li>
+                <li>💬 You received 2 new messages from students</li>
+                <li>📖 Course "Python for Data Science" was updated</li>
+              </ul>
             </CardContent>
           </Card>
         </div>
       </div>
-    </>
+    </div>
   );
 }
