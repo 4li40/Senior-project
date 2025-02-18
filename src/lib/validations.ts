@@ -9,14 +9,20 @@ const nameSchema = z
 
 const emailSchema = z.string().email("Invalid email address").max(100, "Email must be less than 100 characters");
 
+// Updated password schema
 const passwordSchema = z
   .string()
-  .min(6, "Password must be at least 6 characters long")
-  .max(100, "Password must be less than 100 characters");
+  .min(8, "Password must be at least 8 characters long")
+  .max(100, "Password must be less than 100 characters")
+  .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+  .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+  .regex(/[0-9]/, "Password must contain at least one number")
+  .regex(/[!@#$%^&*(),.?":{}|<>]/, "Password must contain at least one special character");
 
-  const phoneSchema = z
+// Updated phone schema to allow 03, 81, 76, 71
+const phoneSchema = z
   .string()
-  .regex(/^(81|76|71)\d{6}$/, "Please enter a valid phone number starting with 81, 76, or 71 followed by 6 digits");
+  .regex(/^(03|81|76|71)\d{6}$/, "Please enter a valid phone number starting with 03, 81, 76, or 71 followed by 6 digits");
 
 const subjectsSchema = z.array(z.string()).min(1, "Select at least one subject");
 
