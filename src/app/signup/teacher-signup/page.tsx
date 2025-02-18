@@ -20,6 +20,13 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { teacherSignupSchema } from "@/lib/validations";
 import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type FormData = z.infer<typeof teacherSignupSchema>;
 
@@ -40,6 +47,14 @@ const days = [
   { id: "sunday", label: "Sunday" },
 ];
 
+const educationLevels = [
+  { id: "bachelors", label: "Bachelor's Degree" },
+  { id: "masters", label: "Master's Degree" },
+  { id: "phd", label: "Ph.D." },
+  { id: "doctorate", label: "Doctorate" },
+  { id: "professional", label: "Professional Certification" },
+];
+
 const TeacherSignup = () => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
@@ -53,7 +68,7 @@ const TeacherSignup = () => {
       phone: "",
       education: "",
       certifications: "",
-      experience: "",
+      experience: 0,
       password: "",
       subjects: [],
       otherSubjects: "",
@@ -184,9 +199,20 @@ const TeacherSignup = () => {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Highest Education Level</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select your education level" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {educationLevels.map((level) => (
+                                <SelectItem key={level.id} value={level.id}>
+                                  {level.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -222,6 +248,11 @@ const TeacherSignup = () => {
                                 }
                               }}
                               {...field}
+                              onChange={(e) => {
+                                const value = parseInt(e.target.value);
+                                field.onChange(isNaN(value) ? "" : value);
+                              }}
+                              value={field.value === null ? "" : field.value}
                             />
                           </FormControl>
                           <FormMessage />

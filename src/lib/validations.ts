@@ -16,7 +16,7 @@ const passwordSchema = z
 
   const phoneSchema = z
   .string()
-  .regex(/^(81|76|71)\d{6}$/, "Please enter a valid phone number starting with 81, 76, or 71 followed by 6 digits");
+  .regex(/^(03|70|71|76|78|79|81|87)\d{6}$/, "Please enter a valid phone number starting with 03, 70, 71, 76, 78, 79, 81, or 87 followed by 6 digits");
 
 const subjectsSchema = z.array(z.string()).min(1, "Select at least one subject");
 
