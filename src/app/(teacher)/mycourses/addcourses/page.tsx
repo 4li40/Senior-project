@@ -7,6 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import TeacherNavBar from "@/components/teacherNavBar";
 import { ArrowLeft } from "lucide-react";
 
@@ -14,6 +21,7 @@ export default function AddCoursePage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
+  const [category, setCategory] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const router = useRouter();
@@ -23,7 +31,7 @@ export default function AddCoursePage() {
     setError("");
     setSuccess(false);
 
-    if (!title || !description || !price) {
+    if (!title || !description || !price || !category) {
       setError("All fields are required.");
       return;
     }
@@ -41,7 +49,7 @@ export default function AddCoursePage() {
           "Content-Type": "application/json",
         },
         credentials: "include", // ✅ Send cookies with request
-        body: JSON.stringify({ title, description, price }),
+        body: JSON.stringify({ title, description, price, category }),
       });
 
       const data = await response.json();
@@ -121,6 +129,30 @@ export default function AddCoursePage() {
                   onChange={(e) => setPrice(e.target.value)}
                   required
                 />
+              </div>
+
+              {/* Course Category Dropdown */}
+              <div className="space-y-2">
+                <Label htmlFor="category">Course Category</Label>
+                <Label htmlFor="category">Course Category</Label>
+                <select
+                  id="category"
+                  title="Course Category"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value.toLowerCase())}
+                  className="w-full border rounded-md p-2"
+                  required
+                >
+                  <option value="">Select a category</option>
+                  <option value="web-development">Web Development</option>
+                  <option value="data-science">Data Science</option>
+                  <option value="ai-ml">AI & Machine Learning</option>
+                  <option value="cybersecurity">Cybersecurity</option>
+                  <option value="mobile-development">Mobile Development</option>
+                  <option value="software-engineering">
+                    Software Engineering
+                  </option>
+                </select>
               </div>
 
               {/* Submit Button */}

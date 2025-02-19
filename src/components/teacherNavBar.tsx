@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Bell } from "lucide-react";
 import { SearchBar } from "@/components/SeachBar";
 import { usePathname } from "next/navigation";
+import ExploreDropdown from "@/components/ExploreDropdown"; // ✅ Import reusable Explore dropdown
 
 const TeacherNavBar = () => {
   const pathname = usePathname();
@@ -17,7 +18,7 @@ const TeacherNavBar = () => {
           </Link>
         </div>
 
-        {/* Navigation Links and Search Bar - Centered */}
+        {/* Navigation Links, Search Bar, and Explore - Centered */}
         <div className="flex flex-1 items-center justify-center gap-16 max-w-3xl mx-auto">
           <nav className="flex items-center gap-12 text-sm font-medium">
             <Link
@@ -71,6 +72,8 @@ const TeacherNavBar = () => {
               Messages
             </Link>
           </nav>
+
+          {/* Search Bar */}
           <SearchBar
             placeholder="Search courses..."
             className="w-[280px] lg:w-[320px]"
@@ -78,6 +81,9 @@ const TeacherNavBar = () => {
               console.log("Searching:", value);
             }}
           />
+
+          {/* 🔹 Explore Dropdown for Teachers */}
+          <ExploreDropdown />
         </div>
 
         {/* Right Side Actions */}

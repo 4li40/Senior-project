@@ -2,13 +2,16 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Bell } from "lucide-react";
 import { SearchBar } from "@/components/SeachBar";
-import { usePathname } from 'next/navigation';
+import { usePathname } from "next/navigation";
+import ExploreDropdown from "@/components/ExploreDropdown"; // ✅ Import reusable Explore dropdown
 
 const StudentNavBar = () => {
   const pathname = usePathname();
 
   const isActive = (path: string) => {
-    return pathname === path ? "text-black font-semibold" : "text-foreground/60 hover:text-foreground/80";
+    return pathname === path
+      ? "text-black font-semibold"
+      : "text-foreground/60 hover:text-foreground/80";
   };
 
   return (
@@ -19,53 +22,70 @@ const StudentNavBar = () => {
           <span className="text-xl font-bold">Study Buddy</span>
         </Link>
 
-        {/* Navigation Links and Search Bar - Centered */}
+        {/* Navigation Links, Search Bar, and Explore - Centered */}
         <div className="flex flex-1 items-center justify-center mx-auto max-w-6xl px-6">
           <nav className="flex items-center gap-8 text-sm font-medium mr-16">
             <Link
               href="/student-dashboard"
-              className={`${isActive('/student-dashboard')} transition-colors whitespace-nowrap`}
+              className={`${isActive(
+                "/student-dashboard"
+              )} transition-colors whitespace-nowrap`}
             >
               Dashboard
             </Link>
             <Link
               href="/MyCourses"
-              className={`${isActive('/MyCourses')} transition-colors whitespace-nowrap text-black`}
+              className={`${isActive(
+                "/MyCourses"
+              )} transition-colors whitespace-nowrap text-black`}
             >
               My Courses
             </Link>
             <Link
               href="/roadmap"
-              className={`${isActive('/roadmap')} transition-colors whitespace-nowrap`}
+              className={`${isActive(
+                "/roadmap"
+              )} transition-colors whitespace-nowrap`}
             >
               Roadmap
             </Link>
             <Link
               href="/FindTutorPage"
-              className={`${isActive('/FindTutorPage')} transition-colors whitespace-nowrap`}
+              className={`${isActive(
+                "/FindTutorPage"
+              )} transition-colors whitespace-nowrap`}
             >
               Find Tutors
             </Link>
             <Link
               href="/Schedule"
-              className={`${isActive('/Schedule')} transition-colors whitespace-nowrap`}
+              className={`${isActive(
+                "/Schedule"
+              )} transition-colors whitespace-nowrap`}
             >
               Schedule
             </Link>
             <Link
               href="/ratings-reviews"
-              className={`${isActive('/ratings-reviews')} transition-colors whitespace-nowrap`}
+              className={`${isActive(
+                "/ratings-reviews"
+              )} transition-colors whitespace-nowrap`}
             >
               Ratings/Reviews
             </Link>
           </nav>
-          <SearchBar 
-            placeholder="Search courses..." 
-            className="w-[280px] lg:w-[320px]"
+
+          {/* Search Bar */}
+          <SearchBar
+            placeholder=" Search courses..."
+            className="w-[280px] lg:w-[320px] ml-4"
             onChange={(value) => {
-              console.log('Searching:', value);
+              console.log("Searching:", value);
             }}
           />
+
+          {/* 🔹 Explore Dropdown for Students */}
+          <ExploreDropdown />
         </div>
 
         {/* Right Side Actions */}
