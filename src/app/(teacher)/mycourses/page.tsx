@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import TeacherNavBar from "@/components/teacherNavBar";
-import { Star, BarChart, Users, Clock } from "lucide-react";
+import { Star, BarChart, Users, Clock, PlusCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface Course {
   id: number;
@@ -20,6 +21,7 @@ export default function MyCoursesPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -43,9 +45,18 @@ export default function MyCoursesPage() {
     <div className="min-h-screen bg-gray-100">
       <TeacherNavBar />
       <div className="p-6 max-w-7xl mx-auto space-y-6">
-        <h2 className="text-3xl font-bold text-blue-700 text-center mb-6">
-          My Courses
-        </h2>
+        {/* Header with "Add Course" Button */}
+        <div className="flex justify-between items-center">
+          <h2 className="text-3xl font-bold text-blue-700">My Courses</h2>
+          <Button
+            className="flex items-center gap-2 bg-green-600 text-white hover:bg-green-700"
+            onClick={() => router.push("mycourses/addcourses")}
+          >
+            <PlusCircle className="w-5 h-5" />
+            Add Course
+          </Button>
+        </div>
+
         {loading && (
           <p className="text-gray-600 text-center">Loading courses...</p>
         )}
