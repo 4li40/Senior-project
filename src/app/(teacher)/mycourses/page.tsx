@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 
 interface Course {
   id: number;
@@ -42,6 +43,18 @@ export default function MyCoursesPage() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
+      {/* 🔙 Back Button */}
+      <div className="flex items-center space-x-2">
+        <Button
+          variant="outline"
+          className="flex items-center gap-2"
+          onClick={() => router.push("/tutor-dashboard")}
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back
+        </Button>
+      </div>
+
       <h2 className="text-3xl font-bold text-blue-700 text-center mb-6">
         My Courses
       </h2>

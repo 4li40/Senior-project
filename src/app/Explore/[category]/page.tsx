@@ -20,6 +20,7 @@ export default function CategoryPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [enrolledCourses, setEnrolledCourses] = useState<number[]>([]); // Store enrolled courses
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -29,13 +30,13 @@ export default function CategoryPage() {
           ? `http://localhost:5003/api/courses?category=${category}`
           : "http://localhost:5003/api/courses";
 
-        console.log("📡 Fetching from:", url); // ✅ Debugging log
+        console.log("📡 Fetching from:", url);
 
         const response = await fetch(url);
         if (!response.ok) throw new Error("Failed to fetch courses");
 
         const data = await response.json();
-        console.log("✅ Courses received:", data); // ✅ Debugging log
+        console.log("✅ Courses received:", data);
 
         setCourses(data);
       } catch (err) {
@@ -46,7 +47,37 @@ export default function CategoryPage() {
     };
 
     fetchCourses();
-  }, [category]); // ✅ Ensure category is used
+  }, [category]);
+
+  const handleEnroll = async (courseId: number) => {
+    try {
+      const response = await fetch(
+        "http://localhost:5003/api/enrollments/enroll",
+        {
+          // ✅ Correct URL
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include", // Ensures authentication cookies are sent
+          body: JSON.stringify({ course_id: courseId }),
+        }
+      );
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Enrollment failed.");
+      }
+
+      alert("Successfully enrolled!");
+    } catch (error) {
+      if (error instanceof Error) {
+        alert(error.message || "Failed to enroll.");
+      } else {
+        alert("Failed to enroll.");
+      }
+    }
+  };
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -87,10 +118,10 @@ export default function CategoryPage() {
                 Price: ${course.price}
               </p>
               <Button
-                variant="outline"
-                className="w-full mt-4 hover:bg-blue-500 hover:text-white"
+                onClick={() => handleEnroll(course.id)}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
               >
-                View Course
+                Enroll Now
               </Button>
             </CardContent>
           </Card>

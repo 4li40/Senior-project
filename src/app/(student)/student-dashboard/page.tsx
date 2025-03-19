@@ -21,24 +21,41 @@ export default function StudentDashboard() {
   const [chatOpen, setChatOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const [error, setError] = useState<string>("");
 
   // Fetch courses from the backend
   useEffect(() => {
-    const fetchCourses = async () => {
+    const fetchEnrolledCourses = async () => {
       try {
-        const response = await fetch("http://localhost:5003/api/courses");
+        setLoading(true);
+        setError(""); // ✅ Reset error state
+
+        const response = await fetch(
+          "http://localhost:5003/api/enrollments/my-courses",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include", // ✅ Ensures authentication is included
+          }
+        );
+
         if (!response.ok) {
-          throw new Error("Failed to fetch courses");
+          throw new Error("Failed to fetch enrolled courses.");
         }
-        const data = await response.json();
-        setCourses(data);
+
+        const enrolledCourses = await response.json();
+        setCourses(enrolledCourses);
       } catch (error) {
-        console.error("Error fetching courses:", error);
+        console.error("❌ Error fetching enrolled courses:", error);
+        setError("Failed to load enrolled courses.");
       } finally {
         setLoading(false);
       }
     };
-    fetchCourses();
+
+    fetchEnrolledCourses();
   }, []);
 
   return (
@@ -159,4 +176,7 @@ export default function StudentDashboard() {
       </div>
     </div>
   );
+}
+function setError(arg0: string) {
+  throw new Error("Function not implemented.");
 }

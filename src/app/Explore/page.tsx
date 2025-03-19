@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import StudentNavBar from "@/components/StudentNavBar";
 import { Calendar, User, DollarSign, BookOpen } from "lucide-react";
 
-export default function MyCoursesPage() {
+export default function ExplorePage() {
   interface Course {
     id: number;
     title: string;
@@ -42,10 +42,44 @@ export default function MyCoursesPage() {
     fetchCourses();
   }, []);
 
+  // ✅ Handle Enrollment
+  const handleEnroll = async (courseId: number) => {
+    try {
+      const response = await fetch(
+        "http://localhost:5003/api/enrollments/enroll",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include", // Ensure authentication is included
+          body: JSON.stringify({ course_id: courseId }),
+        }
+      );
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Enrollment failed.");
+      }
+
+      alert("Successfully enrolled!");
+    } catch (error) {
+      if (error instanceof Error) {
+        alert(error.message || "Failed to enroll.");
+      } else {
+        alert("Failed to enroll.");
+      }
+    }
+  };
+
   return (
     <>
       <StudentNavBar />
       <div className="p-6 max-w-7xl mx-auto space-y-6">
+        <h1 className="text-3xl font-bold text-blue-700 text-center">
+          All Courses
+        </h1>
+
         {loading && (
           <p className="text-gray-600 text-center">Loading courses...</p>
         )}
@@ -89,8 +123,12 @@ export default function MyCoursesPage() {
                     </span>
                   </div>
 
-                  <Button className="w-full mt-3 bg-indigo-600 hover:bg-indigo-700 text-white">
-                    View Details
+                  {/* 🔹 Enroll Button */}
+                  <Button
+                    onClick={() => handleEnroll(course.id)}
+                    className="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    Enroll Now
                   </Button>
                 </CardContent>
               </Card>

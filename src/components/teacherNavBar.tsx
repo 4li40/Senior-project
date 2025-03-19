@@ -39,7 +39,7 @@ const TeacherNavBar = () => {
                   : "text-foreground/60"
               }`}
             >
-              My Courses
+              Courses
             </Link>
             <Link
               href="/schedule"
@@ -62,14 +62,14 @@ const TeacherNavBar = () => {
               Earnings
             </Link>
             <Link
-              href="/messages"
+              href="/ratings"
               className={`transition-colors hover:text-foreground/80 whitespace-nowrap ${
                 pathname === "/teacher/messages"
                   ? "text-foreground font-semibold"
                   : "text-foreground/60"
               }`}
             >
-              Messages
+              Reviews
             </Link>
           </nav>
 
