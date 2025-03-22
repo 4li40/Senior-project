@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { SearchBar } from "@/components/SeachBar";
+import { SearchBar } from "@/components/SearchBar";
 import ExploreDropdown from "@/components/ExploreDropdown"; // ✅ Import the reusable Explore dropdown
 
 const MainNavBar = () => {

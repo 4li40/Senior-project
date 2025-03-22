@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Bell } from "lucide-react";
-import { SearchBar } from "@/components/SeachBar";
+import { SearchBar } from "@/components/SearchBar";
 import { usePathname } from "next/navigation";
 import ExploreDropdown from "@/components/ExploreDropdown";
 
