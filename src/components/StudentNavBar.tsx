@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Bell } from "lucide-react";
 import { SearchBar } from "@/components/SeachBar";
 import { usePathname } from "next/navigation";
-import ExploreDropdown from "@/components/ExploreDropdown"; // ✅ Import reusable Explore dropdown
+import ExploreDropdown from "@/components/ExploreDropdown";
 
 const StudentNavBar = () => {
   const pathname = usePathname();
@@ -23,8 +23,8 @@ const StudentNavBar = () => {
         </Link>
 
         {/* Navigation Links, Search Bar, and Explore - Centered */}
-        <div className="flex flex-1 items-center justify-center mx-auto max-w-6xl px-6">
-          <nav className="flex items-center gap-8 text-sm font-medium mr-16">
+        <div className="flex flex-1 items-center justify-between mx-auto max-w-6xl px-6">
+          <nav className="flex items-center gap-8 text-sm font-medium">
             <Link
               href="/student-dashboard"
               className={`${isActive(
@@ -75,17 +75,19 @@ const StudentNavBar = () => {
             </Link>
           </nav>
 
-          {/* Search Bar */}
-          <SearchBar
-            placeholder=" Search courses..."
-            className="w-[280px] lg:w-[320px] ml-4"
-            onChange={(value) => {
-              console.log("Searching:", value);
-            }}
-          />
+          <div className="flex items-center gap-4">
+            {/* Search Bar */}
+            <SearchBar
+              placeholder="Search courses..."
+              className="w-[280px] lg:w-[320px]"
+              onChange={(value) => {
+                console.log("Searching:", value);
+              }}
+            />
 
-          {/* 🔹 Explore Dropdown for Students */}
-          <ExploreDropdown />
+            {/* 🔹 Explore Dropdown for Students */}
+            <ExploreDropdown />
+          </div>
         </div>
 
         {/* Right Side Actions */}

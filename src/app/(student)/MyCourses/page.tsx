@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation"; // ✅ Import useRouter for navigation
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import StudentNavBar from "@/components/StudentNavBar";
 
 interface Course {
   id: number;
@@ -54,54 +55,53 @@ export default function MyCoursesPage() {
   }, []);
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
-      {/* ✅ Back to Dashboard Button */}
-      <Button
-        variant="outline"
-        className="mb-4"
-        onClick={() => router.push("/student-dashboard")} // ✅ Redirects to student dashboard
-      >
-        ← Back
-      </Button>
-
-      <h2 className="text-3xl font-bold text-blue-700 text-center mb-6">
-        My Courses
-      </h2>
-
-      {loading && (
-        <p className="text-gray-600 text-center">Loading courses...</p>
-      )}
-      {error && <p className="text-red-500 text-center">{error}</p>}
-
-      {!loading && !error && courses.length === 0 && (
-        <p className="text-gray-500 text-center">No courses available.</p>
-      )}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {courses.map((course) => (
-          <Card
-            key={course.id}
-            className="hover:shadow-lg transition duration-300"
-          >
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold text-gray-800">
-                {course.title}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <p className="text-gray-700">{course.description}</p>
-              <p className="text-gray-600">
-                Instructor: {course.tutor_first_name} {course.tutor_last_name}
-              </p>
-              <p className="text-gray-600">
-                Price: ${parseFloat(course.price).toFixed(2)}
-              </p>
-              <Button variant="outline" className="w-full mt-4">
-                View Course
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
+    <div>
+      <StudentNavBar />
+      <div className="p-6 max-w-7xl mx-auto space-y-6">
+        {/* ✅ Back to Dashboard Button */}
+        <Button
+          variant="outline"
+          className="mb-4"
+          onClick={() => router.push("/student-dashboard")} // ✅ Redirects to student dashboard
+        >
+          ← Back
+        </Button>
+        <h2 className="text-3xl font-bold text-blue-700 text-center mb-6">
+          My Courses
+        </h2>
+        {loading && (
+          <p className="text-gray-600 text-center">Loading courses...</p>
+        )}
+        {error && <p className="text-red-500 text-center">{error}</p>}
+        {!loading && !error && courses.length === 0 && (
+          <p className="text-gray-500 text-center">No courses available.</p>
+        )}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {courses.map((course) => (
+            <Card
+              key={course.id}
+              className="hover:shadow-lg transition duration-300"
+            >
+              <CardHeader>
+                <CardTitle className="text-xl font-semibold text-gray-800">
+                  {course.title}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <p className="text-gray-700">{course.description}</p>
+                <p className="text-gray-600">
+                  Instructor: {course.tutor_first_name} {course.tutor_last_name}
+                </p>
+                <p className="text-gray-600">
+                  Price: ${parseFloat(course.price).toFixed(2)}
+                </p>
+                <Button variant="outline" className="w-full mt-4">
+                  View Course
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     </div>
   );
