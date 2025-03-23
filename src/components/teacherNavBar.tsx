@@ -81,9 +81,6 @@ const TeacherNavBar = () => {
               console.log("Searching:", value);
             }}
           />
-
-          {/* 🔹 Explore Dropdown for Teachers */}
-          <ExploreDropdown />
         </div>
 
         {/* Right Side Actions */}

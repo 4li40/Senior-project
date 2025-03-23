@@ -14,16 +14,25 @@ export default function AddCoursePage() {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState("");
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
+  const [fileTypes, setFileTypes] = useState<string[]>([]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const router = useRouter();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
+    if (e.target.files) {
+      const selectedFiles = Array.from(e.target.files);
+      setFiles(selectedFiles);
+      setFileTypes(selectedFiles.map(() => "pdf")); // Default all to pdf
       setError("");
     }
+  };
+
+  const handleFileTypeChange = (index: number, type: string) => {
+    const updatedTypes = [...fileTypes];
+    updatedTypes[index] = type;
+    setFileTypes(updatedTypes);
   };
 
   const handleAddCourse = async (e: React.FormEvent) => {
@@ -31,59 +40,33 @@ export default function AddCoursePage() {
     setError("");
     setSuccess(false);
 
-    if (!title || !description || !price || !category || !file) {
-      setError("All fields, including file upload, are required.");
+    if (!title || !description || !price || !category || files.length === 0) {
+      setError("All fields, including at least one file, are required.");
       return;
     }
 
     try {
-      // ✅ Step 1: Upload File to MongoDB GridFS
-      const fileData = new FormData();
-      fileData.append("file", file);
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("description", description);
+      formData.append("price", price);
+      formData.append("category", category);
 
-      const fileUploadResponse = await fetch("http://localhost:5003/api/courses/upload", {
-        method: "POST",
-        body: fileData,
-        credentials: "include",
+      files.forEach((file) => {
+        formData.append("files", file);
       });
 
-      const fileResult = await fileUploadResponse.json();
-      if (!fileUploadResponse.ok) {
-        throw new Error(fileResult.message || "File upload failed.");
-      }
+      formData.append("types", JSON.stringify(fileTypes));
 
-      const fileId = fileResult.fileId; // ✅ MongoDB File ID
-      console.log("📂 Uploaded fileId:", fileId);
-
-      if (!fileId) {
-        throw new Error("File upload failed. No fileId returned.");
-      }
-
-      // ✅ Step 2: Send Course Data to MySQL
-      const courseData = {
-        title,
-        description,
-        price,
-        category,
-        fileId, // ✅ Link the fileId with the course in MySQL
-      };
-
-      console.log("📤 Sending course data to backend:", courseData);
-
-      const response = await fetch("http://localhost:5003/api/courses", {
+      const response = await fetch("http://localhost:5003/api/courses/", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        body: formData,
         credentials: "include",
-        body: JSON.stringify(courseData),
       });
 
       const data = await response.json();
-
-      if (!response.ok) {
+      if (!response.ok)
         throw new Error(data.message || "Failed to add course.");
-      }
 
       setSuccess(true);
       setTimeout(() => router.push("/mycourses"), 1500);
@@ -94,7 +77,6 @@ export default function AddCoursePage() {
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
-      {/* Back Button */}
       <button
         onClick={() => router.push("/mycourses")}
         className="flex items-center text-gray-700 hover:text-gray-900 transition"
@@ -110,45 +92,101 @@ export default function AddCoursePage() {
         <CardContent>
           <form onSubmit={handleAddCourse} className="space-y-4">
             {error && <p className="text-red-500">{error}</p>}
-            {success && <p className="text-green-500">🎉 Course added successfully!</p>}
+            {success && (
+              <p className="text-green-500">🎉 Course added successfully!</p>
+            )}
 
-            {/* Course Title */}
             <div className="space-y-2">
               <Label htmlFor="title">Course Title</Label>
-              <Input id="title" placeholder="Enter course title" value={title} onChange={(e) => setTitle(e.target.value)} required />
+              <Input
+                id="title"
+                placeholder="Enter course title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+              />
             </div>
 
-            {/* Description */}
             <div className="space-y-2">
               <Label htmlFor="description">Course Description</Label>
-              <Textarea id="description" placeholder="Describe the course" value={description} onChange={(e) => setDescription(e.target.value)} rows={4} required />
+              <Textarea
+                id="description"
+                placeholder="Describe the course"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={4}
+                required
+              />
             </div>
 
-            {/* Price */}
             <div className="space-y-2">
               <Label htmlFor="price">Course Price (USD)</Label>
-              <Input id="price" type="number" min="0" step="0.01" placeholder="Enter price" value={price} onChange={(e) => setPrice(e.target.value)} required />
+              <Input
+                id="price"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="Enter price"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                required
+              />
             </div>
 
-            {/* Category */}
             <div className="space-y-2">
               <Label htmlFor="category">Course Category</Label>
-              <select id="category" value={category} onChange={(e) => setCategory(e.target.value.toLowerCase())} className="w-full border rounded-md p-2" required>
+              <select
+                id="category"
+                value={category}
+                onChange={(e) => setCategory(e.target.value.toLowerCase())}
+                className="w-full border rounded-md p-2"
+                required
+                title="Select course category"
+              >
                 <option value="">Select a category</option>
                 <option value="web-development">Web Development</option>
                 <option value="data-science">Data Science</option>
                 <option value="ai-ml">AI & Machine Learning</option>
                 <option value="cybersecurity">Cybersecurity</option>
                 <option value="mobile-development">Mobile Development</option>
-                <option value="software-engineering">Software Engineering</option>
+                <option value="software-engineering">
+                  Software Engineering
+                </option>
               </select>
             </div>
 
-            {/* File Upload (PDF/Video) */}
             <div className="space-y-2">
-              <Label htmlFor="file">Upload Course Material (PDF or Video)</Label>
-              <input type="file" accept=".pdf, video/*" onChange={handleFileChange} className="w-full border rounded-md p-2" required />
-              {file && <p className="text-gray-700">Selected file: {file.name}</p>}
+              <Label htmlFor="file">
+                Upload Course Materials (PDFs or Videos)
+              </Label>
+              <input
+                type="file"
+                accept=".pdf,video/*"
+                multiple
+                onChange={handleFileChange}
+                className="w-full border rounded-md p-2"
+                required
+                title="Upload Course Materials"
+              />
+              {files.map((file, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between text-sm text-gray-600"
+                >
+                  <span>{file.name}</span>
+                  <select
+                    title="Select file type"
+                    value={fileTypes[index]}
+                    onChange={(e) =>
+                      handleFileTypeChange(index, e.target.value)
+                    }
+                    className="ml-4 p-1 border rounded"
+                  >
+                    <option value="pdf">PDF</option>
+                    <option value="video">Video</option>
+                  </select>
+                </div>
+              ))}
             </div>
 
             <Button className="w-full" type="submit">

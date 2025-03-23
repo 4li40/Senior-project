@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 interface Course {
   id: number;
@@ -17,27 +18,24 @@ interface Course {
 
 export default function CategoryPage() {
   const { category } = useParams();
+  const router = useRouter();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [enrolledCourses, setEnrolledCourses] = useState<number[]>([]); // Store enrolled courses
+  const [enrolledCourses, setEnrolledCourses] = useState<number[]>([]);
+  const [feedback, setFeedback] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const selectedCategory = category || "all";
         const url = category
           ? `http://localhost:5003/api/courses?category=${category}`
           : "http://localhost:5003/api/courses";
-
-        console.log("📡 Fetching from:", url);
 
         const response = await fetch(url);
         if (!response.ok) throw new Error("Failed to fetch courses");
 
         const data = await response.json();
-        console.log("✅ Courses received:", data);
-
         setCourses(data);
       } catch (err) {
         setError("Failed to load courses.");
@@ -54,39 +52,64 @@ export default function CategoryPage() {
       const response = await fetch(
         "http://localhost:5003/api/enrollments/enroll",
         {
-          // ✅ Correct URL
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include", // Ensures authentication cookies are sent
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
           body: JSON.stringify({ course_id: courseId }),
         }
       );
 
       const data = await response.json();
+
       if (!response.ok) {
-        throw new Error(data.message || "Enrollment failed.");
+        // Already enrolled? Add to state for disabled button
+        if (data.message?.toLowerCase().includes("already enrolled")) {
+          setEnrolledCourses((prev) => [...prev, courseId]);
+          setFeedback("You're already enrolled in this course.");
+        } else {
+          throw new Error(data.message || "Enrollment failed.");
+        }
+      } else {
+        setEnrolledCourses((prev) => [...prev, courseId]);
+        setFeedback("🎉 Successfully enrolled!");
       }
 
-      alert("Successfully enrolled!");
+      setTimeout(() => setFeedback(null), 3000); // hide feedback after 3s
     } catch (error) {
-      if (error instanceof Error) {
-        alert(error.message || "Failed to enroll.");
-      } else {
-        alert("Failed to enroll.");
-      }
+      setFeedback(
+        error instanceof Error ? error.message : "Something went wrong"
+      );
+      setTimeout(() => setFeedback(null), 3000);
     }
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <h2 className="text-3xl font-bold text-blue-700 text-center mb-6">
+    <div className="p-6 max-w-7xl mx-auto space-y-6">
+      {/* Back Button */}
+      <div className="flex items-start">
+        <Button
+          variant="outline"
+          className="flex items-center gap-2"
+          onClick={() => router.push("/student-dashboard")}
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back
+        </Button>
+      </div>
+
+      <h2 className="text-3xl font-bold text-blue-700 text-center">
         {Array.isArray(category)
           ? category.join(" ").replace("-", " ")
           : category?.replace("-", " ") || "All"}{" "}
         Courses
       </h2>
+
+      {feedback && (
+        <p className="text-center text-sm font-medium text-green-600 bg-green-100 p-2 rounded-md">
+          {feedback}
+        </p>
+      )}
+
       {loading && (
         <p className="text-gray-600 text-center">Loading courses...</p>
       )}
@@ -99,33 +122,41 @@ export default function CategoryPage() {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {courses.map((course) => (
-          <Card
-            key={course.id}
-            className="hover:shadow-lg transition duration-300"
-          >
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold text-gray-800">
-                {course.title}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <p className="text-gray-700">{course.description}</p>
-              <p className="text-sm text-muted-foreground">
-                Instructor: {course.first_name} {course.last_name}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                Price: ${course.price}
-              </p>
-              <Button
-                onClick={() => handleEnroll(course.id)}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                Enroll Now
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
+        {courses.map((course) => {
+          const isEnrolled = enrolledCourses.includes(course.id);
+          return (
+            <Card
+              key={course.id}
+              className="hover:shadow-lg transition duration-300"
+            >
+              <CardHeader>
+                <CardTitle className="text-xl font-semibold text-gray-800">
+                  {course.title}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <p className="text-gray-700">{course.description}</p>
+                <p className="text-sm text-muted-foreground">
+                  Instructor: {course.first_name} {course.last_name}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Price: ${course.price}
+                </p>
+                <Button
+                  disabled={isEnrolled}
+                  onClick={() => handleEnroll(course.id)}
+                  className={`w-full ${
+                    isEnrolled
+                      ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                      : "bg-blue-600 hover:bg-blue-700 text-white"
+                  }`}
+                >
+                  {isEnrolled ? "✅ Enrolled" : "Enroll Now"}
+                </Button>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );
