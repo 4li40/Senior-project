@@ -21,31 +21,55 @@ export default function MyCoursesPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const response = await fetch("http://localhost:5003/api/courses");
-
-        if (!response.ok) throw new Error("Failed to fetch courses");
-
-        const data = await response.json();
-        setCourses(data);
-      } catch (err) {
-        setError("Failed to load courses.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchCourses();
   }, []);
 
+  const fetchCourses = async () => {
+    try {
+      const response = await fetch("http://localhost:5003/api/courses", {
+        credentials: "include",
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch courses");
+
+      const data = await response.json();
+      setCourses(data);
+    } catch (err) {
+      setError("Failed to load courses.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (courseId: number) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this course?"
+    );
+    if (!confirmDelete) return;
+
+    try {
+      const res = await fetch(`http://localhost:5003/api/courses/${courseId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed to delete.");
+
+      // Update UI by removing deleted course
+      setCourses((prev) => prev.filter((c) => c.id !== courseId));
+      alert("✅ Course deleted successfully!");
+    } catch (err) {
+      console.error("❌ Delete error:", err);
+      alert("Failed to delete course.");
+    }
+  };
+
   return (
     <div>
-      {/* 🔹 Teacher Navigation Bar */}
       <TeacherNavBar />
 
       <div className="p-6 max-w-7xl mx-auto space-y-6">
-        {/* 🔙 Back Button */}
         <div className="flex items-center space-x-2">
           <Button
             variant="outline"
@@ -61,7 +85,6 @@ export default function MyCoursesPage() {
           My Courses
         </h2>
 
-        {/* 🞡 Add Course Button */}
         <div className="flex justify-end">
           <Button
             className="bg-black text-white hover:bg-gray-800 transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg rounded-lg px-4 py-2 font-semibold"
@@ -84,8 +107,7 @@ export default function MyCoursesPage() {
           {courses.map((course) => (
             <Card
               key={course.id}
-              className="hover:shadow-lg transition duration-300 cursor-pointer"
-              onClick={() => router.push(`/mycourses/${course.id}`)}
+              className="hover:shadow-lg transition duration-300"
             >
               <CardHeader>
                 <CardTitle className="text-xl font-semibold text-gray-800">
@@ -95,10 +117,9 @@ export default function MyCoursesPage() {
               <CardContent className="space-y-3">
                 <p className="text-gray-700">{course.description}</p>
 
-                {/* ✅ PDF Preview (if available) */}
                 {course.pdfs?.length > 0 ? (
                   <iframe
-                    src={course.pdfs[0]} // show the first PDF
+                    src={course.pdfs[0]}
                     className="w-full h-40 border rounded-md"
                     title="Course Material Preview"
                   ></iframe>
@@ -106,16 +127,21 @@ export default function MyCoursesPage() {
                   <p className="text-gray-500">No PDF uploaded.</p>
                 )}
 
-                {/* ✅ Download/View PDF */}
-                {course.pdfs?.length > 0 && (
-                  <Button
-                    variant="outline"
-                    className="w-full mt-4"
-                    onClick={() => router.push(`/mycourses/${course.id}`)}
-                  >
-                    📂 View Course
-                  </Button>
-                )}
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => router.push(`/mycourses/${course.id}`)}
+                >
+                  📂 View Course
+                </Button>
+
+                <Button
+                  variant="destructive"
+                  className="w-full"
+                  onClick={() => handleDelete(course.id)}
+                >
+                  🗑 Delete Course
+                </Button>
               </CardContent>
             </Card>
           ))}

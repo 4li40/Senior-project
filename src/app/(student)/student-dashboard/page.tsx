@@ -1,74 +1,92 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { GraduationCap } from "lucide-react";
 import StudentNavBar from "@/components/StudentNavBar";
-import { useRouter } from "next/navigation";
 import ChatPopup from "@/components/chatpopup";
+import { Calendar, momentLocalizer } from "react-big-calendar";
+import moment from "moment";
+import "react-big-calendar/lib/css/react-big-calendar.css";
 
-// Define Course interface
-interface Course {
+// Types
+type Course = {
   id: number;
   title: string;
   description: string;
   price: string;
-}
+};
+
+type Session = {
+  title: string;
+  type: "session" | "announcement";
+  scheduled_at: string;
+  duration_minutes?: number;
+};
 
 export default function StudentDashboard() {
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [chatOpen, setChatOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const [error, setError] = useState<string>("");
 
-  // Fetch courses from the backend
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [loadingCourses, setLoadingCourses] = useState(true);
+
+  const localizer = momentLocalizer(moment);
+
   useEffect(() => {
-    const fetchEnrolledCourses = async () => {
+    const fetchCourses = async () => {
       try {
-        setLoading(true);
-        setError(""); // ✅ Reset error state
-
-        const response = await fetch(
+        const res = await fetch(
           "http://localhost:5003/api/enrollments/my-courses",
           {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include", // ✅ Ensures authentication is included
+            credentials: "include",
           }
         );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch enrolled courses.");
-        }
-
-        const enrolledCourses = await response.json();
-        setCourses(enrolledCourses);
-      } catch (error) {
-        console.error("❌ Error fetching enrolled courses:", error);
-        setError("Failed to load enrolled courses.");
+        const data = await res.json();
+        setCourses(data);
+      } catch (err) {
+        console.error("❌ Failed to load courses:", err);
       } finally {
-        setLoading(false);
+        setLoadingCourses(false);
       }
     };
 
-    fetchEnrolledCourses();
+    const fetchSessions = async () => {
+      try {
+        const res = await fetch(
+          "http://localhost:5003/api/enrollments/my-schedule",
+          {
+            credentials: "include",
+          }
+        );
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setSessions(data.slice(0, 5)); // only show top 5 upcoming
+        }
+      } catch (err) {
+        console.error("❌ Failed to load schedule:", err);
+      }
+    };
+
+    fetchCourses();
+    fetchSessions();
   }, []);
 
   return (
     <div className="flex flex-col min-h-screen">
       <StudentNavBar />
 
-      <div className="flex-grow px-4 md:px-8 lg:px-12 space-y-8 mt-8">
+      <main className="flex-grow px-4 md:px-8 lg:px-12 space-y-8 mt-8">
         <h2 className="text-center text-2xl font-bold text-blue-700 mb-6">
           Welcome to Your Dashboard
         </h2>
 
-        {/* My Courses Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* Top 3-column layout */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* My Courses */}
           <Card className="w-full">
             <CardHeader>
               <CardTitle className="text-center text-purple-700">
@@ -76,19 +94,19 @@ export default function StudentDashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {loading ? (
-                <p className="text-center text-gray-500">Loading courses...</p>
+              {loadingCourses ? (
+                <p className="text-center text-gray-500">Loading...</p>
               ) : courses.length > 0 ? (
                 courses.map((course) => (
                   <div
                     key={course.id}
-                    className="flex items-start gap-4 border-b pb-4"
+                    className="flex items-start gap-4 border-b pb-3"
                   >
                     <div className="p-2 bg-purple-100 rounded-full">
                       <GraduationCap className="w-6 h-6 text-purple-700" />
                     </div>
                     <div className="flex-grow">
-                      <h3 className="font-semibold text-lg text-gray-800">
+                      <h3 className="font-semibold text-gray-800">
                         {course.title}
                       </h3>
                       <p className="text-sm text-gray-600">
@@ -102,7 +120,7 @@ export default function StudentDashboard() {
                 ))
               ) : (
                 <p className="text-center text-gray-500">
-                  No courses available.
+                  You are not enrolled in any courses.
                 </p>
               )}
               <Button
@@ -114,32 +132,80 @@ export default function StudentDashboard() {
             </CardContent>
           </Card>
 
-          {/* Placeholder Sections for Upcoming Sessions and Schedule */}
+          {/* Upcoming Events */}
           <Card className="w-full">
             <CardHeader>
-              <CardTitle className="text-center text-gray-400">
-                Upcoming Sessions
+              <CardTitle className="text-center text-blue-600">
+                Upcoming Events
               </CardTitle>
             </CardHeader>
-            <CardContent className="text-center text-gray-500">
-              Coming Soon...
+            <CardContent className="space-y-3">
+              {sessions.length === 0 ? (
+                <p className="text-center text-gray-500">
+                  No upcoming sessions yet.
+                </p>
+              ) : (
+                sessions.map((s, idx) => (
+                  <div key={idx} className="border-b pb-2">
+                    <p className="font-medium">{s.title}</p>
+                    <p className="text-xs text-gray-600 capitalize">{s.type}</p>
+                    <p className="text-xs text-gray-500">
+                      {new Date(s.scheduled_at).toLocaleString()}
+                    </p>
+                  </div>
+                ))
+              )}
+              <Button
+                variant="outline"
+                className="w-full mt-2"
+                onClick={() => router.push("/Schedule")}
+              >
+                View Calendar
+              </Button>
             </CardContent>
           </Card>
 
+          {/* Calendar Mini View */}
           <Card className="w-full">
             <CardHeader>
-              <CardTitle className="text-center text-gray-400">
+              <CardTitle className="text-center text-blue-600">
                 Schedule Overview
               </CardTitle>
             </CardHeader>
-            <CardContent className="text-center text-gray-500">
-              Coming Soon...
+            <CardContent className="space-y-4">
+              <div style={{ height: 300 }}>
+                <Calendar
+                  localizer={localizer}
+                  events={sessions.map((s) => ({
+                    title: `${s.title} (${s.type})`,
+                    start: new Date(s.scheduled_at),
+                    end: new Date(
+                      new Date(s.scheduled_at).getTime() +
+                        (s.duration_minutes || 60) * 60000
+                    ),
+                    allDay: false,
+                  }))}
+                  startAccessor="start"
+                  endAccessor="end"
+                  views={["month"]}
+                  toolbar={false}
+                  popup
+                  style={{ height: "100%" }}
+                />
+              </div>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => router.push("/Schedule")}
+              >
+                View Schedule
+              </Button>
             </CardContent>
           </Card>
         </div>
 
-        {/* Bottom Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Bottom 2-column layout */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card className="w-full">
             <CardHeader>
               <CardTitle className="text-center text-gray-400">
@@ -162,13 +228,13 @@ export default function StudentDashboard() {
             </CardContent>
           </Card>
         </div>
-      </div>
+      </main>
 
       {/* Chat Widget */}
       <div className="fixed bottom-4 right-4 z-50">
         <button
           onClick={() => setChatOpen(!chatOpen)}
-          className="w-16 h-16 bg-blue-500 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-blue-600"
+          className="w-14 h-14 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 flex items-center justify-center"
         >
           💬
         </button>
@@ -176,7 +242,4 @@ export default function StudentDashboard() {
       </div>
     </div>
   );
-}
-function setError(arg0: string) {
-  throw new Error("Function not implemented.");
 }
