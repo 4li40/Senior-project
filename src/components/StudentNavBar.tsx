@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Bell } from "lucide-react";
@@ -27,51 +28,45 @@ const StudentNavBar = () => {
           <nav className="flex items-center gap-8 text-sm font-medium">
             <Link
               href="/student-dashboard"
-              className={`${isActive(
-                "/student-dashboard"
-              )} transition-colors whitespace-nowrap`}
+              className={`${isActive("/student-dashboard")} transition-colors whitespace-nowrap`}
             >
               Dashboard
             </Link>
             <Link
               href="/MyCourses"
-              className={`${isActive(
-                "/MyCourses"
-              )} transition-colors whitespace-nowrap text-black`}
+              className={`${isActive("/MyCourses")} transition-colors whitespace-nowrap`}
             >
               My Courses
             </Link>
             <Link
               href="/roadmap"
-              className={`${isActive(
-                "/roadmap"
-              )} transition-colors whitespace-nowrap`}
+              className={`${isActive("/roadmap")} transition-colors whitespace-nowrap`}
             >
               Roadmap
             </Link>
             <Link
               href="/FindTutorPage"
-              className={`${isActive(
-                "/FindTutorPage"
-              )} transition-colors whitespace-nowrap`}
+              className={`${isActive("/FindTutorPage")} transition-colors whitespace-nowrap`}
             >
               Find Tutors
             </Link>
             <Link
               href="/Schedule"
-              className={`${isActive(
-                "/Schedule"
-              )} transition-colors whitespace-nowrap`}
+              className={`${isActive("/Schedule")} transition-colors whitespace-nowrap`}
             >
               Schedule
             </Link>
             <Link
               href="/ratings-reviews"
-              className={`${isActive(
-                "/ratings-reviews"
-              )} transition-colors whitespace-nowrap`}
+              className={`${isActive("/ratings-reviews")} transition-colors whitespace-nowrap`}
             >
               Ratings/Reviews
+            </Link>
+            <Link
+              href="/profile"
+              className={`${isActive("/profile")} transition-colors whitespace-nowrap`}
+            >
+              Profile
             </Link>
           </nav>
 

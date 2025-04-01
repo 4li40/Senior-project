@@ -54,6 +54,7 @@ export default function TutorDashboard() {
             { path: "/schedule", title: "📆 Schedule", description: "View and manage your tutoring schedule." },
             { path: "/earnings", title: "💲 Earnings", description: "Track your earnings and payment history." },
             { path: "/messages", title: "💬 Messages", description: "Communicate with students." },
+            { path: "/profile", title: "👤 Profile", description: "View and edit your profile." },
           ].map(({ path, title, description }, index) => (
             <Card
               key={index}
