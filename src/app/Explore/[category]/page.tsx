@@ -90,7 +90,7 @@ export default function CategoryPage() {
         <Button
           variant="outline"
           className="flex items-center gap-2"
-          onClick={() => router.push("/student-dashboard")}
+          onClick={() => router.back()}
         >
           <ArrowLeft className="w-4 h-4" />
           Back

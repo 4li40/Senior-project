@@ -29,10 +29,26 @@ export default function TutorDashboard() {
         {/* 📊 Stats Section */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {[
-            { icon: BarChart, label: "Total Earnings", value: `$${stats.totalEarnings}` },
-            { icon: BookOpen, label: "Courses Created", value: stats.totalCourses },
-            { icon: Users, label: "Active Students", value: stats.activeStudents },
-            { icon: Activity, label: "Sessions Completed", value: stats.sessionsCompleted },
+            {
+              icon: BarChart,
+              label: "Total Earnings",
+              value: `$${stats.totalEarnings}`,
+            },
+            {
+              icon: BookOpen,
+              label: "Courses Created",
+              value: stats.totalCourses,
+            },
+            {
+              icon: Users,
+              label: "Active Students",
+              value: stats.activeStudents,
+            },
+            {
+              icon: Activity,
+              label: "Sessions Completed",
+              value: stats.sessionsCompleted,
+            },
           ].map(({ icon: Icon, label, value }, index) => (
             <Card
               key={index}
@@ -50,10 +66,31 @@ export default function TutorDashboard() {
         {/* 🔹 Navigation Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {[
-            { path: "/mycourses", title: "📖 My Courses", description: "Manage and track your courses." },
-            { path: "/schedule", title: "📆 Schedule", description: "View and manage your tutoring schedule." },
-            { path: "/earnings", title: "💲 Earnings", description: "Track your earnings and payment history." },
-            { path: "/messages", title: "💬 Messages", description: "Communicate with students." },
+            {
+              path: "/mycourses",
+              title: "📖 My Courses",
+              description: "Manage and track your courses.",
+            },
+            {
+              path: "/schedule",
+              title: "📆 Schedule",
+              description: "View and manage your tutoring schedule.",
+            },
+            {
+              path: "/earnings",
+              title: "💲 Earnings",
+              description: "Track your earnings and payment history.",
+            },
+            {
+              path: "/messages",
+              title: "💬 Messages",
+              description: "Communicate with students.",
+            },
+            {
+              path: "/Profile",
+              title: "👤 Profile",
+              description: "View and edit your profile.",
+            },
           ].map(({ path, title, description }, index) => (
             <Card
               key={index}
@@ -61,10 +98,14 @@ export default function TutorDashboard() {
               onClick={() => router.push(path)}
             >
               <CardHeader className="p-4">
-                <CardTitle className="text-xl font-semibold text-black">{title}</CardTitle>
+                <CardTitle className="text-xl font-semibold text-black">
+                  {title}
+                </CardTitle>
               </CardHeader>
               <CardContent className="text-gray-600">{description}</CardContent>
-              <Button className="m-4 bg-black text-white hover:bg-gray-700">Go</Button>
+              <Button className="m-4 bg-black text-white hover:bg-gray-700">
+                Go
+              </Button>
             </Card>
           ))}
         </div>

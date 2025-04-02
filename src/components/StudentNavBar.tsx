@@ -73,6 +73,15 @@ const StudentNavBar = () => {
             >
               Ratings/Reviews
             </Link>
+
+            <Link
+              href="/Profile"
+              className={`${isActive(
+                "/profile"
+              )} transition-colors whitespace-nowrap`}
+            >
+              Profile
+            </Link>
           </nav>
 
           <div className="flex items-center gap-4">
