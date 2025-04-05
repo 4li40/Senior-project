@@ -26,17 +26,28 @@ export default function CategoryPage() {
   const [feedback, setFeedback] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchCourses = async () => {
+    const fetchData = async () => {
       try {
-        const url = category
+        const courseUrl = category
           ? `http://localhost:5003/api/courses?category=${category}`
           : "http://localhost:5003/api/courses";
 
-        const response = await fetch(url);
-        if (!response.ok) throw new Error("Failed to fetch courses");
+        const [coursesRes, enrolledRes] = await Promise.all([
+          fetch(courseUrl),
+          fetch("http://localhost:5003/api/enrollments/my-courses", {
+            credentials: "include",
+          }),
+        ]);
 
-        const data = await response.json();
-        setCourses(data);
+        if (!coursesRes.ok || !enrolledRes.ok) {
+          throw new Error("Failed to fetch data.");
+        }
+
+        const coursesData = await coursesRes.json();
+        const enrolledData = await enrolledRes.json();
+
+        setCourses(coursesData);
+        setEnrolledCourses(enrolledData.map((c: Course) => c.id));
       } catch (err) {
         setError("Failed to load courses.");
       } finally {
@@ -44,7 +55,7 @@ export default function CategoryPage() {
       }
     };
 
-    fetchCourses();
+    fetchData();
   }, [category]);
 
   const handleEnroll = async (courseId: number) => {

@@ -26,6 +26,19 @@ type Session = {
   duration_minutes?: number;
 };
 
+type Tutor = {
+  userId: number;
+  first_name: string;
+  last_name: string;
+  education: string;
+  subjects: string[];
+};
+type Activity = {
+  type: string;
+  message: string;
+  created_at: string;
+};
+
 export default function StudentDashboard() {
   const router = useRouter();
 
@@ -33,8 +46,27 @@ export default function StudentDashboard() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [chatOpen, setChatOpen] = useState(false);
   const [loadingCourses, setLoadingCourses] = useState(true);
+  const [tutors, setTutors] = useState<Tutor[]>([]);
 
   const localizer = momentLocalizer(moment);
+
+  useEffect(() => {
+    const fetchTutors = async () => {
+      try {
+        const res = await fetch("http://localhost:5003/api/tutors", {
+          credentials: "include",
+        });
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setTutors(data);
+        }
+      } catch (error) {
+        console.error("❌ Failed to load tutors:", error);
+      }
+    };
+
+    fetchTutors();
+  }, []);
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -219,12 +251,38 @@ export default function StudentDashboard() {
 
           <Card className="w-full">
             <CardHeader>
-              <CardTitle className="text-center text-gray-400">
+              <CardTitle className="text-center text-blue-600">
                 Find Tutors
               </CardTitle>
             </CardHeader>
-            <CardContent className="text-center text-gray-500">
-              Coming Soon...
+            <CardContent className="space-y-3">
+              {tutors.length === 0 ? (
+                <p className="text-center text-gray-500">
+                  No tutors available.
+                </p>
+              ) : (
+                tutors.slice(0, 3).map((tutor, index) => (
+                  <div key={index} className="border-b pb-2">
+                    <p className="font-semibold">
+                      {tutor.first_name} {tutor.last_name}
+                    </p>
+                    <p className="text-sm text-gray-500">{tutor.education}</p>
+                    <p className="text-sm text-gray-500">
+                      Subjects:{" "}
+                      {Array.isArray(tutor.subjects)
+                        ? tutor.subjects.join(", ")
+                        : "N/A"}
+                    </p>
+                  </div>
+                ))
+              )}
+              <Button
+                variant="outline"
+                className="w-full mt-2"
+                onClick={() => router.push("/FindTutorPage")}
+              >
+                View All Tutors
+              </Button>
             </CardContent>
           </Card>
         </div>
