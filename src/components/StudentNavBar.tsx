@@ -4,6 +4,7 @@ import { Bell } from "lucide-react";
 import { SearchBar } from "@/components/SearchBar";
 import { usePathname } from "next/navigation";
 import ExploreDropdown from "@/components/ExploreDropdown";
+import NotificationBell from "@/components/NotificationBell";
 
 const StudentNavBar = () => {
   const pathname = usePathname();
@@ -49,14 +50,17 @@ const StudentNavBar = () => {
             >
               Roadmap
             </Link>
+
             <Link
-              href="/FindTutorPage"
-              className={`${isActive(
-                "/FindTutorPage"
-              )} transition-colors whitespace-nowrap`}
-            >
-              Find Tutors
-            </Link>
+
+            
+                href="/FindTutorPage"
+                className={`${isActive("/FindTutorPage")} transition-colors whitespace-nowrap`}
+              >
+                Find Tutors
+              </Link>
+
+            
             <Link
               href="/Schedule"
               className={`${isActive(
@@ -100,14 +104,17 @@ const StudentNavBar = () => {
         </div>
 
         {/* Right Side Actions */}
+        
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="icon" className="mr-2">
-            <Bell className="h-5 w-5" />
-          </Button>
+          {/* 🔔 Notification Bell */}
+          <NotificationBell />
+
+          {/* 🚪 Logout */}
           <Button variant="ghost">
             <Link href="/login">Logout</Link>
           </Button>
-        </div>
+</div>
+
       </div>
     </header>
   );
