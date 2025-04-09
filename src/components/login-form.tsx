@@ -51,6 +51,8 @@ export function LoginForm({
         router.push("/tutor-dashboard");
       } else if (userType === "student") {
         router.push("/student-dashboard");
+      } else if (userType === "admin") {
+        router.push("/admin-dashboard"); // Redirect to admin panel
       } else {
         router.push("/");
       }
