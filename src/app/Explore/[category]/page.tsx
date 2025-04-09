@@ -28,12 +28,15 @@ export default function CategoryPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const courseUrl = category
+        // If category is "all", don't include category parameter
+        const courseUrl = category && category !== "all"
           ? `http://localhost:5003/api/courses?category=${category}`
           : "http://localhost:5003/api/courses";
 
         const [coursesRes, enrolledRes] = await Promise.all([
-          fetch(courseUrl),
+          fetch(courseUrl, {
+            credentials: "include"
+          }),
           fetch("http://localhost:5003/api/enrollments/my-courses", {
             credentials: "include",
           }),
