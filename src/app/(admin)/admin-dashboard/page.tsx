@@ -28,14 +28,19 @@ export default function AdminDashboard() {
       <nav className="flex items-center justify-between p-6 bg-gray-800 text-white">
         <div className="text-xl font-bold">StudyBuddy Admin</div>
         <div className="space-x-4">
-          <Button onClick={() => router.push("/admin/adminpanel")} className="bg-black text-white">
+          <Button
+            onClick={() => router.push("/login")}
+            className="bg-black text-white"
+          >
             Logout
           </Button>
         </div>
       </nav>
 
       <div className="flex-grow px-6 md:px-12 space-y-10 mt-10">
-        <h1 className="text-4xl font-bold text-center text-black mb-6">Admin Dashboard</h1>
+        <h1 className="text-4xl font-bold text-center text-black mb-6">
+          Admin Dashboard
+        </h1>
 
         {/* Stats Section */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -78,20 +83,31 @@ export default function AdminDashboard() {
         <div className="mt-10">
           <Card className="border border-gray-300 shadow-lg rounded-xl transition-transform transform hover:scale-105 hover:bg-gray-200">
             <CardHeader>
-              <CardTitle className="text-black">Pending Tutor Applications</CardTitle>
+              <CardTitle className="text-black">
+                Pending Tutor Applications
+              </CardTitle>
             </CardHeader>
             <CardContent className="text-gray-600">
               {/* List of Pending Applications */}
               <ul className="space-y-4">
-                {["Nader Bakir", "Abdala Shalik", "Maher Jneid"].map((name, index) => (
-                  <li key={index} className="flex justify-between items-center">
-                    <span>{name}</span>
-                    <div className="space-x-2">
-                      <Button className="bg-green-500 text-white">Accept</Button>
-                      <Button className="bg-red-500 text-white">Decline</Button>
-                    </div>
-                  </li>
-                ))}
+                {["Nader Bakir", "Abdala Shalik", "Maher Jneid"].map(
+                  (name, index) => (
+                    <li
+                      key={index}
+                      className="flex justify-between items-center"
+                    >
+                      <span>{name}</span>
+                      <div className="space-x-2">
+                        <Button className="bg-green-500 text-white">
+                          Accept
+                        </Button>
+                        <Button className="bg-red-500 text-white">
+                          Decline
+                        </Button>
+                      </div>
+                    </li>
+                  )
+                )}
               </ul>
             </CardContent>
           </Card>
@@ -131,9 +147,21 @@ export default function AdminDashboard() {
                 </thead>
                 <tbody>
                   {[
-                    { name: "Alice Cooper", email: "alice@example.com", role: "Student" },
-                    { name: "Bob Marley", email: "bob@example.com", role: "Tutor" },
-                    { name: "Charlie Brown", email: "charlie@example.com", role: "Admin" },
+                    {
+                      name: "Alice Cooper",
+                      email: "alice@example.com",
+                      role: "Student",
+                    },
+                    {
+                      name: "Bob Marley",
+                      email: "bob@example.com",
+                      role: "Tutor",
+                    },
+                    {
+                      name: "Charlie Brown",
+                      email: "charlie@example.com",
+                      role: "Admin",
+                    },
                   ].map((user, index) => (
                     <tr key={index}>
                       <td className="border-b px-4 py-2">{user.name}</td>
@@ -141,7 +169,9 @@ export default function AdminDashboard() {
                       <td className="border-b px-4 py-2">{user.role}</td>
                       <td className="border-b px-4 py-2 space-x-2">
                         <Button className="bg-blue-500 text-white">Edit</Button>
-                        <Button className="bg-red-500 text-white">Delete</Button>
+                        <Button className="bg-red-500 text-white">
+                          Delete
+                        </Button>
                       </td>
                     </tr>
                   ))}
