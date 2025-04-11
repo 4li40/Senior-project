@@ -27,6 +27,7 @@ export default function CourseDetailPage() {
         credentials: "include",
       });
       const data = await res.json();
+      console.log("Fetched course:", data);
       setCourse(data);
     };
     fetchCourse();

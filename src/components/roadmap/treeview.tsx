@@ -1,71 +1,153 @@
-import React, { useState } from "react";
-import { RoadmapNode } from "@/types/roadmap";
+"use client";
 
-interface TreeViewProps {
-  data: RoadmapNode[];
+import React, { useEffect, useState } from "react";
+import ReactFlow, {
+  ReactFlowProvider,
+  Node,
+  Edge,
+  useNodesState,
+  useEdgesState,
+  addEdge,
+  Connection,
+} from "react-flow-renderer";
+
+// RoadmapNode type definition
+export interface RoadmapNode {
+  id: number;
+  label: string;
+  description?: string;
+  completed: boolean;
+  order_index: number;
+  track: string;
+  children?: RoadmapNode[];
+  onViewCourses?: (track: string) => void;
 }
 
-const TreeView: React.FC<TreeViewProps> = ({ data }) => {
-  const [nodes, setNodes] = useState(data);
+// Props for the TreeViewFlow component
+interface TreeViewFlowProps {
+  data: RoadmapNode[];
+  viewCourses: (track: string) => void;
+}
 
-  const handleComplete = (nodeId: number) => {
-    const updateNodes = (nodes: RoadmapNode[]): RoadmapNode[] =>
-      nodes.map((node) => {
-        if (node.id === nodeId) {
-          return { ...node, completed: true };
-        }
-        if (node.children) {
-          return { ...node, children: updateNodes(node.children) };
-        }
-        return node;
+// Helper function to generate React Flow nodes and edges from the roadmap data.
+const generateFlowElements = (
+  data: RoadmapNode[]
+): { nodes: Node[]; edges: Edge[] } => {
+  const nodes: Node[] = [];
+  const edges: Edge[] = [];
+
+  // Recursive traversal function:
+  const traverse = (nodesData: RoadmapNode[], parentId?: string, level = 0) => {
+    nodesData.forEach((node, index) => {
+      const nodeId = node.id.toString();
+      // Position calculation – adjust 'x' and 'y' as needed for your layout.
+      const position = {
+        x: level * 250 + 50,
+        y: index * 120 + 50,
+      };
+
+      nodes.push({
+        id: nodeId,
+        data: {
+          label: node.label,
+          description: node.description,
+          completed: node.completed,
+          track: node.track,
+          onViewCourses: node.onViewCourses,
+        },
+        position,
       });
 
-    setNodes(updateNodes(nodes));
+      // If there's a parent, create an edge from the parent to this node.
+      if (parentId) {
+        edges.push({
+          id: `e-${parentId}-${nodeId}`,
+          source: parentId,
+          target: nodeId,
+          animated: false,
+          // You can also define style here if you want to override default settings.
+          style: { stroke: "#333", strokeWidth: 2 },
+        });
+      }
+
+      // Recursively process children if available.
+      if (node.children && node.children.length > 0) {
+        traverse(node.children, nodeId, level + 1);
+      }
+    });
   };
 
-  const renderTree = (nodes: RoadmapNode[]) => {
-    return nodes.map((node) => (
-      <div key={node.id} className="relative">
-        {/* Node Box */}
-        <div
-          className={`p-4 border rounded-md shadow-md mb-4 ${
-            node.completed ? "bg-blue-500 text-white font-bold" : "bg-white"
-          }`}
-          style={{ minWidth: "200px", textAlign: "center" }}
-        >
-          <span>{node.label}</span>
-          <div className="text-sm">
-            {node.completed ? (
-              <span>✔ Completed</span>
-            ) : (
-              <button
-                onClick={() => handleComplete(node.id)}
-                className="mt-2 px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600"
-              >
-                Mark Complete
-              </button>
-            )}
-          </div>
-        </div>
+  traverse(data);
+  return { nodes, edges };
+};
 
-        {/* Connecting Lines */}
-        {node.children && (
-          <div className="relative">
-            {/* Line from Parent to Children */}
-            <div className="w-0.5 h-8 bg-gray-300 mx-auto"></div>
-            {/* Children Nodes */}
-            <div className="flex justify-around">
-              {renderTree(node.children)}
-            </div>
-          </div>
-        )}
-      </div>
-    ));
-  };
-
+// Custom node renderer for React Flow.
+const CustomNode: React.FC<{ data: any }> = ({ data }) => {
   return (
-    <div className="flex flex-col items-center space-y-4">{renderTree(nodes)}</div>
+    <div className="p-3 border rounded bg-white shadow-sm">
+      <h4
+        className={`text-md font-bold ${
+          data.completed ? "text-green-600" : "text-gray-800"
+        }`}
+      >
+        {data.label}
+      </h4>
+      {data.description && (
+        <p className="text-xs text-gray-600 mt-1">{data.description}</p>
+      )}
+      <button
+        onClick={() => data.onViewCourses && data.onViewCourses(data.track)}
+        className="mt-2 text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+      >
+        View Courses
+      </button>
+    </div>
   );
 };
 
-export default TreeView;
+// Register custom node type.
+const nodeTypes = {
+  custom: CustomNode,
+};
+
+const TreeViewFlow: React.FC<TreeViewFlowProps> = ({ data, viewCourses }) => {
+  const [flowElements, setFlowElements] = useState<{
+    nodes: Node[];
+    edges: Edge[];
+  }>({
+    nodes: [],
+    edges: [],
+  });
+
+  useEffect(() => {
+    // Recursively add the viewCourses callback to each roadmap node.
+    const addCallbacks = (nodesData: RoadmapNode[]): RoadmapNode[] =>
+      nodesData.map((node) => ({
+        ...node,
+        onViewCourses: viewCourses,
+        children: node.children ? addCallbacks(node.children) : [],
+      }));
+
+    const dataWithCallbacks = addCallbacks(data);
+    setFlowElements(generateFlowElements(dataWithCallbacks));
+  }, [data, viewCourses]);
+
+  return (
+    <div style={{ height: 600, border: "1px solid #e5e7eb" }}>
+      <ReactFlowProvider>
+        <ReactFlow
+          nodes={flowElements.nodes}
+          edges={flowElements.edges}
+          nodeTypes={nodeTypes}
+          fitView
+          defaultEdgeOptions={{
+            type: "smoothstep",
+            style: { stroke: "#333", strokeWidth: 2 },
+          }}
+        />
+      </ReactFlowProvider>
+    </div>
+  );
+};
+
+export default TreeViewFlow;

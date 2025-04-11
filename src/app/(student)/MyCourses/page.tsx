@@ -99,7 +99,7 @@ export default function MyCoursesPage() {
                 <Button
                   variant="outline"
                   className="w-full mt-4"
-                  onClick={() => router.push(`/mycourses/${course.id}`)}
+                  onClick={() => router.push(`/MyCourses/${course.id}`)}
                 >
                   📂 View Course
                 </Button>

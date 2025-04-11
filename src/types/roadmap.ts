@@ -1,8 +1,12 @@
-export type RoadmapNode = {
+export interface RoadmapNode {
   id: number;
-  label: string;
-  description?: string; // Optional description for the node
-  completed: boolean;
-  progress?: number; // Optional progress percentage
-  children?: RoadmapNode[];
-};
+  label: string;        // from step_title
+  description?: string; // from step_description
+  completed?: boolean;
+  course_title?: string;
+  track?: string;
+  order_index: number;
+  onToggle?: () => void;
+   children?: RoadmapNode[];
+  course_id?: number;
+}
