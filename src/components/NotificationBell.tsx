@@ -19,7 +19,6 @@ export default function NotificationBell() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
 
-  // Fetch notifications periodically regardless of popover state
   const fetchNotifications = () => {
     fetch("http://localhost:5003/api/notifications", {
       credentials: "include",
@@ -28,44 +27,47 @@ export default function NotificationBell() {
       .then((data) => {
         console.log("📥 Notifications fetched from backend:", data);
 
-        setNotifications(data);
+        // ✅ Make sure it's an array before setting it
+        if (Array.isArray(data)) {
+          setNotifications(data);
+        } else {
+          console.warn("Unexpected notification response:", data);
+          setNotifications([]); // fallback
+        }
       })
       .catch((error) => {
         console.error("Error fetching notifications:", error);
       });
   };
 
-  // Mark all as read when popover is opened
   const markAsRead = () => {
     fetch("http://localhost:5003/api/notifications/mark-read", {
       method: "PATCH",
       credentials: "include",
     })
       .then(() => {
-        // Update local state to reflect read status
-        setNotifications(notifications.map((n) => ({ ...n, isRead: true })));
+        setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
       })
       .catch((error) => {
         console.error("Error marking notifications as read:", error);
       });
   };
 
-  // Fetch notifications on component mount and every 30 seconds
   useEffect(() => {
     fetchNotifications();
-
     const interval = setInterval(fetchNotifications, 30000);
     return () => clearInterval(interval);
   }, []);
 
-  // When popover is opened, mark notifications as read
   useEffect(() => {
     if (open && notifications.some((n) => !n.isRead)) {
       markAsRead();
     }
   }, [open]);
 
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
+  const unreadCount = Array.isArray(notifications)
+    ? notifications.filter((n) => !n.isRead).length
+    : 0;
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -84,7 +86,7 @@ export default function NotificationBell() {
       <PopoverContent className="w-72">
         <h4 className="font-semibold mb-2">Notifications</h4>
         <div className="space-y-2 max-h-60 overflow-y-auto">
-          {notifications.length === 0 ? (
+          {!Array.isArray(notifications) || notifications.length === 0 ? (
             <p className="text-sm text-gray-500">No notifications</p>
           ) : (
             notifications.map((n) => (

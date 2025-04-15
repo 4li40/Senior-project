@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -310,10 +310,7 @@ export default function StudentDashboard() {
                       <p className="text-sm text-gray-500">
                         Price: ${course.price}
                       </p>
-                      <Progress
-                        value={course.progress ?? 0}
-                        className="h-2"
-                      />
+                      <Progress value={course.progress ?? 0} className="h-2" />
                       <span className="text-xs text-gray-500">
                         Progress: {course.progress ?? 0}%
                       </span>
@@ -528,10 +525,7 @@ export default function StudentDashboard() {
                             : "-"}
                         </span>
                       </div>
-                      <Progress
-                        value={course.progress ?? 0}
-                        className="h-2"
-                      />
+                      <Progress value={course.progress ?? 0} className="h-2" />
                       <span className="text-xs text-gray-500">
                         Progress: {course.progress ?? 0}%
                       </span>
@@ -549,7 +543,7 @@ export default function StudentDashboard() {
         <button
           onClick={() => setChatOpen(!chatOpen)}
           className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 text-white rounded-full shadow-2xl hover:scale-105 transition-transform flex items-center justify-center border-4 border-white"
-          aria-label={chatOpen ? 'Close chat' : 'Open chat'}
+          aria-label={chatOpen ? "Close chat" : "Open chat"}
         >
           <span className="text-2xl">💬</span>
         </button>

@@ -28,7 +28,7 @@ const subjects = [
   "AI",
   "Data Analyst",
   "Software Engineer",
-  "Quality Assurance",
+
   "UI/UX",
 ];
 
@@ -70,7 +70,7 @@ export default function StudentSignupPage() {
 
       if (response.ok) {
         alert("Registration successful!");
-        router.push("/student-dashboard");
+        router.push("/login");
       } else {
         const errorData = await response.json();
         console.error("Backend responded with error:", errorData);
@@ -134,7 +134,9 @@ export default function StudentSignupPage() {
                     {...register("email")}
                   />
                   {errors.email && (
-                    <p className="text-red-500 text-sm">{errors.email.message}</p>
+                    <p className="text-red-500 text-sm">
+                      {errors.email.message}
+                    </p>
                   )}
                 </div>
 
@@ -200,7 +202,9 @@ export default function StudentSignupPage() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="high-school">High School</SelectItem>
-                      <SelectItem value="undergraduate">Undergraduate</SelectItem>
+                      <SelectItem value="undergraduate">
+                        Undergraduate
+                      </SelectItem>
                       <SelectItem value="graduate">Graduate</SelectItem>
                       <SelectItem value="other">Other</SelectItem>
                     </SelectContent>
@@ -220,7 +224,9 @@ export default function StudentSignupPage() {
                     {...register("school")}
                   />
                   {errors.school && (
-                    <p className="text-red-500 text-sm">{errors.school.message}</p>
+                    <p className="text-red-500 text-sm">
+                      {errors.school.message}
+                    </p>
                   )}
                 </div>
               </div>
@@ -248,7 +254,9 @@ export default function StudentSignupPage() {
                 ))}
               </div>
               {errors.subjects && (
-                <p className="text-red-500 text-sm">{errors.subjects.message}</p>
+                <p className="text-red-500 text-sm">
+                  {errors.subjects.message}
+                </p>
               )}
 
               <div className="space-y-2">
@@ -285,7 +293,11 @@ export default function StudentSignupPage() {
             </div>
 
             <div className="flex justify-between">
-              <Button type="button" variant="outline" onClick={() => router.back()}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => router.back()}
+              >
                 Back
               </Button>
               <Button type="submit">Register</Button>

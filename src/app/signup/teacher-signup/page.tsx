@@ -89,7 +89,7 @@ const TeacherSignup = () => {
       });
 
       if (response.ok) {
-        router.push("/tutor-dashboard");
+        router.push("/login");
       } else {
         const error = await response.json();
         console.error("Signup failed:", error);
@@ -199,7 +199,10 @@ const TeacherSignup = () => {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Highest Education Level</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
                             <FormControl>
                               <SelectTrigger>
                                 <SelectValue placeholder="Select your education level" />

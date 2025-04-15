@@ -9,31 +9,54 @@ import { useEffect, useState } from "react";
 
 export default function TutorDashboard() {
   const router = useRouter();
+
   const [stats, setStats] = useState({
-    totalEarnings: 4500,
-    totalCourses: 12,
-    activeStudents: 150,
-    sessionsCompleted: 85,
+    totalCourses: 0,
+    totalStudents: 0,
+    totalEnrollments: 0,
+    popularCourse: "N/A",
   });
+
+  const [activity, setActivity] = useState<{
+    courses: { title: string; created_at: string }[];
+    enrollments: { title: string; enrolledAt: string }[];
+    sessions: { title: string; scheduled_at: string }[];
+  }>({
+    courses: [],
+    enrollments: [],
+    sessions: [],
+  });
+
+  useEffect(() => {
+    fetch("http://localhost:5003/api/tutors/dashboard-stats", {
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then(setStats)
+      .catch((err) => console.error("❌ Error fetching dashboard stats:", err));
+  }, []);
+
+  useEffect(() => {
+    fetch("http://localhost:5003/api/tutors/dashboard-activity", {
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then(setActivity)
+      .catch((err) => console.error("❌ Error fetching recent activity:", err));
+  }, []);
 
   return (
     <div className="flex flex-col min-h-screen bg-white text-black">
-      {/* 🔹 Teacher NavBar */}
       <TeacherNavBar />
 
       <div className="flex-grow px-6 md:px-12 space-y-10 mt-10">
-        <h1 className="text-4xl font-bold text-center text-black mb-6">
+        <h1 className="text-4xl font-bold text-center mb-6">
           Welcome to Your Tutor Dashboard
         </h1>
 
-        {/* 📊 Stats Section */}
+        {/* 🔹 Stats Section */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {[
-            {
-              icon: BarChart,
-              label: "Total Earnings",
-              value: `$${stats.totalEarnings}`,
-            },
             {
               icon: BookOpen,
               label: "Courses Created",
@@ -42,20 +65,22 @@ export default function TutorDashboard() {
             {
               icon: Users,
               label: "Active Students",
-              value: stats.activeStudents,
+              value: stats.totalStudents,
             },
             {
-              icon: Activity,
-              label: "Sessions Completed",
-              value: stats.sessionsCompleted,
+              icon: BarChart,
+              label: "Total Enrollments",
+              value: stats.totalEnrollments,
             },
-          ].map(({ icon: Icon, label, value }, index) => (
-            <Card
-              key={index}
-              className="border border-gray-300 shadow-lg rounded-xl transition-transform transform hover:scale-105 hover:bg-gray-200"
-            >
+            {
+              icon: BookOpen,
+              label: "Top Course",
+              value: stats.popularCourse,
+            },
+          ].map(({ icon: Icon, label, value }, i) => (
+            <Card key={i} className="border shadow-md hover:bg-gray-100">
               <CardContent className="flex flex-col items-center justify-center p-6">
-                <Icon className="w-10 h-10 text-gray-700 mb-3" />
+                <Icon className="w-8 h-8 mb-2 text-gray-700" />
                 <h2 className="text-xl font-semibold">{value}</h2>
                 <p className="text-sm text-gray-600">{label}</p>
               </CardContent>
@@ -63,65 +88,74 @@ export default function TutorDashboard() {
           ))}
         </div>
 
-        {/* 🔹 Navigation Cards */}
+        {/* 🔹 Navigation Links */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {[
             {
               path: "/mycourses",
-              title: "📖 My Courses",
-              description: "Manage and track your courses.",
+              title: "\ud83d\udcd6 My Courses",
+              desc: "Manage and track your courses.",
             },
             {
               path: "/schedule",
-              title: "📆 Schedule",
-              description: "View and manage your tutoring schedule.",
+              title: "\ud83d\udcc6 Schedule",
+              desc: "Manage your tutoring schedule.",
             },
             {
               path: "/earnings",
-              title: "💲 Earnings",
-              description: "Track your earnings and payment history.",
-            },
-            {
-              path: "/messages",
-              title: "💬 Messages",
-              description: "Communicate with students.",
+              title: "\ud83d\udcb2 Earnings",
+              desc: "View payment history.",
             },
             {
               path: "/Profile",
-              title: "👤 Profile",
-              description: "View and edit your profile.",
+              title: "\ud83d\udc64 Profile",
+              desc: "Edit your profile.",
             },
-          ].map(({ path, title, description }, index) => (
+          ].map(({ path, title, desc }, i) => (
             <Card
-              key={index}
-              className="border border-gray-300 shadow-lg rounded-xl transition-transform transform hover:scale-105 hover:bg-gray-200 cursor-pointer"
+              key={i}
+              className="border hover:bg-gray-100 cursor-pointer"
               onClick={() => router.push(path)}
             >
               <CardHeader className="p-4">
-                <CardTitle className="text-xl font-semibold text-black">
-                  {title}
-                </CardTitle>
+                <CardTitle className="text-lg font-medium">{title}</CardTitle>
               </CardHeader>
-              <CardContent className="text-gray-600">{description}</CardContent>
-              <Button className="m-4 bg-black text-white hover:bg-gray-700">
+              <CardContent className="text-sm text-gray-600">
+                {desc}
+              </CardContent>
+              <Button className="m-4 bg-black text-white hover:bg-gray-800">
                 Go
               </Button>
             </Card>
           ))}
         </div>
 
-        {/* 🔹 Recent Activity Section */}
+        {/* 🔹 Recent Activity */}
         <div className="mt-10">
-          <Card className="border border-gray-300 shadow-lg rounded-xl transition-transform transform hover:scale-105 hover:bg-gray-200">
+          <Card className="border shadow-md">
             <CardHeader>
-              <CardTitle className="text-black">Recent Activity</CardTitle>
+              <CardTitle className="text-lg">Recent Activity</CardTitle>
             </CardHeader>
-            <CardContent className="text-gray-600">
-              <ul className="list-disc ml-6 space-y-3">
-                <li>🎉 New student enrolled in "Advanced React"</li>
-                <li>💬 You received 2 new messages from students</li>
-                <li>📖 Course "Python for Data Science" was updated</li>
-              </ul>
+            <CardContent className="text-sm text-gray-700 space-y-2">
+              {activity.courses.map((c, i) => (
+                <p key={`course-${i}`}>
+                  📘 New course added: <strong>{c.title}</strong>
+                </p>
+              ))}
+              {activity.enrollments.map((e, i) => (
+                <p key={`enroll-${i}`}>
+                  🧑‍🎓 New student enrolled in <strong>{e.title}</strong>
+                </p>
+              ))}
+              {activity.sessions.map((s, i) => (
+                <p key={`session-${i}`}>
+                  📅 New session scheduled: <strong>{s.title}</strong>
+                </p>
+              ))}
+              {activity.courses.length +
+                activity.enrollments.length +
+                activity.sessions.length ===
+                0 && <p>No recent activity yet.</p>}
             </CardContent>
           </Card>
         </div>

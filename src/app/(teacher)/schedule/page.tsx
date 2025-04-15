@@ -25,7 +25,6 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 
 const localizer = momentLocalizer(moment);
 
-// Define the Event type to match the expected structure
 type Event = {
   title: string;
   start: Date;
@@ -33,7 +32,6 @@ type Event = {
   allDay: boolean;
 };
 
-// Define the Session type to match the API response structure
 type Session = {
   title: string;
   type: string;
@@ -43,12 +41,9 @@ type Session = {
 
 export default function SchedulePage() {
   const router = useRouter();
-
   const [showModal, setShowModal] = useState(false);
   const [courses, setCourses] = useState([]);
-  const [events, setEvents] = useState<
-    { title: string; start: Date; end: Date; allDay: boolean }[]
-  >([]);
+  const [events, setEvents] = useState<Event[]>([]);
   const [form, setForm] = useState({
     courseId: "",
     title: "",
@@ -80,10 +75,7 @@ export default function SchedulePage() {
       });
       const data = await res.json();
 
-      if (!Array.isArray(data)) {
-        console.error("❌ Expected array, got:", data);
-        return;
-      }
+      if (!Array.isArray(data)) return;
 
       const formatted: Event[] = data.map((session: Session) => {
         const start = new Date(session.scheduled_at);
@@ -99,7 +91,6 @@ export default function SchedulePage() {
       });
 
       setEvents(formatted);
-      // ⬅️ This should be passed to <Calendar events={events} />
     } catch (err) {
       console.error("Failed to load events:", err);
     }
@@ -119,7 +110,7 @@ export default function SchedulePage() {
     setSuccess(false);
 
     try {
-      const response = await fetch(
+      const res = await fetch(
         `http://localhost:5003/api/courses/${form.courseId}/sessions`,
         {
           method: "POST",
@@ -129,9 +120,8 @@ export default function SchedulePage() {
         }
       );
 
-      const data = await response.json();
-      if (!response.ok)
-        throw new Error(data.message || "Failed to create session");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to create session");
 
       setSuccess(true);
       setShowModal(false);
@@ -172,10 +162,11 @@ export default function SchedulePage() {
 
       <Dialog open={showModal} onOpenChange={setShowModal}>
         <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Schedule a Session or Announcement</DialogTitle>
-          </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
+            <DialogHeader>
+              <DialogTitle>Schedule a Session or Announcement</DialogTitle>
+            </DialogHeader>
+
             {error && <p className="text-red-500 text-sm">{error}</p>}
             {success && (
               <p className="text-green-500 text-sm">🎉 Created successfully!</p>
