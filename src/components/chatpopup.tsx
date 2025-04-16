@@ -104,7 +104,7 @@ const ChatPopup: React.FC<ChatPopupProps> = ({ isOpen, onToggle }) => {
                 className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-xs px-4 py-2 rounded-xl break-words shadow transition-colors duration-200 text-sm font-medium ${
+                  className={`max-w-xs px-4 py-2 rounded-xl break-words shadow transition-colors duration-200 text-sm font-medium whitespace-pre-wrap ${ // Added whitespace-pre-wrap here
                     msg.sender === 'user'
                       ? 'bg-blue-600 text-white rounded-br-sm'
                       : 'bg-gray-100 text-blue-900 rounded-bl-sm border border-gray-200'
