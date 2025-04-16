@@ -1,76 +1,82 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import { SearchBar } from "@/components/SearchBar";
-import ExploreDropdown from "@/components/ExploreDropdown"; // ✅ Import the reusable Explore dropdown
+import ExploreDropdown from "@/components/ExploreDropdown";
+
+import { Info, Rocket, DollarSign, Mail } from "lucide-react";
+
+const navItems = [
+  { label: "About Us", href: "/about", icon: <Info size={16} /> },
+  { label: "Features", href: "/features", icon: <Rocket size={16} /> },
+  { label: "Pricing", href: "/pricing", icon: <DollarSign size={16} /> },
+  { label: "Contact", href: "/contact", icon: <Mail size={16} /> },
+];
 
 const MainNavBar = () => {
+  const pathname = usePathname();
+
   return (
-    <>
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="flex h-16 items-center justify-between px-6 lg:px-8">
-          {/* Logo */}
-          <div className="w-[180px]">
-            <Link href="/" className="flex items-center">
-              <span className="text-xl font-bold">Study Buddy</span>
-            </Link>
-          </div>
+    <header className="sticky top-0 z-50 w-full border-b bg-white/90 backdrop-blur-md">
+      <div className="flex h-16 items-center justify-between px-6 lg:px-10">
+        {/* 🔹 Left: Logo */}
+        <div className="w-[180px]">
+          <Link href="/" className="text-xl font-bold text-black">
+            Study Buddy
+          </Link>
+        </div>
 
-          {/* Center Section with Nav, Search, and Explore */}
-          <div className="flex flex-1 items-center justify-center gap-4 max-w-3xl">
-            <nav className="hidden md:flex items-center gap-8 whitespace-nowrap">
+        {/* 🔹 Center: Navigation & Search */}
+        <div className="flex-1 flex justify-center items-center gap-6 max-w-4xl">
+          <nav className="hidden md:flex items-center gap-6">
+            {navItems.map((item) => (
               <Link
-                href="/about"
-                className="text-sm font-medium text-foreground/60 hover:text-foreground/80"
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${
+                  pathname === item.href
+                    ? "text-black font-semibold"
+                    : "text-gray-500 hover:text-black"
+                }`}
               >
-                About Us
+                {item.icon}
+                {item.label}
               </Link>
-              <Link
-                href="/features"
-                className="text-sm font-medium text-foreground/60 hover:text-foreground/80"
-              >
-                Features
-              </Link>
-              <Link
-                href="/pricing"
-                className="text-sm font-medium text-foreground/60 hover:text-foreground/80"
-              >
-                Pricing
-              </Link>
-              <Link
-                href="/contact"
-                className="text-sm font-medium text-foreground/60 hover:text-foreground/80"
-              >
-                Contact
-              </Link>
-            </nav>
+            ))}
+          </nav>
 
-            {/* Search Bar */}
+          {/* 🔍 Search */}
+          <div className="hidden md:block">
             <SearchBar
               placeholder="Search courses..."
-              className="w-[280px] lg:w-[320px]"
-              onChange={(value) => {
-                console.log("Searching:", value);
-              }}
+              className="w-[260px] rounded-md"
+              onChange={(val) => console.log("Searching:", val)}
             />
+          </div>
 
-            {/* 🔹 Explore Dropdown Component */}
+          {/* 🔽 Explore Dropdown */}
+          <div className="hidden lg:block">
             <ExploreDropdown />
           </div>
-
-          {/* Right Side Actions */}
-          <div className="w-[180px] flex items-center gap-4 justify-end">
-            <Button variant="ghost" className="text-sm font-medium">
-              <Link href="/login">Login</Link>
-            </Button>
-            <Button className="bg-black text-white hover:bg-gray-800">
-              <Link href="/signup">Sign Up</Link>
-            </Button>
-          </div>
         </div>
-      </header>
-    </>
+
+        {/* 🔹 Right: Auth Buttons */}
+        <div className="w-[180px] flex items-center gap-3 justify-end">
+          <Link href="/login">
+            <Button variant="ghost" className="text-sm font-medium">
+              Login
+            </Button>
+          </Link>
+          <Link href="/signup">
+            <Button className="bg-black text-white hover:bg-gray-800 text-sm">
+              Sign Up
+            </Button>
+          </Link>
+        </div>
+      </div>
+    </header>
   );
 };
 

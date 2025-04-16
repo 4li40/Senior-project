@@ -48,8 +48,9 @@ export default function SchedulePage() {
     courseId: "",
     title: "",
     description: "",
-    type: "session",
+    type: "live",
     scheduled_at: "",
+    visibility: "private",
     duration_minutes: "60",
   });
   const [loading, setLoading] = useState(false);
@@ -220,7 +221,7 @@ export default function SchedulePage() {
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="session">Live Session</SelectItem>
+                  <SelectItem value="live">Live Session</SelectItem>
                   <SelectItem value="announcement">Announcement</SelectItem>
                 </SelectContent>
               </Select>
@@ -236,6 +237,25 @@ export default function SchedulePage() {
                 }
                 required
               />
+            </div>
+            <div>
+              <Label>Visibility</Label>
+              <Select
+                value={form.visibility}
+                onValueChange={(val) => setForm({ ...form, visibility: val })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select visibility" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="private">
+                    Private (Enrolled students)
+                  </SelectItem>
+                  <SelectItem value="public">
+                    Public (Show on landing page)
+                  </SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
