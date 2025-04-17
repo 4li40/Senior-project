@@ -87,15 +87,21 @@ const TeacherSignup = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-
+  
       if (response.ok) {
-        router.push("/login");
+        // ✅ Show confirmation popup
+        alert("🎉 Your account has been created and is pending admin approval.\nYou will be notified once approved.");
+        
+        // ✅ Redirect to homepage (or login)
+        router.push("/");
       } else {
         const error = await response.json();
         console.error("Signup failed:", error);
+        alert("❌ Error: " + error.message);
       }
     } catch (error) {
       console.error("An unexpected error occurred:", error);
+      alert("❌ Unexpected error: " + error);
     }
   };
 

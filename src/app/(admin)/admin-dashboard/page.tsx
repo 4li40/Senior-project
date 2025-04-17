@@ -68,7 +68,7 @@ export default function AdminDashboard() {
       {/* NAVBAR */}
       <nav className="flex items-center justify-between p-6 bg-gray-800 text-white">
         <div className="text-xl font-bold">StudyBuddy Admin</div>
-        <Button onClick={() => router.push("/admin/adminpanel")} className="bg-black text-white">
+        <Button onClick={() => router.push("/")} className="bg-black text-white">
           Logout
         </Button>
       </nav>
