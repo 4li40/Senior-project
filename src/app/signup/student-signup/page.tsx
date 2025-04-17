@@ -25,11 +25,11 @@ type StudentSignupFormData = z.infer<typeof studentSignupSchema>;
 
 const subjects = [
   "Cybersecurity",
-  "AI",
-  "Data Analyst",
-  "Software Engineer",
-
-  "UI/UX",
+  "AI & Machine Learning",
+  "Data Science",
+  "Software Engineering",
+  "Web Development",
+  "Mobile Development",
 ];
 
 export default function StudentSignupPage() {

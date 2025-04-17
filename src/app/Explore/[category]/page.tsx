@@ -20,38 +20,57 @@ export default function CategoryPage() {
   const { category } = useParams();
   const router = useRouter();
   const [courses, setCourses] = useState<Course[]>([]);
+  const [enrolledCourses, setEnrolledCourses] = useState<number[]>([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [feedback, setFeedback] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [enrolledCourses, setEnrolledCourses] = useState<number[]>([]);
-  const [feedback, setFeedback] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // If category is "all", don't include category parameter
-        const courseUrl = category && category !== "all"
-          ? `http://localhost:5003/api/courses?category=${category}`
-          : "http://localhost:5003/api/courses";
+        // 🔐 Check login status
+        const authRes = await fetch("http://localhost:5003/api/auth/status", {
+          credentials: "include",
+        });
 
-        const [coursesRes, enrolledRes] = await Promise.all([
-          fetch(courseUrl, {
-            credentials: "include"
-          }),
-          fetch("http://localhost:5003/api/enrollments/my-courses", {
-            credentials: "include",
-          }),
-        ]);
+        if (!authRes.ok) {
+          console.log("🔴 Not logged in");
+          setIsLoggedIn(false);
+          setEnrolledCourses([]);
+        } else {
+          console.log("🟢 Logged in");
+          setIsLoggedIn(true);
 
-        if (!coursesRes.ok || !enrolledRes.ok) {
-          throw new Error("Failed to fetch data.");
+          const enrolledRes = await fetch(
+            "http://localhost:5003/api/enrollments/my-courses",
+            { credentials: "include" }
+          );
+
+          if (enrolledRes.ok) {
+            const enrolledData = await enrolledRes.json();
+            setEnrolledCourses(enrolledData.map((c: Course) => c.id));
+          } else {
+            setEnrolledCourses([]);
+          }
         }
 
-        const coursesData = await coursesRes.json();
-        const enrolledData = await enrolledRes.json();
+        // 📚 Fetch courses
+        const courseUrl =
+          category && category !== "all"
+            ? `http://localhost:5003/api/courses?category=${category}`
+            : "http://localhost:5003/api/courses";
 
+        const coursesRes = await fetch(courseUrl, {
+          credentials: "include",
+        });
+
+        if (!coursesRes.ok) throw new Error("Course fetch failed");
+
+        const coursesData = await coursesRes.json();
         setCourses(coursesData);
-        setEnrolledCourses(enrolledData.map((c: Course) => c.id));
       } catch (err) {
+        console.error(err);
         setError("Failed to load courses.");
       } finally {
         setLoading(false);
@@ -62,6 +81,12 @@ export default function CategoryPage() {
   }, [category]);
 
   const handleEnroll = async (courseId: number) => {
+    if (!isLoggedIn) {
+      setFeedback("Please log in to enroll in a course.");
+      setTimeout(() => setFeedback(null), 3000);
+      return;
+    }
+
     try {
       const response = await fetch(
         "http://localhost:5003/api/enrollments/enroll",
@@ -76,7 +101,6 @@ export default function CategoryPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        // Already enrolled? Add to state for disabled button
         if (data.message?.toLowerCase().includes("already enrolled")) {
           setEnrolledCourses((prev) => [...prev, courseId]);
           setFeedback("You're already enrolled in this course.");
@@ -88,7 +112,7 @@ export default function CategoryPage() {
         setFeedback("🎉 Successfully enrolled!");
       }
 
-      setTimeout(() => setFeedback(null), 3000); // hide feedback after 3s
+      setTimeout(() => setFeedback(null), 3000);
     } catch (error) {
       setFeedback(
         error instanceof Error ? error.message : "Something went wrong"
@@ -137,7 +161,8 @@ export default function CategoryPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {courses.map((course) => {
-          const isEnrolled = enrolledCourses.includes(course.id);
+          const isEnrolled = isLoggedIn && enrolledCourses.includes(course.id);
+
           return (
             <Card
               key={course.id}
@@ -156,17 +181,23 @@ export default function CategoryPage() {
                 <p className="text-sm text-muted-foreground">
                   Price: ${course.price}
                 </p>
-                <Button
-                  disabled={isEnrolled}
-                  onClick={() => handleEnroll(course.id)}
-                  className={`w-full ${
-                    isEnrolled
-                      ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                      : "bg-blue-600 hover:bg-blue-700 text-white"
-                  }`}
-                >
-                  {isEnrolled ? "✅ Enrolled" : "Enroll Now"}
-                </Button>
+
+                {!isLoggedIn ? (
+                  <div className="bg-gray-100 text-center text-gray-400 py-2 rounded">
+                    🔒 Please log in to enroll
+                  </div>
+                ) : isEnrolled ? (
+                  <div className="bg-gray-100 p-2 rounded flex items-center justify-center text-green-600">
+                    ✅ Enrolled
+                  </div>
+                ) : (
+                  <Button
+                    onClick={() => handleEnroll(course.id)}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    Enroll Now
+                  </Button>
+                )}
               </CardContent>
             </Card>
           );

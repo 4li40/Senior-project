@@ -88,8 +88,24 @@ const TeacherNavBar = () => {
           <Button variant="ghost" size="icon" className="mr-2">
             <Bell className="h-5 w-5" />
           </Button>
-          <Button variant="ghost">
-            <Link href="/login">Logout</Link>
+          <Button
+            variant="ghost"
+            onClick={async () => {
+              try {
+                await fetch("http://localhost:5003/api/auth/logout", {
+                  method: "POST",
+                  credentials: "include",
+                });
+
+                // Redirect to login after logout
+                window.location.href = "/";
+              } catch (error) {
+                console.error("Logout failed", error);
+                alert("Logout failed. Please try again.");
+              }
+            }}
+          >
+            Logout
           </Button>
         </div>
       </div>

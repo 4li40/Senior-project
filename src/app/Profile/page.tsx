@@ -1,18 +1,46 @@
+/* -----------------------------------------------------------------------------
+   PAGE ▸ /profile  – Student / Tutor profile & settings
+   --------------------------------------------------------------------------- */
 "use client";
 
-import { useState, useEffect, FormEvent } from "react";
+import React, { useEffect, useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import TeacherNavBar from "@/components/teacherNavBar";
-import StudentNavBar from "@/components/StudentNavBar";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
 
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Separator } from "@/components/ui/separator";
+
+import StudentNavBar from "@/components/StudentNavBar";
+import TeacherNavBar from "@/components/teacherNavBar";
+import { AvatarImage, AvatarFallback, Avatar } from "@/components/ui/avatar";
+import {
+  ArrowLeft,
+  Camera,
+  Paperclip,
+  PlayCircle,
+  CheckCircle,
+  BookOpenText,
+} from "lucide-react";
+
+/* -------------------------------------------------------------------------- */
+/*  Types                                                                     */
+/* -------------------------------------------------------------------------- */
 interface ProfileData {
   firstName: string;
   lastName: string;
   email: string;
-  userType: string;
+  userType: "student" | "tutor";
   profilePictureUrl?: string | null;
   bio?: string;
   experience?: number;
@@ -23,354 +51,439 @@ interface ProfileData {
   goals?: string;
 }
 
+/* -------------------------------------------------------------------------- */
+/*  Helper: initials for Avatar fallback                                      */
+/* -------------------------------------------------------------------------- */
+const initials = (first = "", last = "") =>
+  (first[0] || "").toUpperCase() + (last[0] || "").toUpperCase();
+
+/* -------------------------------------------------------------------------- */
+/*  Component                                                                 */
+/* -------------------------------------------------------------------------- */
 export default function ProfilePage() {
+  /* ───────── state ───────── */
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
-  const [certificateFile, setCertificateFile] = useState<File | null>(null);
+
+  // images / uploads
+  const [picFile, setPicFile] = useState<File | null>(null);
+  const [picPreview, setPicPreview] = useState<string | null>(null);
+  const [certFile, setCertFile] = useState<File | null>(null);
+
+  // editable fields
   const [bio, setBio] = useState("");
   const [experience, setExperience] = useState("");
   const [goals, setGoals] = useState("");
 
   const router = useRouter();
 
+  /* ───────── fetch profile once ───────── */
   useEffect(() => {
-    async function fetchProfile() {
+    (async () => {
       try {
         const res = await fetch("http://localhost:5003/api/profile", {
           credentials: "include",
         });
         const data = await res.json();
-        setProfile({
+        const normalised: ProfileData = {
           firstName: data.first_name,
           lastName: data.last_name,
           email: data.email,
-          userType: data.userType || "student",
-          profilePictureUrl: data.profilePictureUrl || null,
-          bio: data.bio || "",
-          experience: data.experience,
-          certificateUrls: data.certificateUrls || [],
+          userType: data.userType ?? "student",
+          profilePictureUrl: data.profilePictureUrl ?? null,
+          bio: data.bio ?? "",
+          experience: data.experience ?? 0,
+          certificateUrls: data.certificateUrls ?? [],
           educationLevel: data.educationLevel,
           school: data.school,
           subjects: data.subjects,
-          goals: data.goals,
-        });
-        if (data.userType === "tutor") {
-          setBio(data.bio || "");
-          setExperience(data.experience?.toString() || "");
-        } else {
-          setGoals(data.goals || "");
-        }
-      } catch (error) {
-        console.error(error);
+          goals: data.goals ?? "",
+        };
+        setProfile(normalised);
+        setBio(normalised.bio ?? "");
+        setExperience(normalised.experience?.toString() ?? "");
+        setGoals(normalised.goals ?? "");
+      } catch (e) {
+        console.error(e);
       } finally {
         setLoading(false);
       }
-    }
-    fetchProfile();
+    })();
   }, []);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.[0]) {
-      const file = e.target.files[0];
-      setSelectedFile(file);
-      setPreview(URL.createObjectURL(file));
-    }
+  /* ───────── upload helpers ───────── */
+  const uploadPicture = async () => {
+    if (!picFile) return;
+    const fd = new FormData();
+    fd.append("profilePicture", picFile);
+    const res = await fetch("http://localhost:5003/api/profile/upload", {
+      method: "POST",
+      credentials: "include",
+      body: fd,
+    });
+    const json = await res.json();
+    setProfile(
+      (prev) =>
+        prev && {
+          ...prev,
+          profilePictureUrl: `/api/profile/picture/${json.fileId}`,
+        }
+    );
+    setPicFile(null);
+    setPicPreview(null);
   };
 
-  const handleUpload = async () => {
-    if (!selectedFile) return alert("No file selected");
-    const formData = new FormData();
-    formData.append("profilePicture", selectedFile);
-    try {
-      const res = await fetch("http://localhost:5003/api/profile/upload", {
+  const uploadCert = async () => {
+    if (!certFile) return;
+    const fd = new FormData();
+    fd.append("certificate", certFile);
+    const res = await fetch(
+      "http://localhost:5003/api/profile/upload-certificate",
+      {
         method: "POST",
         credentials: "include",
-        body: formData,
-      });
-      const data = await res.json();
-      alert("Profile picture updated!");
-      setProfile((prev) =>
-        prev
-          ? {
-              ...prev,
-              profilePictureUrl: `/api/profile/picture/${data.fileId}`,
-            }
-          : prev
-      );
-    } catch (error) {
-      console.error(error);
-      alert("Upload failed");
-    }
-  };
-
-  const handleCertificateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.[0]) {
-      setCertificateFile(e.target.files[0]);
-    }
-  };
-
-  const handleCertificateUpload = async () => {
-    if (!certificateFile) return alert("No certificate file selected");
-    const formData = new FormData();
-    formData.append("certificate", certificateFile);
-    try {
-      const res = await fetch(
-        "http://localhost:5003/api/profile/upload-certificate",
-        {
-          method: "POST",
-          credentials: "include",
-          body: formData,
+        body: fd,
+      }
+    );
+    const json = await res.json();
+    setProfile(
+      (p) =>
+        p && {
+          ...p,
+          certificateUrls: [
+            ...(p.certificateUrls ?? []),
+            `/api/profile/certificate/${json.fileIds?.[0]}`,
+          ],
         }
-      );
-      const data = await res.json();
-      alert("Certificate uploaded successfully!");
-      setProfile((prev) =>
-        prev && prev.certificateUrls
-          ? {
-              ...prev,
-              certificateUrls: [
-                ...prev.certificateUrls,
-                `/api/profile/certificate/${data.fileIds?.[0]}`,
-              ],
-            }
-          : prev
-      );
-    } catch (error) {
-      console.error(error);
-      alert("Certificate upload failed");
-    }
+    );
+    setCertFile(null);
   };
 
-  const handleUpdate = async (e: FormEvent<HTMLFormElement>) => {
+  /* ───────── save editable fields ───────── */
+  const handleSave = async (e: FormEvent) => {
     e.preventDefault();
-    try {
-      const payload =
-        profile?.userType === "tutor"
-          ? { bio, experience: parseInt(experience, 10) }
-          : { goals };
-      const res = await fetch("http://localhost:5003/api/profile", {
-        method: "PUT",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      alert(data.message || "Profile updated");
-    } catch (error) {
-      console.error(error);
-      alert("Update failed");
-    }
+    const payload =
+      profile?.userType === "tutor"
+        ? { bio, experience: Number(experience) }
+        : { goals };
+    await fetch("http://localhost:5003/api/profile", {
+      method: "PUT",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    alert("Profile saved!");
   };
 
-  if (loading) return <p className="p-6 text-center">Loading profile...</p>;
-  if (!profile)
-    return <p className="p-6 text-center">Error loading profile.</p>;
+  if (loading) return <p className="p-6 text-center">Loading…</p>;
+  if (!profile) return <p className="p-6 text-center">Could not load.</p>;
 
+  /* ───────── JSX ───────── */
   return (
-    <div>
+    <>
       {profile.userType === "tutor" ? <TeacherNavBar /> : <StudentNavBar />}
 
-      <div className="max-w-4xl mx-auto p-6">
+      <div className="mx-auto max-w-5xl px-6 pb-20">
+        {/* back button */}
         <Button
-          variant="outline"
-          onClick={() => router.push(`/${profile.userType}-dashboard`)}
-          className="mb-4"
+          variant="secondary"
+          className="mb-6"
+          onClick={() => router.back()}
         >
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Dashboard
+          <ArrowLeft className="h-4 w-4 mr-1.5" />
+          Dashboard
         </Button>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl font-bold"></CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col md:flex-row items-center gap-6">
-            <div className="w-32 h-32 rounded-full overflow-hidden border shadow">
-              {preview || profile.profilePictureUrl ? (
-                <img
-                  src={
-                    preview ||
-                    `http://localhost:5003${profile.profilePictureUrl}`
-                  }
-                  alt="Profile"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                  No Image
-                </div>
-              )}
-            </div>
-            <div className="flex-1 space-y-1">
-              <p className="text-lg font-semibold">
-                {profile.firstName} {profile.lastName}
-              </p>
-              <p className="text-sm text-gray-600">{profile.email}</p>
-              <div className="flex items-center gap-2 mt-2">
-                <label className="text-sm">
-                  Upload Profile Picture
-                  <input
-                    type="file"
-                    onChange={handleFileChange}
-                    className="text-sm"
-                    title="Upload Profile Picture"
+        {/* ---------- header card ---------------------------------------------------- */}
+        <Card className="mb-8">
+          <CardContent className="p-6 flex flex-col sm:flex-row items-center gap-6">
+            {/* avatar + picker */}
+            <div className="space-y-3 text-center sm:text-left">
+              <Avatar className="h-24 w-24 mx-auto sm:mx-0">
+                {profile.profilePictureUrl ? (
+                  <AvatarImage
+                    src={`http://localhost:5003${profile.profilePictureUrl}`}
+                    alt={profile.email}
                   />
-                </label>
-                <Button size="sm" onClick={handleUpload}>
+                ) : picPreview ? (
+                  <AvatarImage src={picPreview} alt="preview" />
+                ) : (
+                  <AvatarFallback className="text-2xl">
+                    {initials(profile.firstName, profile.lastName)}
+                  </AvatarFallback>
+                )}
+              </Avatar>
+
+              <Label
+                htmlFor="pic-input"
+                className="cursor-pointer inline-flex items-center gap-1 text-sm text-primary"
+              >
+                <Camera className="h-4 w-4" />
+                Change photo
+              </Label>
+              <Input
+                id="pic-input"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  const file: File | undefined = e.target.files?.[0];
+                  if (file) {
+                    setPicFile(file);
+                    setPicPreview(URL.createObjectURL(file));
+                  }
+                }}
+              />
+              {picFile && (
+                <Button size="sm" onClick={uploadPicture}>
                   Upload
                 </Button>
-              </div>
+              )}
+            </div>
+
+            {/* name / email */}
+            <div className="flex-1 space-y-1">
+              <h2 className="text-xl font-semibold">
+                {profile.firstName} {profile.lastName}
+              </h2>
+              <p className="text-sm text-muted-foreground">{profile.email}</p>
             </div>
           </CardContent>
         </Card>
-      </div>
 
-      {profile.userType === "student" && (
-        <div className="max-w-4xl mx-auto p-6 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold">
-                Student Information
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm text-gray-700">
-              <p>
-                <strong>Education Level:</strong>{" "}
-                {profile.educationLevel || "Not specified"}
-              </p>
-              <p>
-                <strong>School:</strong> {profile.school || "Not specified"}
-              </p>
-              <p>
-                <strong>Subjects:</strong>{" "}
-                {Array.isArray(profile.subjects)
-                  ? profile.subjects.join(", ")
-                  : "Not specified"}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold">
-                Edit Learning Goals
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleUpdate} className="space-y-4">
-                <textarea
-                  className="w-full border p-2 rounded"
-                  rows={3}
-                  value={goals}
-                  onChange={(e) => setGoals(e.target.value)}
-                  placeholder="What are your learning goals?"
-                />
-                <Button type="submit">Save Goals</Button>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {profile.userType === "tutor" && (
-        <>
-          <div className="max-w-4xl mx-auto p-6 space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-xl font-semibold">
-                  Subjects You Teach
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {profile.subjects?.length ? (
-                  <div className="flex flex-wrap gap-2">
-                    {profile.subjects.map((subj, i) => (
-                      <span
-                        key={i}
-                        className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm"
-                      >
-                        {subj}
-                      </span>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-gray-500">No subjects listed.</p>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-xl font-semibold">
-                  Certificates
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex gap-4 items-center">
-                  <label>
-                    Upload Certificate
-                    <input
-                      type="file"
-                      onChange={handleCertificateChange}
-                      title="Upload Certificate"
-                    />
-                  </label>
-                  <Button size="sm" onClick={handleCertificateUpload}>
-                    Upload
-                  </Button>
-                </div>
-                {profile.certificateUrls?.map((url, i) => (
-                  <a
-                    key={i}
-                    href={`http://localhost:5003${url}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 underline block"
-                  >
-                    View Certificate {i + 1}
-                  </a>
-                ))}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-xl font-semibold">
-                  Update Profile Details
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleUpdate} className="space-y-4">
+        {/* ---------- GRID ---------------------------------------------------------- */}
+        <form onSubmit={handleSave} className="grid lg:grid-cols-3 gap-6">
+          {/* === left column =================================================== */}
+          <div className="space-y-6 lg:col-span-1">
+            {/* --- info card  (student OR tutor) --------------------------- */}
+            {profile.userType === "student" ? (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Student Info</CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm space-y-2">
+                  <p>
+                    <strong>Education Level:</strong>{" "}
+                    {profile.educationLevel ?? "—"}
+                  </p>
+                  <p>
+                    <strong>School:</strong> {profile.school ?? "—"}
+                  </p>
+                  <p>
+                    <strong>Subjects:</strong>{" "}
+                    {profile.subjects?.join(", ") || "—"}
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Tutor Details</CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm space-y-3">
                   <div>
-                    <label className="block text-gray-700 mb-1">Bio</label>
-                    <textarea
-                      className="w-full border p-2 rounded"
+                    <Label>Bio</Label>
+                    <Textarea
                       value={bio}
-                      onChange={(e) => setBio(e.target.value)}
-                      rows={3}
-                      placeholder="Write a short bio about yourself"
+                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                        setBio(e.target.value)
+                      }
+                      rows={4}
+                      placeholder="Tell students about yourself"
                     />
                   </div>
                   <div>
-                    <label className="block text-gray-700 mb-1">
-                      Years of Experience
-                    </label>
-                    <input
+                    <Label>Experience (years)</Label>
+                    <Input
                       type="number"
-                      className="w-full border p-2 rounded"
                       value={experience}
-                      onChange={(e) => setExperience(e.target.value)}
-                      placeholder="Enter your years of experience"
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setExperience(e.target.value)
+                      }
                     />
                   </div>
-                  <Button type="submit">Save Changes</Button>
-                </form>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* --- certificates (tutor only) -------------------------------- */}
+            {profile.userType === "tutor" && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Certificates</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {profile.certificateUrls?.length ? (
+                    <ul className="space-y-1">
+                      {profile.certificateUrls.map((u, i) => (
+                        <li key={i}>
+                          <a
+                            href={`http://localhost:5003${u}`}
+                            target="_blank"
+                            className="underline text-blue-600 text-sm"
+                          >
+                            Certificate&nbsp;{i + 1}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-muted-foreground text-sm">
+                      No certificates uploaded.
+                    </p>
+                  )}
+
+                  <Separator />
+
+                  <Label
+                    htmlFor="cert-inp"
+                    className="flex items-center gap-1 text-sm cursor-pointer"
+                  >
+                    <Paperclip className="h-4 w-4" />
+                    Attach certificate
+                  </Label>
+                  <Input
+                    id="cert-inp"
+                    type="file"
+                    className="hidden"
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setCertFile(e.target.files?.[0] ?? null)
+                    }
+                  />
+                  {certFile && (
+                    <Button size="sm" onClick={uploadCert}>
+                      Upload
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+            )}
           </div>
-        </>
-      )}
-    </div>
+
+          {/* === right / main column ======================================= */}
+          <div className="space-y-6 lg:col-span-2">
+            {/* --- learning goals (student) -------------------------------- */}
+            {profile.userType === "student" && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Learning Goals</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Textarea
+                    rows={4}
+                    value={goals}
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                      setGoals(e.target.value)
+                    }
+                    placeholder="Write what you want to achieve…"
+                  />
+                  <Button type="submit">Save Goals</Button>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* --- dashboard widgets (student only) ----------------------- */}
+            {profile.userType === "student" && (
+              <div className="grid md:grid-cols-3 gap-6">
+                {/* progress */}
+                <Card className="flex flex-col">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-emerald-600" />
+                      Roadmap Progress
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex-1 flex flex-col justify-center items-center">
+                    {/* replace with real data */}
+                    <Progress value={35} className="w-full mb-1" />
+                    <p className="text-xs text-muted-foreground">
+                      7&nbsp;/&nbsp;20&nbsp;steps
+                    </p>
+                  </CardContent>
+                </Card>
+
+                {/* current course */}
+                <Card className="flex flex-col">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <PlayCircle className="h-4 w-4 text-indigo-600" />
+                      Currently Watching
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex-1 flex flex-col gap-3">
+                    <p className="text-sm font-medium leading-tight">
+                      “Intro&nbsp;to&nbsp;Network&nbsp;Security”
+                    </p>
+                    <Progress value={62} />
+                    <p className="text-xs text-muted-foreground">
+                      62 % • 8 / 13 lessons
+                    </p>
+                    <Button
+                      size="sm"
+                      className="mt-auto self-start"
+                      onClick={() => router.push("/course/123")}
+                    >
+                      Resume
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                {/* quick actions */}
+                <Card className="flex flex-col">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <BookOpenText className="h-4 w-4 text-sky-600" />
+                      Quick Actions
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex-1 space-y-3">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-start"
+                            onClick={() => router.push("/roadmap")}
+                          >
+                            Roadmap
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Open your roadmap</TooltipContent>
+                      </Tooltip>
+
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-start"
+                            onClick={() => router.push("/explore")}
+                          >
+                            Explore Courses
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Browse all courses</TooltipContent>
+                      </Tooltip>
+
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-start"
+                            onClick={() => router.push("/settings")}
+                          >
+                            Account Settings
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Change password, email…</TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+          </div>
+        </form>
+      </div>
+    </>
   );
 }

@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { SearchBar } from "@/components/SearchBar";
 import ExploreDropdown from "@/components/ExploreDropdown";
-
+import { useEffect, useState } from "react";
 import { Info, Rocket, DollarSign, Mail } from "lucide-react";
 
 const navItems = [
@@ -17,6 +17,13 @@ const navItems = [
 
 const MainNavBar = () => {
   const pathname = usePathname();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsLoggedIn(document.cookie.includes("token"));
+    }
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white/90 backdrop-blur-md">
@@ -28,8 +35,8 @@ const MainNavBar = () => {
           </Link>
         </div>
 
-        {/* 🔹 Center: Navigation & Search */}
-        <div className="flex-1 flex justify-center items-center gap-6 max-w-4xl">
+        {/* 🔹 Center: Navigation & Optional Search */}
+        <div className="flex-1 flex justify-center items-center gap-4 max-w-4xl">
           <nav className="hidden md:flex items-center gap-6">
             {navItems.map((item) => (
               <Link
@@ -47,16 +54,14 @@ const MainNavBar = () => {
             ))}
           </nav>
 
-          {/* 🔍 Search */}
-          <div className="hidden md:block">
+          {isLoggedIn && (
             <SearchBar
               placeholder="Search courses..."
-              className="w-[260px] rounded-md"
+              className="w-[250px] lg:w-[300px]"
               onChange={(val) => console.log("Searching:", val)}
             />
-          </div>
+          )}
 
-          {/* 🔽 Explore Dropdown */}
           <div className="hidden lg:block">
             <ExploreDropdown />
           </div>

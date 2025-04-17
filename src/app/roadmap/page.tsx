@@ -1,3 +1,6 @@
+/* -------------------------------------------------------------------------- */
+/*  PAGE – Roadmap (student)                                                  */
+/* -------------------------------------------------------------------------- */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -7,7 +10,9 @@ import NormalView from "@/components/roadmap/normalview";
 import TreeView from "@/components/roadmap/treeview";
 import { Button } from "@/components/ui/button";
 
-// Ensure your RoadmapNode type has a default completed value (if not provided, assume false)
+/* -------------------------------------------------------------------------- */
+/*  Types                                                                     */
+/* -------------------------------------------------------------------------- */
 export interface RoadmapNode {
   id: number;
   label: string;
@@ -16,19 +21,25 @@ export interface RoadmapNode {
   order_index: number;
   course_title?: string;
   track: string;
+  parent_id?: number;
   children?: RoadmapNode[];
 }
 
+/* -------------------------------------------------------------------------- */
+/*  Component                                                                 */
+/* -------------------------------------------------------------------------- */
 export default function RoadmapPage() {
   const router = useRouter();
 
+  /* ----------------------------- state ----------------------------------- */
   const [loading, setLoading] = useState(true);
-  const [roadmapItems, setRoadmapItems] = useState<RoadmapNode[]>([]);
-  const [selectedTrack, setSelectedTrack] = useState<string>("");
+  const [allSteps, setAllSteps] = useState<RoadmapNode[]>([]);
+  const [selectedTrack, setSelectedTrack] = useState("");
   const [viewMode, setViewMode] = useState<"normal" | "tree">("normal");
 
+  /* -------------------------- data fetch --------------------------------- */
   useEffect(() => {
-    const fetchRoadmap = async () => {
+    (async () => {
       try {
         const res = await fetch("http://localhost:5003/api/roadmap", {
           credentials: "include",
@@ -36,130 +47,163 @@ export default function RoadmapPage() {
         if (!res.ok) throw new Error("Failed to fetch roadmap");
         const data: RoadmapNode[] = await res.json();
 
-        // Ensure every item has completed defined
-        const dataWithDefaults = data.map((item) => ({
-          ...item,
-          completed:
-            typeof item.completed === "boolean" ? item.completed : false,
+        /* normalise */
+        const withDefault = data.map((s) => ({
+          ...s,
+          completed: !!s.completed,
         }));
+        setAllSteps(withDefault);
 
-        setRoadmapItems(dataWithDefaults);
-
-        // Extract unique tracks from the roadmap data
-        const uniqueTracks = Array.from(
-          new Set(dataWithDefaults.map((item) => item.track.trim()))
+        /* first track becomes default */
+        const uniq = Array.from(
+          new Set(withDefault.map((s) => s.track.trim()))
         );
-        if (uniqueTracks.length > 0) {
-          setSelectedTrack(uniqueTracks[0]);
-        }
-      } catch (err) {
-        console.error("Error fetching roadmap:", err);
+        if (uniq.length) setSelectedTrack(uniq[0]);
+      } catch (e) {
+        console.error(e);
       } finally {
         setLoading(false);
       }
-    };
-
-    fetchRoadmap();
+    })();
   }, []);
 
-  // Group roadmap items by track
-  const groupedRoadmap: Record<string, RoadmapNode[]> = roadmapItems.reduce(
-    (acc, item) => {
-      const track = item.track.trim();
-      if (!acc[track]) {
-        acc[track] = [];
-      }
-      acc[track].push(item);
-      return acc;
-    },
-    {} as Record<string, RoadmapNode[]>
-  );
-
-  // Get the data for the selected track
-  const selectedData: Record<string, RoadmapNode[]> = {
-    [selectedTrack]: groupedRoadmap[selectedTrack] || [],
+  const trackSlug: Record<string, string> = {
+    cybersecurity: "cybersecurity",
+    "ai & machine learning": "ai-ml",
+    "ai and machine learning": "ai-ml", // handle “and” variant
+    "data science": "data-science",
+    "web development": "web-dev",
+    "mobile development": "mobile-dev",
+    "software engineering": "software-eng",
+    // add / tweak as you introduce new tracks
   };
 
-  // Navigate to the Explore page for the given track.
-  const viewCoursesForTrack = (track: string) => {
-    // Lowercase and replace spaces with hyphens.
-    const lowerTrack = track.toLowerCase();
-    // If you need to map "Software Engineer" to "software-engineering", add a mapping:
-    const trackMap: Record<string, string> = {
-      "software engineer": "software-engineering",
-      // add other mappings as needed
-    };
-    const normalizedTrack =
-      trackMap[lowerTrack] || lowerTrack.replace(/\s+/g, "-");
-    router.push(`/Explore/${normalizedTrack}`);
+  /* ----------------------- derived structures ---------------------------- */
+  const grouped: Record<string, RoadmapNode[]> = allSteps.reduce((acc, n) => {
+    const t = n.track.trim();
+    acc[t] = acc[t] ? [...acc[t], n] : [n];
+    return acc;
+  }, {} as Record<string, RoadmapNode[]>);
+
+  const currentSteps = grouped[selectedTrack] ?? [];
+
+  /* --------------------------- helpers ----------------------------------- */
+  const viewCourses = (track: string) => {
+    const key = track.trim().toLowerCase();
+    const slug = trackSlug[key] ?? key.replace(/\s+/g, "-"); // fallback
+    router.push(`/Explore/${slug}`);
   };
 
+  const handleMarkComplete = async (id: number, done: boolean) => {
+    try {
+      await fetch("http://localhost:5003/api/roadmap/progress", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ roadmap_step_id: id, completed: done }),
+      });
+
+      /* optimistic UI update */
+      setAllSteps((prev) =>
+        prev.map((s) => (s.id === id ? { ...s, completed: done } : s))
+      );
+    } catch (e) {
+      console.error("Could not update progress", e);
+    }
+  };
+
+  /* ---------------------------------------------------------------------- */
+  /*  render                                                                */
+  /* ---------------------------------------------------------------------- */
   return (
-    <div>
+    <>
       <StudentNavBar />
-      <div className="p-6 max-w-4xl mx-auto">
+
+      <div className="p-6 max-w-screen-xl mx-auto">
         <h1 className="text-3xl font-bold text-center mb-6">
           Your Learning Roadmap
         </h1>
+
+        {/* --------------------- track selector --------------------------- */}
+        {Object.keys(grouped).length > 1 && (
+          <div className="flex justify-center mb-4">
+            <label htmlFor="trackSelect" className="mr-2 font-medium">
+              Select Track:
+            </label>
+            <select
+              id="trackSelect"
+              value={selectedTrack}
+              onChange={(e) => setSelectedTrack(e.target.value)}
+              className="border rounded p-2"
+            >
+              {Object.keys(grouped).map((t) => (
+                <option key={t}>{t}</option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {/* --------------------- view mode toggle ------------------------ */}
+        <div className="flex justify-center mb-6">
+          <Button
+            onClick={() =>
+              setViewMode((m) => (m === "normal" ? "tree" : "normal"))
+            }
+            className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-900"
+          >
+            {viewMode === "normal"
+              ? "Switch to Tree View"
+              : "Switch to List View"}
+          </Button>
+        </div>
+
+        {/* ----------------------- 2‑column layout ------------------------ */}
         {loading ? (
-          <p className="text-center text-gray-500">Loading roadmap...</p>
+          <p className="text-center text-gray-500">Loading…</p>
         ) : (
-          <>
-            {/* Dropdown for selecting track */}
-            {Object.keys(groupedRoadmap).length > 1 && (
-              <div className="mb-6 text-center">
-                <label htmlFor="trackSelect" className="mr-2 font-medium">
-                  Select Track:
-                </label>
-                <select
-                  id="trackSelect"
-                  value={selectedTrack}
-                  onChange={(e) => setSelectedTrack(e.target.value)}
-                  className="border rounded p-2"
-                >
-                  {Object.keys(groupedRoadmap).map((track) => (
-                    <option key={track} value={track}>
-                      {track}
-                    </option>
-                  ))}
-                </select>
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/*  left sidebar */}
+            <aside className="w-full lg:w-1/4 space-y-4">
+              <div className="bg-white p-4 rounded shadow-sm">
+                <h2 className="font-semibold text-lg mb-1">Track Info</h2>
+                <p className="text-sm text-muted-foreground">
+                  You’re learning <strong>{selectedTrack}</strong>.
+                </p>
               </div>
-            )}
 
-            {/* Toggle between Normal (list) and Tree views */}
-            <div className="flex justify-center mb-6">
-              <Button
-                onClick={() =>
-                  setViewMode((prev) => (prev === "normal" ? "tree" : "normal"))
-                }
-                className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-900 transition"
-              >
-                {viewMode === "normal"
-                  ? "Switch to Tree View"
-                  : "Switch to List View"}
-              </Button>
-            </div>
+              <div className="bg-white p-4 rounded shadow-sm">
+                <h2 className="font-semibold text-lg mb-1">Tips</h2>
+                <ul className="list-disc pl-4 text-sm text-muted-foreground space-y-0.5">
+                  <li>Complete the steps one‑by‑one</li>
+                  <li>Use “View Courses” to dive deeper</li>
+                  <li>Mark items as done to track progress</li>
+                </ul>
+              </div>
+            </aside>
 
-            {/* Display roadmap based on view mode */}
-            {Object.keys(selectedData).length === 0 ||
-            selectedData[selectedTrack].length === 0 ? (
-              <p className="text-center text-gray-500">
-                No roadmap steps available for the selected track.
-              </p>
-            ) : viewMode === "normal" ? (
-              <NormalView
-                data={selectedData}
-                viewCourses={viewCoursesForTrack}
-              />
-            ) : (
-              <TreeView
-                data={selectedData[selectedTrack]}
-                viewCourses={viewCoursesForTrack}
-              />
-            )}
-          </>
+            {/*  main panel (tree or list) */}
+            <section className="w-full lg:w-3/4">
+              {currentSteps.length === 0 ? (
+                <p className="text-center text-gray-500">
+                  No steps for this track.
+                </p>
+              ) : viewMode === "normal" ? (
+                <NormalView
+                  data={{ [selectedTrack]: currentSteps }}
+                  viewCourses={viewCourses}
+                  onMarkComplete={handleMarkComplete}
+                />
+              ) : (
+                <TreeView
+                  data={currentSteps}
+                  viewCourses={viewCourses}
+                  onMarkComplete={handleMarkComplete}
+                />
+              )}
+            </section>
+          </div>
         )}
       </div>
-    </div>
+    </>
   );
 }

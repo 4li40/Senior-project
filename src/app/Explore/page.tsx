@@ -21,17 +21,25 @@ export default function ExplorePage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [feedback, setFeedback] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchCourses = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:5003/api/courses", {
-          credentials: "include"
+        const authRes = await fetch("http://localhost:5003/api/auth/status", {
+          credentials: "include",
         });
-        if (!response.ok) {
-          throw new Error("Failed to fetch courses.");
-        }
-        const coursesData = await response.json();
+
+        setIsLoggedIn(authRes.ok);
+
+        const coursesRes = await fetch("http://localhost:5003/api/courses", {
+          credentials: "include",
+        });
+
+        if (!coursesRes.ok) throw new Error("Failed to fetch courses");
+
+        const coursesData = await coursesRes.json();
         setCourses(coursesData);
       } catch (error) {
         console.error("Error fetching courses:", error);
@@ -41,11 +49,16 @@ export default function ExplorePage() {
       }
     };
 
-    fetchCourses();
+    fetchData();
   }, []);
 
-  // ✅ Handle Enrollment
   const handleEnroll = async (courseId: number) => {
+    if (!isLoggedIn) {
+      setFeedback("Please log in to enroll in a course.");
+      setTimeout(() => setFeedback(null), 3000);
+      return;
+    }
+
     try {
       const response = await fetch(
         "http://localhost:5003/api/enrollments/enroll",
@@ -54,23 +67,23 @@ export default function ExplorePage() {
           headers: {
             "Content-Type": "application/json",
           },
-          credentials: "include", // Ensure authentication is included
+          credentials: "include",
           body: JSON.stringify({ course_id: courseId }),
         }
       );
 
       const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || "Enrollment failed.");
-      }
+      if (!response.ok) throw new Error(data.message || "Enrollment failed.");
 
-      alert("Successfully enrolled!");
+      setFeedback("🎉 Successfully enrolled!");
     } catch (error) {
       if (error instanceof Error) {
-        alert(error.message || "Failed to enroll.");
+        setFeedback(error.message || "Failed to enroll.");
       } else {
-        alert("Failed to enroll.");
+        setFeedback("Failed to enroll.");
       }
+    } finally {
+      setTimeout(() => setFeedback(null), 3000);
     }
   };
 
@@ -81,6 +94,12 @@ export default function ExplorePage() {
         <h1 className="text-3xl font-bold text-blue-700 text-center">
           All Courses
         </h1>
+
+        {feedback && (
+          <p className="text-center text-sm font-medium text-green-600 bg-green-100 p-2 rounded-md">
+            {feedback}
+          </p>
+        )}
 
         {loading && (
           <p className="text-gray-600 text-center">Loading courses...</p>
@@ -125,13 +144,19 @@ export default function ExplorePage() {
                     </span>
                   </div>
 
-                  {/* 🔹 Enroll Button */}
-                  <Button
-                    onClick={() => handleEnroll(course.id)}
-                    className="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    Enroll Now
-                  </Button>
+                  {/* 🔐 Enroll Button */}
+                  {!isLoggedIn ? (
+                    <div className="bg-gray-100 text-center text-gray-400 py-2 rounded">
+                      🔒 Please log in to enroll
+                    </div>
+                  ) : (
+                    <Button
+                      onClick={() => handleEnroll(course.id)}
+                      className="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      Enroll Now
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             ))}

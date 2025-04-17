@@ -106,9 +106,28 @@ const StudentNavBar = () => {
           {/* 🔔 Notification Bell */}
           <NotificationBell />
 
-          {/* 🚪 Logout */}
-          <Button variant="ghost">
-            <Link href="/login">Logout</Link>
+          <Button
+            variant="ghost"
+            onClick={async () => {
+              try {
+                await fetch("http://localhost:5003/api/auth/logout", {
+                  method: "POST",
+                  credentials: "include",
+                });
+
+                // Option 1: reload everything to reset auth
+                window.location.href = "/";
+
+                // Option 2 (better if using useAuth context):
+                // setIsLoggedIn(false);
+                // router.push("/login");
+              } catch (error) {
+                console.error("Logout failed", error);
+                alert("Failed to log out. Please try again.");
+              }
+            }}
+          >
+            Logout
           </Button>
         </div>
       </div>
