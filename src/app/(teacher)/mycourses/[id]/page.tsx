@@ -4,7 +4,29 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"; // Import Accordion components
+import { FileText } from "lucide-react"; // Import an icon for files
 
+// Define the structure for a file within a section
+interface CourseFile {
+  id: number;
+  name: string;
+  url: string;
+}
+
+// Define the structure for a course section
+interface CourseSection {
+  id: number;
+  title: string;
+  files: CourseFile[];
+}
+
+// Update the main CourseDetail interface
 interface CourseDetail {
   id: number;
   title: string;
@@ -12,7 +34,7 @@ interface CourseDetail {
   price: string;
   category: string;
   tutor: string;
-  pdfs: string[];
+  sections: CourseSection[]; // Changed from pdfs: string[]
   playlistUrl: string | null;
 }
 
@@ -20,83 +42,147 @@ export default function CourseDetailPage() {
   const { id } = useParams();
   const router = useRouter();
   const [course, setCourse] = useState<CourseDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCourse = async () => {
-      const res = await fetch(`http://localhost:5003/api/courses/${id}`, {
-        credentials: "include",
-      });
-      const data = await res.json();
-      setCourse(data);
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(`http://localhost:5003/api/courses/${id}`, {
+          credentials: "include",
+        });
+        if (!res.ok) {
+          throw new Error(`Failed to fetch course: ${res.statusText}`);
+        }
+        const data = await res.json();
+        // Ensure sections is always an array, even if null/undefined from API
+        setCourse({ ...data, sections: data.sections || [] });
+      } catch (err: any) {
+        console.error("Error fetching course:", err);
+        setError(err.message || "An error occurred while loading the course.");
+      } finally {
+        setLoading(false);
+      }
     };
     fetchCourse();
   }, [id]);
 
-  if (!course) {
+  if (loading) {
     return <p className="text-center mt-10 text-gray-600">Loading course...</p>;
   }
 
+  if (error) {
+    return <p className="text-center mt-10 text-red-600">Error: {error}</p>;
+  }
+
+  if (!course) {
+    return <p className="text-center mt-10 text-gray-600">Course not found.</p>;
+  }
+
   return (
-    <div className="max-w-5xl mx-auto p-6 space-y-6">
+    <div className="max-w-5xl mx-auto p-6 space-y-8">
       {/* Back Button */}
-      <Button variant="outline" onClick={() => router.back()}>
+      <Button variant="outline" onClick={() => router.back()} className="mb-4">
         ← Back
       </Button>
 
       {/* Header */}
-      <div className="space-y-2 text-center">
-        <h1 className="text-3xl font-bold text-blue-700">{course.title}</h1>
-        <p className="text-gray-600">{course.description}</p>
-        <div className="text-sm text-gray-500">
-          Instructor: <span className="font-medium">{course.tutor}</span> |
-          Category: <span className="capitalize">{course.category}</span> |
-          Price: ${parseFloat(course.price).toFixed(2)}
+      <div className="space-y-3 text-center border-b pb-6 mb-6">
+        <h1 className="text-4xl font-bold text-gray-800">{course.title}</h1>
+        <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+          {course.description}
+        </p>
+        <div className="text-md text-gray-500">
+          Instructor:{" "}
+          <span className="font-medium text-gray-700">{course.tutor}</span> |
+          Category:{" "}
+          <span className="capitalize font-medium text-gray-700">
+            {course.category}
+          </span>{" "}
+          | Price:{" "}
+          <span className="font-medium text-gray-700">
+            ${parseFloat(course.price).toFixed(2)}
+          </span>
         </div>
       </div>
 
-      {/* PDFs Section */}
-      <Card>
+      {/* Sections (Chapters) using Accordion */}
+      <Card className="shadow-md">
         <CardHeader>
-          <CardTitle>📄 Course PDFs</CardTitle>
+          <CardTitle className="text-2xl font-semibold text-gray-700">
+            📚 Course Content
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          {course.pdfs.length === 0 ? (
-            <p className="text-gray-500">No PDFs uploaded.</p>
+          {course.sections.length === 0 ? (
+            <p className="text-gray-500 italic">
+              No content sections uploaded yet.
+            </p>
           ) : (
-            <ul className="list-disc list-inside space-y-2">
-              {course.pdfs.map((pdfUrl, i) => (
-                <li key={i}>
-                  <a
-                    href={pdfUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 underline"
-                  >
-                    View / Download PDF {i + 1}
-                  </a>
-                </li>
+            <Accordion type="single" collapsible className="w-full space-y-4">
+              {course.sections.map((section, index) => (
+                <AccordionItem
+                  key={section.id || index}
+                  value={`item-${index}`}
+                  className="border rounded-lg overflow-hidden"
+                >
+                  <AccordionTrigger className="bg-gray-50 hover:bg-gray-100 px-4 py-3 text-lg font-medium text-gray-700">
+                    {section.title || `Section ${index + 1}`}
+                  </AccordionTrigger>
+                  <AccordionContent className="p-4 bg-white">
+                    {section.files.length === 0 ? (
+                      <p className="text-gray-500 italic">
+                        No files in this section.
+                      </p>
+                    ) : (
+                      <ul className="space-y-2">
+                        {section.files.map((file, fileIndex) => (
+                          <li
+                            key={file.id || fileIndex}
+                            className="flex items-center gap-2"
+                          >
+                            <FileText className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                            <a
+                              href={file.url} // Assuming the backend provides the correct URL
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:underline hover:text-blue-800 transition-colors"
+                            >
+                              {file.name || `File ${fileIndex + 1}`}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
               ))}
-            </ul>
+            </Accordion>
           )}
         </CardContent>
       </Card>
 
       {/* Playlist Section (optional) */}
       {course.playlistUrl && (
-        <Card>
+        <Card className="shadow-md">
           <CardHeader>
-            <CardTitle>🎥 Course Playlist</CardTitle>
+            <CardTitle className="text-2xl font-semibold text-gray-700">
+              🎥 Course Playlist
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <iframe
-              width="100%"
-              height="400"
-              src={course.playlistUrl}
-              title="Course Playlist"
-              frameBorder="0"
-              allowFullScreen
-              className="rounded-md"
-            ></iframe>
+            <div className="aspect-w-16 aspect-h-9">
+              <iframe
+                src={course.playlistUrl}
+                title="Course Playlist"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="rounded-md w-full h-full"
+              ></iframe>
+            </div>
           </CardContent>
         </Card>
       )}
