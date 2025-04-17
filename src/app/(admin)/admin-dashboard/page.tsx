@@ -1,76 +1,92 @@
 "use client";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Users, Activity, BarChart, MapPin } from "lucide-react";
-import { useRouter } from "next/navigation";
+
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { BarChart, Activity, Users, MapPin, DollarSign } from "lucide-react";
+
+/* ────────────────────────────────────────────────────────── */
+/*  1. SINGLE SOURCE OF TRUTH FOR YOUR BACKEND BASE URL       */
+/*     Change this if your backend is on a different port     */
+/* ────────────────────────────────────────────────────────── */
+const API_BASE = "http://localhost:5003/api/admin";
+
+/* ────────── Types ────────── */
+type StatPayload = {
+  totalUsers: number;
+  activeUsers: number;
+  activeSessions: number;
+  countriesReached: number;
+  revenue: string;
+};
+type UserRow  = { id: number; name: string; email: string; role: "student" | "tutor" };
+type TutorApp = { id: number; name: string };
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const [stats, setStats] = useState({
-    totalUsers: 12345,
-    activeSessions: 789,
-    countriesReached: 92,
-    activeUsers: 6345,
-  });
 
-  // Simulate fetching data from an API
+  const [stats,     setStats] = useState<StatPayload | null>(null);
+  const [users,     setUsers] = useState<UserRow[]>([]);
+  const [tutorApps, setApps]  = useState<TutorApp[]>([]);
+  const [error,     setError] = useState("");
+
+  /* ───────── Helper to validate JSON & status ───────── */
+  const fetchJSON = (url: string) =>
+    fetch(url, { credentials: "include" })
+      .then(async (res) => {
+        if (!res.ok)
+          throw new Error(`${res.status} ${res.statusText} — ${await res.text()}`);
+        return res.json();
+      });
+
+  /* ───────── Fetch data ───────── */
   useEffect(() => {
-    // Example of API call to fetch stats
-    // fetch('/api/admin/stats')
-    //   .then(res => res.json())
-    //   .then(data => setStats(data))
+    fetchJSON(`${API_BASE}/stats`).then(setStats).catch((e) => setError(e.message));
+    fetchJSON(`${API_BASE}/users`).then(setUsers).catch((e) => setError(e.message));
+    fetchJSON(`${API_BASE}/tutor-applications`)
+      .then((data) => setApps(Array.isArray(data) ? data : []))
+      .catch((e) => setError(e.message));
   }, []);
 
+  /* ───────── Approve / decline tutors ───────── */
+  const handleTutor = async (id: number, decision: "accept" | "decline") => {
+    await fetch(`${API_BASE}/tutor-applications/${id}/${decision}`, {
+      method: "POST",
+      credentials: "include",
+    });
+    setApps((prev) => prev.filter((t) => t.id !== id));
+  };
+
+  /* ───────── UI States ───────── */
+  if (error)      return <div className="p-10 text-red-600 text-center">{error}</div>;
+  if (!stats)     return <p className="p-10 text-gray-500">Loading…</p>;
+
+  /* ───────── Render ───────── */
   return (
-    <div className="flex flex-col min-h-screen bg-white text-black">
-      {/* Admin Navbar - You can use the same structure from your teacher navbar */}
+    <div className="flex flex-col min-h-screen bg-white">
+      {/* NAVBAR */}
       <nav className="flex items-center justify-between p-6 bg-gray-800 text-white">
         <div className="text-xl font-bold">StudyBuddy Admin</div>
-        <div className="space-x-4">
-          <Button
-            onClick={() => router.push("/login")}
-            className="bg-black text-white"
-          >
-            Logout
-          </Button>
-        </div>
+        <Button onClick={() => router.push("/admin/adminpanel")} className="bg-black text-white">
+          Logout
+        </Button>
       </nav>
 
-      <div className="flex-grow px-6 md:px-12 space-y-10 mt-10">
-        <h1 className="text-4xl font-bold text-center text-black mb-6">
-          Admin Dashboard
-        </h1>
+      <main className="flex-grow px-6 md:px-12 space-y-10 mt-10">
+        <h1 className="text-4xl font-bold text-center mb-6">Admin Dashboard</h1>
 
-        {/* Stats Section */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {/* STATS */}
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
           {[
-            {
-              icon: BarChart,
-              label: "Total Users",
-              value: stats.totalUsers.toLocaleString(),
-            },
-            {
-              icon: Activity,
-              label: "Active Sessions",
-              value: stats.activeSessions,
-            },
-            {
-              icon: Users,
-              label: "Active Users",
-              value: stats.activeUsers,
-            },
-            {
-              icon: MapPin,
-              label: "Countries Reached",
-              value: stats.countriesReached,
-            },
-          ].map(({ icon: Icon, label, value }, index) => (
-            <Card
-              key={index}
-              className="border border-gray-300 shadow-lg rounded-xl transition-transform transform hover:scale-105 hover:bg-gray-200"
-            >
-              <CardContent className="flex flex-col items-center justify-center p-6">
+            { icon: BarChart,   label: "Total Users",        value: stats.totalUsers.toLocaleString() },
+            { icon: Activity,   label: "Active Sessions",    value: stats.activeSessions },
+            { icon: Users,      label: "Active Users",       value: stats.activeUsers },
+            { icon: MapPin,     label: "Countries Reached",  value: stats.countriesReached },
+            { icon: DollarSign, label: "15% Revenue ($)",    value: stats.revenue },
+          ].map(({ icon: Icon, label, value }, i) => (
+            <Card key={i} className="border shadow-lg rounded-xl hover:scale-105 hover:bg-gray-200 transition-transform">
+              <CardContent className="flex flex-col items-center p-6">
                 <Icon className="w-10 h-10 text-gray-700 mb-3" />
                 <h2 className="text-xl font-semibold">{value}</h2>
                 <p className="text-sm text-gray-600">{label}</p>
@@ -79,108 +95,59 @@ export default function AdminDashboard() {
           ))}
         </div>
 
-        {/* User Management Section */}
-        <div className="mt-10">
-          <Card className="border border-gray-300 shadow-lg rounded-xl transition-transform transform hover:scale-105 hover:bg-gray-200">
-            <CardHeader>
-              <CardTitle className="text-black">
-                Pending Tutor Applications
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-gray-600">
-              {/* List of Pending Applications */}
+        {/* PENDING TUTORS */}
+        <Card className="border shadow-lg rounded-xl">
+          <CardHeader><CardTitle>Pending Tutor Applications</CardTitle></CardHeader>
+          <CardContent>
+            {tutorApps.length === 0 ? (
+              <p className="text-sm text-gray-500">No pending applications 🎉</p>
+            ) : (
               <ul className="space-y-4">
-                {["Nader Bakir", "Abdala Shalik", "Maher Jneid"].map(
-                  (name, index) => (
-                    <li
-                      key={index}
-                      className="flex justify-between items-center"
-                    >
-                      <span>{name}</span>
-                      <div className="space-x-2">
-                        <Button className="bg-green-500 text-white">
-                          Accept
-                        </Button>
-                        <Button className="bg-red-500 text-white">
-                          Decline
-                        </Button>
-                      </div>
-                    </li>
-                  )
-                )}
+                {tutorApps.map((t) => (
+                  <li key={t.id} className="flex justify-between items-center">
+                    <span>{t.name}</span>
+                    <div className="space-x-2">
+                      <Button onClick={() => handleTutor(t.id, "accept")}  className="bg-green-500 text-white">Accept</Button>
+                      <Button onClick={() => handleTutor(t.id, "decline")} className="bg-red-500 text-white">Decline</Button>
+                    </div>
+                  </li>
+                ))}
               </ul>
-            </CardContent>
-          </Card>
-        </div>
+            )}
+          </CardContent>
+        </Card>
 
-        {/* Recent Activity Section */}
-        <div className="mt-10">
-          <Card className="border border-gray-300 shadow-lg rounded-xl transition-transform transform hover:scale-105 hover:bg-gray-200">
-            <CardHeader>
-              <CardTitle className="text-black">Recent Activity</CardTitle>
-            </CardHeader>
-            <CardContent className="text-gray-600">
-              <ul className="list-disc ml-6 space-y-3">
-                <li>🎉 New student enrolled in "Advanced React"</li>
-                <li>💬 You received 2 new messages from tutors</li>
-                <li>📖 Course "Data Science with Python" was updated</li>
-              </ul>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* User Management Section */}
-        <div className="mt-10">
-          <Card className="border border-gray-300 shadow-lg rounded-xl transition-transform transform hover:scale-105 hover:bg-gray-200">
-            <CardHeader>
-              <CardTitle className="text-black">User Management</CardTitle>
-            </CardHeader>
-            <CardContent className="text-gray-600">
-              <table className="w-full table-auto">
-                <thead>
-                  <tr>
-                    <th className="border-b px-4 py-2">Name</th>
-                    <th className="border-b px-4 py-2">Email</th>
-                    <th className="border-b px-4 py-2">Role</th>
-                    <th className="border-b px-4 py-2">Actions</th>
+        {/* USER MANAGEMENT */}
+        <Card className="border shadow-lg rounded-xl">
+          <CardHeader><CardTitle>User Management</CardTitle></CardHeader>
+          <CardContent className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr>{["Name","Email","Role","Actions"].map(h=>(
+                  <th key={h} className="border-b px-4 py-2 text-left">{h}</th>
+                ))}</tr>
+              </thead>
+              <tbody>
+                {users.map((u) => (
+                  <tr key={u.id}>
+                    <td className="border-b px-4 py-2">{u.name}</td>
+                    <td className="border-b px-4 py-2">{u.email}</td>
+                    <td className="border-b px-4 py-2 capitalize">{u.role}</td>
+                    <td className="border-b px-4 py-2 space-x-2">
+                      <Button size="sm" className="bg-blue-500 text-white">Edit</Button>
+                      <Button size="sm" className="bg-red-500  text-white"
+                        onClick={async () => {
+                          await fetch(`${API_BASE}/users/${u.id}`, { method: "DELETE", credentials: "include" });
+                          setUsers(prev => prev.filter(x => x.id !== u.id));
+                        }}>Delete</Button>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {[
-                    {
-                      name: "Alice Cooper",
-                      email: "alice@example.com",
-                      role: "Student",
-                    },
-                    {
-                      name: "Bob Marley",
-                      email: "bob@example.com",
-                      role: "Tutor",
-                    },
-                    {
-                      name: "Charlie Brown",
-                      email: "charlie@example.com",
-                      role: "Admin",
-                    },
-                  ].map((user, index) => (
-                    <tr key={index}>
-                      <td className="border-b px-4 py-2">{user.name}</td>
-                      <td className="border-b px-4 py-2">{user.email}</td>
-                      <td className="border-b px-4 py-2">{user.role}</td>
-                      <td className="border-b px-4 py-2 space-x-2">
-                        <Button className="bg-blue-500 text-white">Edit</Button>
-                        <Button className="bg-red-500 text-white">
-                          Delete
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+                ))}
+              </tbody>
+            </table>
+          </CardContent>
+        </Card>
+      </main>
     </div>
   );
 }
