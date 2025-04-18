@@ -83,10 +83,19 @@ export default function CourseDetailPage() {
 
   return (
     <div className="max-w-5xl mx-auto p-6 space-y-8">
-      {/* Back Button */}
-      <Button variant="outline" onClick={() => router.back()} className="mb-4">
-        ← Back
-      </Button>
+      {/* Back Button and Edit Button */}
+      <div className="flex justify-between items-center mb-4">
+        <Button variant="outline" onClick={() => router.back()}>
+          ← Back
+        </Button>
+        <Button
+          variant="default"
+          className="bg-blue-600 hover:bg-blue-700 text-white"
+          onClick={() => router.push(`/mycourses/edit/${id}`)}
+        >
+          ✏️ Edit Course
+        </Button>
+      </div>
 
       {/* Header */}
       <div className="space-y-3 text-center border-b pb-6 mb-6">
