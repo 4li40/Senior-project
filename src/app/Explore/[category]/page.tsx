@@ -80,43 +80,40 @@ export default function CategoryPage() {
     fetchData();
   }, [category]);
 
-  const handleEnroll = async (courseId: number) => {
+  const handleCheckoutOrEnroll = async (course: Course) => {
     if (!isLoggedIn) {
       setFeedback("Please log in to enroll in a course.");
       setTimeout(() => setFeedback(null), 3000);
       return;
     }
 
+    // Free course → enroll directly
+    if (parseFloat(course.price) === 0) {
+      await handleCheckoutOrEnroll(course);
+      return;
+    }
+
+    // Paid course → Stripe checkout
     try {
-      const response = await fetch(
-        "http://localhost:5003/api/enrollments/enroll",
+      const res = await fetch(
+        "http://localhost:5003/api/payments/create-checkout-session",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
-          body: JSON.stringify({ course_id: courseId }),
+          body: JSON.stringify({ courseId: course.id }),
         }
       );
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (data.message?.toLowerCase().includes("already enrolled")) {
-          setEnrolledCourses((prev) => [...prev, courseId]);
-          setFeedback("You're already enrolled in this course.");
-        } else {
-          throw new Error(data.message || "Enrollment failed.");
-        }
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url; // ⬅️ Redirect to Stripe Checkout
       } else {
-        setEnrolledCourses((prev) => [...prev, courseId]);
-        setFeedback("🎉 Successfully enrolled!");
+        alert("Unable to redirect to payment.");
       }
-
-      setTimeout(() => setFeedback(null), 3000);
-    } catch (error) {
-      setFeedback(
-        error instanceof Error ? error.message : "Something went wrong"
-      );
+    } catch (err) {
+      console.error("Checkout error:", err);
+      setFeedback("Payment failed. Please try again.");
       setTimeout(() => setFeedback(null), 3000);
     }
   };
@@ -192,10 +189,12 @@ export default function CategoryPage() {
                   </div>
                 ) : (
                   <Button
-                    onClick={() => handleEnroll(course.id)}
+                    onClick={() => handleCheckoutOrEnroll(course)}
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                   >
-                    Enroll Now
+                    {parseFloat(course.price) === 0
+                      ? "Enroll for Free"
+                      : "Buy Course"}
                   </Button>
                 )}
               </CardContent>
