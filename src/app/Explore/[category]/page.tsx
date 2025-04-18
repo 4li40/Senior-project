@@ -58,8 +58,8 @@ export default function CategoryPage() {
         // 📚 Fetch courses
         const courseUrl =
           category && category !== "all"
-            ? `http://localhost:5003/api/courses?category=${category}`
-            : "http://localhost:5003/api/courses";
+            ? `http://localhost:5003/api/courses/public?category=${category}`
+            : "http://localhost:5003/api/courses/public";
 
         const coursesRes = await fetch(courseUrl, {
           credentials: "include",
