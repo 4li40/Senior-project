@@ -41,7 +41,14 @@ export default function TutorDashboard() {
       credentials: "include",
     })
       .then((res) => res.json())
-      .then(setActivity)
+      .then((data) => {
+        // Ensure arrays exist, default to empty array if missing
+        setActivity({
+          courses: data?.courses || [],
+          enrollments: data?.enrollments || [],
+          sessions: data?.sessions || [],
+        });
+      })
       .catch((err) => console.error("❌ Error fetching recent activity:", err));
   }, []);
 
