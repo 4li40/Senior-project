@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Bell } from "lucide-react";
-import { SearchBar } from "@/components/SearchBar";
 import { usePathname } from "next/navigation";
+import { SearchBar } from "@/components/SearchBar";
 import ExploreDropdown from "@/components/ExploreDropdown"; // ✅ Import reusable Explore dropdown
+import NotificationBell from "@/components/NotificationBell"; // Add NotificationBell import
 
 const TeacherNavBar = () => {
   const pathname = usePathname();
@@ -85,9 +85,8 @@ const TeacherNavBar = () => {
 
         {/* Right Side Actions */}
         <div className="w-[180px] flex items-center space-x-4 justify-end">
-          <Button variant="ghost" size="icon" className="mr-2">
-            <Bell className="h-5 w-5" />
-          </Button>
+          {/* Replace simple Bell icon with NotificationBell component */}
+          <NotificationBell />
           <Button
             variant="ghost"
             onClick={async () => {

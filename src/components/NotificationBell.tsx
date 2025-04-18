@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Bell } from "lucide-react";
+import { Bell, UserPlus, CalendarClock, Bell as BellIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -11,6 +11,7 @@ import {
 interface Notification {
   _id: string;
   message: string;
+  type: string;
   isRead: boolean;
   createdAt: string;
 }
@@ -69,6 +70,35 @@ export default function NotificationBell() {
     ? notifications.filter((n) => !n.isRead).length
     : 0;
 
+  // Get notification icon based on type
+  const getNotificationIcon = (type: string) => {
+    switch (type) {
+      case "enrollment":
+        return <UserPlus className="w-4 h-4 mr-2 text-green-500" />;
+      case "announcement":
+      case "session":
+        return <CalendarClock className="w-4 h-4 mr-2 text-blue-500" />;
+      default:
+        return <BellIcon className="w-4 h-4 mr-2 text-gray-500" />;
+    }
+  };
+
+  // Get background color class based on notification type
+  const getNotificationClass = (type: string, isRead: boolean) => {
+    if (isRead) return "bg-gray-100";
+
+    switch (type) {
+      case "enrollment":
+        return "bg-green-100 border-l-4 border-green-500";
+      case "announcement":
+        return "bg-blue-100";
+      case "session":
+        return "bg-purple-100";
+      default:
+        return "bg-blue-100";
+    }
+  };
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -92,13 +122,19 @@ export default function NotificationBell() {
             notifications.map((n) => (
               <div
                 key={n._id}
-                className={`text-sm p-2 rounded ${
-                  n.isRead ? "bg-gray-100" : "bg-blue-100"
-                }`}
+                className={`text-sm p-2 rounded ${getNotificationClass(
+                  n.type,
+                  n.isRead
+                )}`}
               >
-                {n.message}
-                <div className="text-xs text-gray-500">
-                  {new Date(n.createdAt).toLocaleString()}
+                <div className="flex items-start">
+                  {getNotificationIcon(n.type)}
+                  <div>
+                    {n.message}
+                    <div className="text-xs text-gray-500">
+                      {new Date(n.createdAt).toLocaleString()}
+                    </div>
+                  </div>
                 </div>
               </div>
             ))
