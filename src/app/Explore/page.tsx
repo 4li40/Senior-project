@@ -33,7 +33,7 @@ export default function ExplorePage() {
 
         setIsLoggedIn(authRes.ok);
 
-        const coursesRes = await fetch("http://localhost:5003/api/courses", {
+        const coursesRes = await fetch("http://localhost:5003/api/courses/public", {
           credentials: "include",
         });
 
