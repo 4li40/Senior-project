@@ -77,6 +77,7 @@ const TeacherNavBar = () => {
           <SearchBar
             placeholder="Search courses..."
             className="w-[280px] lg:w-[320px]"
+            userRole="teacher"
             onChange={(value) => {
               console.log("Searching:", value);
             }}

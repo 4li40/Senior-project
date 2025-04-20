@@ -10,18 +10,21 @@ interface Course {
   id: number;
   title: string;
   category: string;
+  tutor_id?: number; // Added to help with role checking
 }
 
 interface SearchBarProps {
   placeholder?: string;
   onChange?: (value: string) => void;
   className?: string;
+  userRole?: string; // New prop to identify the user role
 }
 
 export function SearchBar({
   placeholder = "Search for anything",
   onChange,
   className,
+  userRole = "student", // Default to student role for safety
 }: SearchBarProps) {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
@@ -71,7 +74,14 @@ export function SearchBar({
   const handleCourseSelect = (course: Course) => {
     setSearchTerm("");
     setShowDropdown(false);
-    router.push(`/mycourses/${course.id}`);
+    
+    // Route differently based on user role
+    if (userRole === 'tutor' || userRole === 'teacher') {
+      router.push(`/mycourses/${course.id}`);
+    } else {
+      // For students, check if they're enrolled first
+      router.push(`/MyCourses/${course.id}`);
+    }
   };
 
   return (
