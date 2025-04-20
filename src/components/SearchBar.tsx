@@ -37,8 +37,13 @@ export function SearchBar({
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await fetch("http://localhost:5003/api/courses/public", {
-          credentials: "include"
+        // Different API endpoints based on user role
+        const endpoint = userRole === 'tutor' || userRole === 'teacher'
+          ? "http://localhost:5003/api/courses" // Tutor's own courses
+          : "http://localhost:5003/api/courses/public"; // All public courses for students
+          
+        const response = await fetch(endpoint, {
+          credentials: "include",
         });
         if (!response.ok) throw new Error("Failed to fetch courses");
         const data = await response.json();
@@ -49,7 +54,7 @@ export function SearchBar({
     };
 
     fetchCourses();
-  }, []);
+  }, [userRole]);
 
   // Filter courses based on search term
   useEffect(() => {
@@ -59,7 +64,7 @@ export function SearchBar({
       return;
     }
 
-    const filtered = courses.filter(course =>
+    const filtered = courses.filter((course) =>
       course.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredCourses(filtered);
@@ -74,9 +79,9 @@ export function SearchBar({
   const handleCourseSelect = (course: Course) => {
     setSearchTerm("");
     setShowDropdown(false);
-    
+
     // Route differently based on user role
-    if (userRole === 'tutor' || userRole === 'teacher') {
+    if (userRole === "tutor" || userRole === "teacher") {
       router.push(`/mycourses/${course.id}`);
     } else {
       // For students, check if they're enrolled first
@@ -109,7 +114,7 @@ export function SearchBar({
           ${className}
         `}
       />
-      
+
       {/* Dropdown Results */}
       {showDropdown && (
         <div className="absolute z-50 w-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 max-h-60 overflow-y-auto">
@@ -129,7 +134,9 @@ export function SearchBar({
               ))}
             </ul>
           ) : (
-            <div className="p-4 text-center text-gray-500">No courses found</div>
+            <div className="p-4 text-center text-gray-500">
+              No courses found
+            </div>
           )}
         </div>
       )}

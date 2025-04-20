@@ -58,7 +58,7 @@ const MainNavBar = () => {
             <SearchBar
               placeholder="Search courses..."
               className="w-[250px] lg:w-[300px]"
-              userRole="student" 
+              userRole="student"
               onChange={(val) => console.log("Searching:", val)}
             />
           )}
