@@ -73,7 +73,10 @@ export default function CourseDetailPage() {
     <div className="max-w-5xl mx-auto p-6 space-y-8">
       {/* Back & Edit Buttons */}
       <div className="flex justify-between items-center mb-4">
-        <Button variant="outline" onClick={() => router.back()}>
+        <Button
+          variant="outline"
+          onClick={() => router.push("/tutor-dashboard")}
+        >
           ← Back
         </Button>
         <Button
@@ -105,7 +108,7 @@ export default function CourseDetailPage() {
         </div>
       </div>
 
-      {/* Course Sections */}
+      {/* Course Content */}
       <Card className="shadow-md">
         <CardHeader>
           <CardTitle className="text-2xl font-semibold text-gray-700">
@@ -118,62 +121,75 @@ export default function CourseDetailPage() {
               No content sections uploaded yet.
             </p>
           ) : (
-            <Accordion type="single" collapsible className="w-full space-y-4">
-              {course.sections.map((section, index) => (
-                <AccordionItem
-                  key={section.id || index}
-                  value={`item-${index}`}
-                  className="border rounded-lg overflow-hidden"
-                >
-                  <AccordionTrigger className="bg-gray-50 hover:bg-gray-100 px-4 py-3 text-lg font-medium text-gray-700">
-                    {section.title || `Section ${index + 1}`}
-                  </AccordionTrigger>
-                  <AccordionContent className="p-4 bg-white space-y-4">
-                    {section.files.length === 0 ? (
-                      <p className="text-gray-500 italic">
-                        No files in this section.
-                      </p>
-                    ) : (
-                      <ul className="space-y-2">
-                        {section.files.map((file, fileIndex) => (
-                          <li
-                            key={file.id || fileIndex}
-                            className="flex items-center gap-2"
-                          >
-                            <FileText className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                            <a
-                              href={file.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-600 hover:underline hover:text-blue-800 transition-colors"
+            <>
+              <Accordion type="single" collapsible className="w-full space-y-4">
+                {course.sections.map((section, index) => (
+                  <AccordionItem
+                    key={section.id || index}
+                    value={`item-${index}`}
+                    className="border rounded-lg overflow-hidden"
+                  >
+                    <AccordionTrigger className="bg-gray-50 hover:bg-gray-100 px-4 py-3 text-lg font-medium text-gray-700">
+                      {section.title || `Section ${index + 1}`}
+                    </AccordionTrigger>
+                    <AccordionContent className="p-4 bg-white space-y-4">
+                      {section.files.length === 0 ? (
+                        <p className="text-gray-500 italic">
+                          No files in this section.
+                        </p>
+                      ) : (
+                        <ul className="space-y-2">
+                          {section.files.map((file, fileIndex) => (
+                            <li
+                              key={file.id || fileIndex}
+                              className="flex items-center gap-2"
                             >
-                              {file.name || `File ${fileIndex + 1}`}
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
+                              <FileText className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                              <a
+                                href={file.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:underline hover:text-blue-800 transition-colors"
+                              >
+                                {file.name || `File ${fileIndex + 1}`}
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
 
-                    {/* ➕ Add Quiz Question */}
-                    <Button
-                      variant="outline"
-                      onClick={() =>
-                        router.push(
-                          `/sections/${section.id}/addquestions?courseId=${id}`
-                        )
-                      }
-                    >
-                      ➕ Add Quiz Question
-                    </Button>
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
+                      {/* ➕ Add Quiz Question */}
+                      <Button
+                        variant="outline"
+                        onClick={() =>
+                          router.push(
+                            `/sections/${section.id}/addquestions?courseId=${id}`
+                          )
+                        }
+                      >
+                        ➕ Add Quiz Question
+                      </Button>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+
+              {/* ➕ Add Final Quiz */}
+              <div className="mt-6">
+                <Button
+                  variant="default"
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                  onClick={() => router.push(`/mycourses/${id}/add-final-quiz`)}
+                >
+                  ➕ Add Final Quiz
+                </Button>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
 
-      {/* Playlist Section (optional) */}
+      {/* Optional Playlist */}
       {course.playlistUrl && (
         <Card className="shadow-md">
           <CardHeader>

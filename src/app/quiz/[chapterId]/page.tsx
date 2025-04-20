@@ -204,7 +204,7 @@ export default function TakeQuizPage() {
           <div className="flex flex-wrap justify-center gap-4">
             <Button
               variant="secondary"
-              onClick={() => router.push(`/student-dashboard`)}
+              onClick={() => router.push(`/MyCourses`)}
             >
               ← Back to Course Sections
             </Button>

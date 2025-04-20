@@ -12,7 +12,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { FileText, Lock } from "lucide-react";
+import { FileText, Lock, GraduationCap } from "lucide-react";
 
 interface CourseFile {
   id: number;
@@ -47,6 +47,7 @@ export default function CourseDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [accessibleChapters, setAccessibleChapters] = useState<number[]>([]);
+  const [finalQuizUnlocked, setFinalQuizUnlocked] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -68,6 +69,12 @@ export default function CourseDetailPage() {
 
         if (Array.isArray(accessData.chapterIds)) {
           setAccessibleChapters(accessData.chapterIds);
+          if (
+            accessData.chapterIds.length >= 3 &&
+            accessData.chapterIds.length === courseData.sections.length
+          ) {
+            setFinalQuizUnlocked(true);
+          }
         } else {
           setAccessibleChapters([]);
         }
@@ -93,7 +100,6 @@ export default function CourseDetailPage() {
         credentials: "include",
         body: JSON.stringify({ progress: progressInput }),
       });
-
       setCourse((prev) => (prev ? { ...prev, progress: progressInput } : prev));
     } catch (err) {
       alert("Error updating progress.");
@@ -120,7 +126,11 @@ export default function CourseDetailPage() {
 
   return (
     <div className="max-w-3xl mx-auto p-6 space-y-8">
-      <Button variant="outline" onClick={() => router.back()} className="mb-2">
+      <Button
+        variant="outline"
+        onClick={() => router.push("/student-dashboard")}
+        className="mb-2"
+      >
         ← Back
       </Button>
 
@@ -149,35 +159,16 @@ export default function CourseDetailPage() {
             <span>Price: ${parseFloat(course.price).toFixed(2)}</span>
           </div>
 
-          <div className="mt-3 space-y-2">
-            <Progress value={course.progress ?? 0} className="h-2" />
-            <span className="text-xs text-gray-500">
-              Progress: {course.progress ?? 0}%
-            </span>
-            <div className="flex items-center justify-center gap-2 mt-2">
-              <label htmlFor="progress-range" className="sr-only">
-                Progress
-              </label>
-              <input
-                id="progress-range"
-                type="range"
-                min={0}
-                max={100}
-                value={progressInput ?? 0}
-                onChange={(e) => setProgressInput(Number(e.target.value))}
-                className="w-40 accent-blue-600"
-                title="Adjust progress"
+          <div className="mt-3 space-y-2 text-center">
+            <div className="flex justify-between text-xs text-gray-500">
+              <span>Progress</span>
+              <span>{course.progress ?? 0}%</span>
+            </div>
+            <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+              <div
+                className="bg-blue-600 h-full transition-all duration-500"
+                style={{ width: `${course.progress ?? 0}%` }}
               />
-              <span className="text-xs w-8 text-center">
-                {progressInput ?? 0}%
-              </span>
-              <Button
-                size="sm"
-                onClick={handleProgressUpdate}
-                disabled={updating || progressInput === course.progress}
-              >
-                {updating ? "Updating..." : "Update Progress"}
-              </Button>
             </div>
           </div>
         </CardHeader>
@@ -232,17 +223,14 @@ export default function CourseDetailPage() {
                                 </li>
                               ))}
                             </ul>
-                            {index !== 0 && (
-                              <Button
-                                variant="outline"
-                                className="mt-4 text-blue-600 border-blue-600"
-                                onClick={() =>
-                                  router.push(`/quiz/${section.id}`)
-                                }
-                              >
-                                Take Quiz
-                              </Button>
-                            )}
+                            {/* ✅ Show quiz for all unlocked sections */}
+                            <Button
+                              variant="outline"
+                              className="mt-4 text-blue-600 border-blue-600"
+                              onClick={() => router.push(`/quiz/${section.id}`)}
+                            >
+                              Take Quiz
+                            </Button>
                           </>
                         ) : (
                           <div className="text-sm text-gray-500 flex items-center gap-2">
@@ -257,6 +245,21 @@ export default function CourseDetailPage() {
               </Accordion>
             )}
           </div>
+
+          {finalQuizUnlocked && (
+            <div className="mt-6">
+              <h2 className="text-lg font-semibold mb-2 flex items-center gap-2">
+                <GraduationCap className="w-5 h-5 text-green-600" /> Final Quiz
+              </h2>
+              <Button
+                variant="default"
+                className="bg-green-600 hover:bg-green-700 text-white"
+                onClick={() => router.push(`/final-quiz/${id}`)}
+              >
+                Take Final Quiz & Get Certificate
+              </Button>
+            </div>
+          )}
 
           {course.playlistUrl && (
             <div>
