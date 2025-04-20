@@ -1,6 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Bell, UserPlus, CalendarClock, Bell as BellIcon } from "lucide-react";
+import {
+  Bell,
+  UserPlus,
+  CalendarClock,
+  Bell as BellIcon,
+  Star,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -75,6 +81,8 @@ export default function NotificationBell() {
     switch (type) {
       case "enrollment":
         return <UserPlus className="w-4 h-4 mr-2 text-green-500" />;
+      case "review":
+        return <Star className="w-4 h-4 mr-2 text-yellow-500" />;
       case "announcement":
       case "session":
         return <CalendarClock className="w-4 h-4 mr-2 text-blue-500" />;
@@ -90,6 +98,8 @@ export default function NotificationBell() {
     switch (type) {
       case "enrollment":
         return "bg-green-100 border-l-4 border-green-500";
+      case "review":
+        return "bg-yellow-100 border-l-4 border-yellow-500";
       case "announcement":
         return "bg-blue-100";
       case "session":
