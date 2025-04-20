@@ -5,9 +5,14 @@ import { useRouter, usePathname } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
-import StudentNavBar from "@/components/StudentNavBar";
 import { ArrowLeft } from "lucide-react";
 
 interface Course {
@@ -58,20 +63,21 @@ export default function MyCoursesPage() {
     .filter(Boolean)
     .filter(
       (course) =>
-        (course.title?.toLowerCase?.().includes(search.toLowerCase()) ?? false) ||
+        (course.title?.toLowerCase?.().includes(search.toLowerCase()) ??
+          false) ||
         (course.tutor?.toLowerCase?.().includes(search.toLowerCase()) ?? false)
     )
     .sort((a, b) => {
       if (sort === "title") return (a.title || "").localeCompare(b.title || "");
-      if (sort === "instructor") return (a.tutor || "").localeCompare(b.tutor || "");
-      if (sort === "price") return parseFloat(a.price || "0") - parseFloat(b.price || "0");
+      if (sort === "instructor")
+        return (a.tutor || "").localeCompare(b.tutor || "");
+      if (sort === "price")
+        return parseFloat(a.price || "0") - parseFloat(b.price || "0");
       return 0;
     });
 
   return (
     <>
-      <StudentNavBar />
-
       <div className="p-6 max-w-7xl mx-auto space-y-6">
         {/* 🔙 Back Button */}
         <div className="flex items-start">
@@ -104,7 +110,7 @@ export default function MyCoursesPage() {
           <Input
             placeholder="Search by course or instructor..."
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
             className="max-w-xs"
           />
           <Select value={sort} onValueChange={setSort}>
@@ -135,7 +141,9 @@ export default function MyCoursesPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <p className="text-gray-700 line-clamp-3 min-h-[56px]">{course.description}</p>
+                <p className="text-gray-700 line-clamp-3 min-h-[56px]">
+                  {course.description}
+                </p>
                 <p className="text-sm text-muted-foreground">
                   Instructor: {course.tutor}
                 </p>
@@ -145,7 +153,9 @@ export default function MyCoursesPage() {
                 {/* Progress Bar Placeholder */}
                 <div className="mt-2">
                   <Progress value={course.progress ?? 0} className="h-2" />
-                  <span className="text-xs text-gray-500">Progress: {course.progress ?? 0}%</span>
+                  <span className="text-xs text-gray-500">
+                    Progress: {course.progress ?? 0}%
+                  </span>
                 </div>
                 <Button
                   variant="outline"

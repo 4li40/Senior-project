@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { GraduationCap } from "lucide-react";
-import StudentNavBar from "@/components/StudentNavBar";
 import ChatPopup from "@/components/chatpopup";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
@@ -266,8 +265,6 @@ export default function StudentDashboard() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      <StudentNavBar />
-
       <main className="flex-grow px-4 md:px-8 lg:px-16 space-y-12 mt-10">
         <h2 className="text-center text-3xl font-extrabold text-blue-800 mb-8 tracking-tight drop-shadow-sm">
           Welcome to Your Dashboard

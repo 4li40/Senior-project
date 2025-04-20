@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { BarChartComponent } from "@/components/ui/bar-chart";
-import TeacherNavBar from "@/components/teacherNavBar";
 
 export default function EarningsPage() {
   const [total, setTotal] = useState(0);
@@ -32,7 +31,6 @@ export default function EarningsPage() {
 
   return (
     <>
-      <TeacherNavBar />
       <div className="p-6 max-w-7xl mx-auto space-y-6">
         <h1 className="text-2xl font-bold">Earnings</h1>
 

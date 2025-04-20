@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import StudentNavBar from "@/components/StudentNavBar";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BookOpen, Award, Clock, Mail, Search } from "lucide-react";
@@ -83,7 +82,6 @@ export default function FindTutorPage() {
   };
   return (
     <div className="min-h-screen bg-gray-50">
-      <StudentNavBar />
       <div className="max-w-7xl mx-auto p-6">
         <div className="mb-8">
           <h1 className="text-3xl font-bold tracking-tight text-gray-900 mb-2">

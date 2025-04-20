@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import TeacherNavBar from "@/components/teacherNavBar";
 
 interface Course {
   id: number;
@@ -67,8 +66,6 @@ export default function MyCoursesPage() {
 
   return (
     <div>
-      <TeacherNavBar />
-
       <div className="p-6 max-w-7xl mx-auto space-y-6">
         <div className="flex items-center space-x-2">
           <Button

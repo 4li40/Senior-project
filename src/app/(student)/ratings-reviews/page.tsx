@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Star, User } from "lucide-react";
-import StudentNavBar from "@/components/StudentNavBar";
 
 export default function RatingsReviewsPage() {
   const [courses, setCourses] = useState<Course[]>([]);
@@ -125,7 +124,6 @@ export default function RatingsReviewsPage() {
 
   return (
     <>
-      <StudentNavBar />
       <div className="p-6 max-w-6xl mx-auto space-y-8">
         <h1 className="text-3xl font-bold text-center text-gray-900">
           Ratings and Reviews

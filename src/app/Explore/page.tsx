@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import StudentNavBar from "@/components/StudentNavBar";
 import { Calendar, User, DollarSign, BookOpen } from "lucide-react";
 
 export default function ExplorePage() {
@@ -33,9 +32,12 @@ export default function ExplorePage() {
 
         setIsLoggedIn(authRes.ok);
 
-        const coursesRes = await fetch("http://localhost:5003/api/courses/public", {
-          credentials: "include",
-        });
+        const coursesRes = await fetch(
+          "http://localhost:5003/api/courses/public",
+          {
+            credentials: "include",
+          }
+        );
 
         if (!coursesRes.ok) throw new Error("Failed to fetch courses");
 
@@ -89,7 +91,6 @@ export default function ExplorePage() {
 
   return (
     <>
-      <StudentNavBar />
       <div className="p-6 max-w-7xl mx-auto space-y-6">
         <h1 className="text-3xl font-bold text-blue-700 text-center">
           All Courses
