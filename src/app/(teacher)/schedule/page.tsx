@@ -260,6 +260,8 @@ export default function SchedulePage() {
             startAccessor="start"
             endAccessor="end"
             style={{ height: 500 }}
+            defaultView="month"
+            views={["month", "week", "day", "agenda"]}
             eventPropGetter={(event) => {
               const bgColor = event.type === "live" ? "#c7d2fe" : "#fef08a";
               return {
