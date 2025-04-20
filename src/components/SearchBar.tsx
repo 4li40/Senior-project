@@ -38,10 +38,11 @@ export function SearchBar({
     const fetchCourses = async () => {
       try {
         // Different API endpoints based on user role
-        const endpoint = userRole === 'tutor' || userRole === 'teacher'
-          ? "http://localhost:5003/api/courses" // Tutor's own courses
-          : "http://localhost:5003/api/courses/public"; // All public courses for students
-          
+        const endpoint =
+          userRole === "tutor" || userRole === "teacher"
+            ? "http://localhost:5003/api/courses" // Tutor's own courses
+            : "http://localhost:5003/api/courses/public"; // All public courses for students
+
         const response = await fetch(endpoint, {
           credentials: "include",
         });
