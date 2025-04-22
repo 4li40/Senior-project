@@ -187,11 +187,11 @@ export default function ProfilePage() {
         {/* back button */}
         <Button
           variant="secondary"
-          className="mb-6"
+          className="mb-4 mt-2"
           onClick={() => router.back()}
         >
           <ArrowLeft className="h-4 w-4 mr-1.5" />
-          Dashboard
+          Back
         </Button>
 
         {/* ---------- header card ---------------------------------------------------- */}
@@ -412,11 +412,11 @@ export default function ProfilePage() {
                   </CardHeader>
                   <CardContent className="flex-1 flex flex-col gap-3">
                     <p className="text-sm font-medium leading-tight">
-                      “Intro&nbsp;to&nbsp;Network&nbsp;Security”
+                      "Intro&nbsp;to&nbsp;Network&nbsp;Security"
                     </p>
                     <Progress value={62} />
                     <p className="text-xs text-muted-foreground">
-                      62 % • 8 / 13 lessons
+                      62&nbsp;%&nbsp;•&nbsp;8&nbsp;/&nbsp;13&nbsp;lessons
                     </p>
                     <Button
                       size="sm"
@@ -433,7 +433,7 @@ export default function ProfilePage() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <BookOpenText className="h-4 w-4 text-sky-600" />
-                      Quick Actions
+                      Quick&nbsp;Actions
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="flex-1 space-y-3">
