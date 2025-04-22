@@ -91,9 +91,14 @@ export default function MyCoursesPage() {
           </Button>
         </div>
 
-        <h2 className="text-3xl font-bold text-blue-700 text-center mb-6">
-          My Courses
-        </h2>
+        <div className="flex justify-center items-center gap-6 mb-6">
+  <h2 className="text-4xl font-bold text-blue-700">My Courses</h2>
+  <img
+    src="/images/courses.svg"
+    alt="Courses Illustration"
+    className="w-24 h-24 md:w-32 md:h-32"
+  />
+</div>
 
         {loading && (
           <p className="text-gray-600 text-center">Loading courses...</p>

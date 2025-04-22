@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useInView } from "react-intersection-observer";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { BookOpen, Users, Code, Layout } from "lucide-react";
@@ -9,6 +11,11 @@ import MainNavBar from "@/components/MainNavBar";
 
 export default function LandingPage() {
   const [announcements, setAnnouncements] = useState<any[]>([]);
+
+  const [ref, inView] = useInView({
+    threshold: 0.1,
+    triggerOnce: true,
+  });
 
   useEffect(() => {
     fetch("http://localhost:5003/api/courses/announcements/public")
@@ -80,41 +87,35 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Public Announcements */}
-      <section className="bg-blue-50 py-20">
-        <div className="container mx-auto px-6">
-          <h2 className="text-4xl font-bold text-center mb-12">
-            🔔 Upcoming Events & Announcements
-          </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {announcements.length > 0 ? (
-              announcements.map((a, i) => (
-                <Card
-                  key={i}
-                  className="shadow-md hover:shadow-lg border border-gray-200"
-                >
-                  <CardContent className="p-6">
-                    <p className="text-lg font-semibold text-blue-700 mb-1">
-                      {a.title}
-                    </p>
-                    <p className="text-sm text-gray-700 mb-2">
-                      {a.description}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      By {a.first_name} {a.last_name} —{" "}
-                      {new Date(a.scheduled_at).toLocaleString()}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))
-            ) : (
-              <p className="text-center text-gray-600 col-span-full">
-                No announcements available right now.
-              </p>
-            )}
-          </div>
-        </div>
-      </section>
+      {/* Scroll Reveal Image After Why Study Buddy */}
+      <motion.div
+  ref={ref}
+  initial={{ opacity: 0, y: 100 }}
+  animate={inView ? { opacity: 1, y: 0 } : {}}
+  transition={{ duration: 1 }}
+  className="relative h-[500px] w-full"
+>
+  <Image
+    src="/images/student-class-looking-course.jpg"
+    alt="Student class setup"
+    layout="fill"
+    objectFit="cover"
+    className="object-cover"
+  />
+  <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-center px-4">
+    <div>
+      <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-4 drop-shadow-lg">
+        Earn Certificates. Prove Your Skills.
+      </h2>
+      <p className="text-lg text-gray-200 max-w-2xl mx-auto">
+        Get recognized for your learning by earning certificates upon course completion.
+      </p>
+    </div>
+  </div>
+</motion.div>
+
+
+      
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-14 mt-16">
@@ -173,7 +174,9 @@ function FeatureCard({
   description: string;
 }) {
   return (
-    <Card className="shadow-md hover:shadow-xl border border-gray-200">
+    <Card
+      className="shadow-md border border-gray-200 transition-transform duration-300 ease-in-out hover:scale-105"
+    >
       <CardContent className="p-6">
         <div className="mb-4 flex justify-center">{icon}</div>
         <h3 className="text-lg font-semibold text-center text-gray-800 mb-2">
@@ -184,3 +187,4 @@ function FeatureCard({
     </Card>
   );
 }
+

@@ -77,23 +77,23 @@ export default function AdminDashboard() {
         <h1 className="text-4xl font-bold text-center mb-6">Admin Dashboard</h1>
 
         {/* STATS */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-          {[
-            { icon: BarChart,   label: "Total Users",        value: stats.totalUsers.toLocaleString() },
-            { icon: Activity,   label: "Active Sessions",    value: stats.activeSessions },
-            { icon: Users,      label: "Active Users",       value: stats.activeUsers },
-            { icon: MapPin,     label: "Countries Reached",  value: stats.countriesReached },
-            { icon: DollarSign, label: "15% Revenue ($)",    value: stats.revenue },
-          ].map(({ icon: Icon, label, value }, i) => (
-            <Card key={i} className="border shadow-lg rounded-xl hover:scale-105 hover:bg-gray-200 transition-transform">
-              <CardContent className="flex flex-col items-center p-6">
-                <Icon className="w-10 h-10 text-gray-700 mb-3" />
-                <h2 className="text-xl font-semibold">{value}</h2>
-                <p className="text-sm text-gray-600">{label}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+  {[
+    { icon: BarChart,   label: "Total Users",     value: stats.totalUsers.toLocaleString() },
+    { icon: Activity,   label: "Active Sessions", value: stats.activeSessions },
+    { icon: Users,      label: "Active Users",    value: stats.activeUsers },
+    { icon: DollarSign, label: "15% Revenue ($)", value: stats.revenue },
+  ].map(({ icon: Icon, label, value }, i) => (
+    <Card key={i} className="border shadow-lg rounded-xl hover:scale-105 hover:bg-gray-200 transition-transform">
+      <CardContent className="flex flex-col items-center p-6">
+        <Icon className="w-10 h-10 text-gray-700 mb-3" />
+        <h2 className="text-xl font-semibold">{value}</h2>
+        <p className="text-sm text-gray-600">{label}</p>
+      </CardContent>
+    </Card>
+  ))}
+</div>
+
 
         {/* PENDING TUTORS */}
         <Card className="border shadow-lg rounded-xl">
@@ -134,7 +134,7 @@ export default function AdminDashboard() {
                     <td className="border-b px-4 py-2">{u.email}</td>
                     <td className="border-b px-4 py-2 capitalize">{u.role}</td>
                     <td className="border-b px-4 py-2 space-x-2">
-                      <Button size="sm" className="bg-blue-500 text-white">Edit</Button>
+                      <Button size="sm" className="bg-blue-500 text-white">View</Button>
                       <Button size="sm" className="bg-red-500  text-white"
                         onClick={async () => {
                           await fetch(`${API_BASE}/users/${u.id}`, { method: "DELETE", credentials: "include" });

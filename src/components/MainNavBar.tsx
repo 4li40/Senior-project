@@ -6,13 +6,12 @@ import { Button } from "@/components/ui/button";
 import { SearchBar } from "@/components/SearchBar";
 import ExploreDropdown from "@/components/ExploreDropdown";
 import { useEffect, useState } from "react";
-import { Info, Rocket, DollarSign, Mail } from "lucide-react";
 
 const navItems = [
-  { label: "About Us", href: "/about", icon: <Info size={16} /> },
-  { label: "Features", href: "/features", icon: <Rocket size={16} /> },
-  { label: "Pricing", href: "/pricing", icon: <DollarSign size={16} /> },
-  { label: "Contact", href: "/contact", icon: <Mail size={16} /> },
+  { label: "About Us", href: "/about" },
+  { label: "Features", href: "/features" },
+  { label: "Pricing", href: "/pricing" },
+  { label: "Contact", href: "/contact" },
 ];
 
 const MainNavBar = () => {
@@ -37,19 +36,18 @@ const MainNavBar = () => {
 
         {/* 🔹 Center: Navigation & Optional Search */}
         <div className="flex-1 flex justify-center items-center gap-4 max-w-4xl">
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden md:flex items-center gap-4">
             {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${
-                  pathname === item.href
-                    ? "text-black font-semibold"
-                    : "text-gray-500 hover:text-black"
-                }`}
-              >
-                {item.icon}
-                {item.label}
+              <Link key={item.href} href={item.href}>
+                <div
+                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 transform ${
+                    pathname === item.href
+                      ? "bg-gray-200 text-black scale-105"
+                      : "bg-white text-gray-600 hover:bg-gray-200 hover:text-black hover:scale-105"
+                  }`}
+                >
+                  {item.label}
+                </div>
               </Link>
             ))}
           </nav>
@@ -71,12 +69,15 @@ const MainNavBar = () => {
         {/* 🔹 Right: Auth Buttons */}
         <div className="w-[180px] flex items-center gap-3 justify-end">
           <Link href="/login">
-            <Button variant="ghost" className="text-sm font-medium">
+            <Button
+              variant="ghost"
+              className="bg-white text-sm font-medium hover:bg-gray-200 hover:scale-105 transition-transform rounded-xl"
+            >
               Login
             </Button>
           </Link>
           <Link href="/signup">
-            <Button className="bg-black text-white hover:bg-gray-800 text-sm">
+            <Button className="bg-white text-sm text-black hover:bg-gray-300 hover:scale-105 transition-transform rounded-xl">
               Sign Up
             </Button>
           </Link>
