@@ -269,7 +269,7 @@ export default function CourseDetailPage() {
                               <>
                                 <ul className="space-y-2">
                                   {section.files.map((file) => {
-                                    // Check if the file is a video based on name or URL
+                                    // Check if the file is a video or PDF based on name or URL
                                     const isVideo =
                                       file.name
                                         .toLowerCase()
@@ -277,6 +277,10 @@ export default function CourseDetailPage() {
                                           /\.(mp4|webm|mov|avi|wmv|flv|mkv)$/
                                         ) ||
                                       file.url.toLowerCase().includes("video");
+                                    
+                                    const isPDF =
+                                      file.name.toLowerCase().endsWith(".pdf") ||
+                                      file.url.toLowerCase().includes("pdf");
 
                                     return (
                                       <li
@@ -287,6 +291,8 @@ export default function CourseDetailPage() {
                                           className={`w-4 h-4 ${
                                             isVideo
                                               ? "text-red-600"
+                                              : isPDF
+                                              ? "text-green-600"
                                               : "text-blue-600"
                                           } flex-shrink-0`}
                                         />
@@ -302,8 +308,20 @@ export default function CourseDetailPage() {
                                           >
                                             {file.name} (Video)
                                           </a>
+                                        ) : isPDF ? (
+                                          // For PDF files, link to the PDF viewer page
+                                          <a
+                                            onClick={() =>
+                                              router.push(
+                                                `/MyCourses/${id}/pdf/${file.id}`
+                                              )
+                                            }
+                                            className="text-green-600 hover:underline hover:text-green-800 text-sm cursor-pointer"
+                                          >
+                                            {file.name} (PDF)
+                                          </a>
                                         ) : (
-                                          // For non-video files, keep the current behavior
+                                          // For other files, keep the current behavior
                                           <a
                                             href={file.url}
                                             target="_blank"

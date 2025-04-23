@@ -140,9 +140,12 @@ export default function CourseDetailPage() {
                       ) : (
                         <ul className="space-y-2">
                           {section.files.map((file, fileIndex) => {
-                            // Check if the file is a video based on name or URL
+                            // Check if the file is a video or PDF based on name or URL
                             const isVideo = file.name.toLowerCase().match(/\.(mp4|webm|mov|avi|wmv|flv|mkv)$/) || 
                                            file.url.toLowerCase().includes('video');
+                            
+                            const isPDF = file.name.toLowerCase().endsWith(".pdf") ||
+                                          file.url.toLowerCase().includes("pdf");
                             
                             return (
                               <li
@@ -151,6 +154,8 @@ export default function CourseDetailPage() {
                               >
                                 {isVideo ? (
                                   <Video className="w-4 h-4 text-red-600 flex-shrink-0" />
+                                ) : isPDF ? (
+                                  <FileText className="w-4 h-4 text-green-600 flex-shrink-0" />
                                 ) : (
                                   <FileText className="w-4 h-4 text-blue-600 flex-shrink-0" />
                                 )}
@@ -162,6 +167,14 @@ export default function CourseDetailPage() {
                                     className="text-red-600 hover:underline hover:text-red-800 text-sm cursor-pointer"
                                   >
                                     {file.name || `File ${fileIndex + 1}`} (Video)
+                                  </a>
+                                ) : isPDF ? (
+                                  // For PDF files, link to the PDF viewer page
+                                  <a
+                                    onClick={() => router.push(`/mycourses/${id}/pdf/${file.id}`)}
+                                    className="text-green-600 hover:underline hover:text-green-800 text-sm cursor-pointer"
+                                  >
+                                    {file.name || `File ${fileIndex + 1}`} (PDF)
                                   </a>
                                 ) : (
                                   // For non-video files, keep the current behavior

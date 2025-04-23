@@ -25,44 +25,62 @@ interface Notification {
 export default function NotificationBell() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const fetchNotifications = () => {
-    fetch("http://localhost:5003/api/notifications", {
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("📥 Notifications fetched from backend:", data);
-
-        // ✅ Make sure it's an array before setting it
-        if (Array.isArray(data)) {
-          setNotifications(data);
-        } else {
-          console.warn("Unexpected notification response:", data);
-          setNotifications([]); // fallback
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching notifications:", error);
+  const fetchNotifications = async () => {
+    try {
+      setIsLoading(true);
+      const res = await fetch("http://localhost:5003/api/notifications", {
+        credentials: "include",
       });
+
+      if (!res.ok) {
+        // If response is not ok, throw an error with the status
+        throw new Error(`Failed to fetch notifications: ${res.status}`);
+      }
+
+      const data = await res.json();
+      console.log("📥 Notifications fetched from backend:", data);
+
+      // ✅ Make sure it's an array before setting it
+      if (Array.isArray(data)) {
+        setNotifications(data);
+        setError(null); // Clear any previous errors
+      } else {
+        console.warn("Unexpected notification response:", data);
+        setNotifications([]); // fallback
+      }
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      setError("Failed to load notifications");
+      setNotifications([]); // Reset notifications on error
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const markAsRead = () => {
-    fetch("http://localhost:5003/api/notifications/mark-read", {
-      method: "PATCH",
-      credentials: "include",
-    })
-      .then(() => {
-        setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
-      })
-      .catch((error) => {
-        console.error("Error marking notifications as read:", error);
+  const markAsRead = async () => {
+    try {
+      const res = await fetch("http://localhost:5003/api/notifications/mark-read", {
+        method: "PATCH",
+        credentials: "include",
       });
+
+      if (!res.ok) {
+        throw new Error("Failed to mark notifications as read");
+      }
+
+      setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+    } catch (error) {
+      console.error("Error marking notifications as read:", error);
+      // Don't show error to user for this non-critical operation
+    }
   };
 
   useEffect(() => {
     fetchNotifications();
-    const interval = setInterval(fetchNotifications, 30000);
+    const interval = setInterval(fetchNotifications, 30000); // Fetch every 30 seconds
     return () => clearInterval(interval);
   }, []);
 
@@ -72,9 +90,7 @@ export default function NotificationBell() {
     }
   }, [open]);
 
-  const unreadCount = Array.isArray(notifications)
-    ? notifications.filter((n) => !n.isRead).length
-    : 0;
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   // Get notification icon based on type
   const getNotificationIcon = (type: string) => {
@@ -126,8 +142,16 @@ export default function NotificationBell() {
       <PopoverContent className="w-72">
         <h4 className="font-semibold mb-2">Notifications</h4>
         <div className="space-y-2 max-h-60 overflow-y-auto">
-          {!Array.isArray(notifications) || notifications.length === 0 ? (
-            <p className="text-sm text-gray-500">No notifications</p>
+          {isLoading ? (
+            <div className="flex justify-center py-4">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+            </div>
+          ) : error ? (
+            <div className="text-sm text-gray-500 text-center py-2">
+              {error}
+            </div>
+          ) : !Array.isArray(notifications) || notifications.length === 0 ? (
+            <p className="text-sm text-gray-500 text-center">No notifications</p>
           ) : (
             notifications.map((n) => (
               <div
