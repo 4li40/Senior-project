@@ -10,7 +10,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { FileText } from "lucide-react";
+import { FileText, Video } from "lucide-react";
 
 interface CourseFile {
   id: number;
@@ -139,22 +139,44 @@ export default function CourseDetailPage() {
                         </p>
                       ) : (
                         <ul className="space-y-2">
-                          {section.files.map((file, fileIndex) => (
-                            <li
-                              key={file.id || fileIndex}
-                              className="flex items-center gap-2"
-                            >
-                              <FileText className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                              <a
-                                href={file.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 hover:underline hover:text-blue-800 transition-colors"
+                          {section.files.map((file, fileIndex) => {
+                            // Check if the file is a video based on name or URL
+                            const isVideo = file.name.toLowerCase().match(/\.(mp4|webm|mov|avi|wmv|flv|mkv)$/) || 
+                                           file.url.toLowerCase().includes('video');
+                            
+                            return (
+                              <li
+                                key={file.id || fileIndex}
+                                className="flex items-center gap-2"
                               >
-                                {file.name || `File ${fileIndex + 1}`}
-                              </a>
-                            </li>
-                          ))}
+                                {isVideo ? (
+                                  <Video className="w-4 h-4 text-red-600 flex-shrink-0" />
+                                ) : (
+                                  <FileText className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                                )}
+                                
+                                {isVideo ? (
+                                  // For video files, link to the video player page
+                                  <a
+                                    onClick={() => router.push(`/mycourses/${id}/video/${file.id}`)}
+                                    className="text-red-600 hover:underline hover:text-red-800 text-sm cursor-pointer"
+                                  >
+                                    {file.name || `File ${fileIndex + 1}`} (Video)
+                                  </a>
+                                ) : (
+                                  // For non-video files, keep the current behavior
+                                  <a
+                                    href={file.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-600 hover:underline hover:text-blue-800 transition-colors"
+                                  >
+                                    {file.name || `File ${fileIndex + 1}`}
+                                  </a>
+                                )}
+                              </li>
+                            );
+                          })}
                         </ul>
                       )}
 
