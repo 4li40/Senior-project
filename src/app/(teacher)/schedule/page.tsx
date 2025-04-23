@@ -19,6 +19,7 @@ import {
   TableCell,
   TableBody,
 } from "@/components/ui/table";
+import { useRef } from "react"; // ← add this
 
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -70,6 +71,7 @@ export default function SchedulePage() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const formRef = useRef<HTMLDivElement>(null); // 🔽 scroll target
 
   const fetchCourses = async () => {
     const res = await fetch("http://localhost:5003/api/courses", {
@@ -82,29 +84,26 @@ export default function SchedulePage() {
     }
   };
 
+  // Define the Session interface
+  interface Session {
+    scheduled_at: string;
+    duration_minutes?: number;
+    title: string;
+    type: string;
+    course_title: string;
+    description?: string;
+  }
+
   const fetchSessions = async () => {
     const res = await fetch("http://localhost:5003/api/courses/sessions", {
       credentials: "include",
     });
-    const data = await res.json();
-    interface Session {
-      scheduled_at: string;
-      duration_minutes?: number;
-      title: string;
-      type: string;
-      course_title: string;
-      description?: string;
-    }
 
-    interface Event {
-      title: string;
-      course: string;
-      type: string;
-      start: Date;
-      end: Date;
-      allDay: boolean;
-      description?: string;
-      duration: number;
+    const data = await res.json();
+
+    if (!Array.isArray(data)) {
+      console.error("❌ Expected array but got:", data);
+      return;
     }
 
     const formatted: Event[] = data.map((session: Session) => {
@@ -123,6 +122,7 @@ export default function SchedulePage() {
         duration: session.duration_minutes || 60,
       };
     });
+
     setEvents(formatted);
   };
 
@@ -194,7 +194,21 @@ export default function SchedulePage() {
           Schedule Management
         </h1>
         <Button
-          onClick={() => setShowForm(!showForm)} // Toggle form visibility
+          onClick={() => {
+            setShowForm((prev) => {
+              const next = !prev;
+              if (!prev) {
+                // just opened it
+                setTimeout(() => {
+                  formRef.current?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                  });
+                }, 100);
+              }
+              return next;
+            });
+          }}
           className="bg-blue-600 hover:bg-blue-700 text-white"
         >
           {showForm ? "Cancel" : "+ New Session"}
@@ -324,7 +338,7 @@ export default function SchedulePage() {
       </div>
 
       {showForm && (
-        <div className="bg-white p-6 rounded-lg shadow-lg mt-4">
+        <div ref={formRef} className="bg-white p-6 rounded-lg shadow-lg mt-4">
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && <p className="text-red-500 text-sm">{error}</p>}
 
@@ -406,7 +420,6 @@ export default function SchedulePage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="enrolled">enrolled</SelectItem>
-                  <SelectItem value="public">Public</SelectItem>
                 </SelectContent>
               </Select>
             </div>

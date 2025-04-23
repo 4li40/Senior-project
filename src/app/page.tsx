@@ -17,12 +17,12 @@ export default function LandingPage() {
     triggerOnce: true,
   });
 
-  useEffect(() => {
-    fetch("http://localhost:5003/api/courses/announcements/public")
-      .then((res) => res.json())
-      .then(setAnnouncements)
-      .catch((err) => console.error("Error loading announcements", err));
-  }, []);
+  // useEffect(() => {
+  //   fetch("http://localhost:5003/api/courses/announcements/public")
+  //     .then((res) => res.json())
+  //     .then(setAnnouncements)
+  //     .catch((err) => console.error("Error loading announcements", err));
+  // }, []);
 
   return (
     <div className="min-h-screen">
@@ -89,33 +89,31 @@ export default function LandingPage() {
 
       {/* Scroll Reveal Image After Why Study Buddy */}
       <motion.div
-  ref={ref}
-  initial={{ opacity: 0, y: 100 }}
-  animate={inView ? { opacity: 1, y: 0 } : {}}
-  transition={{ duration: 1 }}
-  className="relative h-[500px] w-full"
->
-  <Image
-    src="/images/student-class-looking-course.jpg"
-    alt="Student class setup"
-    layout="fill"
-    objectFit="cover"
-    className="object-cover"
-  />
-  <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-center px-4">
-    <div>
-      <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-4 drop-shadow-lg">
-        Earn Certificates. Prove Your Skills.
-      </h2>
-      <p className="text-lg text-gray-200 max-w-2xl mx-auto">
-        Get recognized for your learning by earning certificates upon course completion.
-      </p>
-    </div>
-  </div>
-</motion.div>
-
-
-      
+        ref={ref}
+        initial={{ opacity: 0, y: 100 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 1 }}
+        className="relative h-[500px] w-full"
+      >
+        <Image
+          src="/images/student-class-looking-course.jpg"
+          alt="Student class setup"
+          layout="fill"
+          objectFit="cover"
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-center px-4">
+          <div>
+            <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-4 drop-shadow-lg">
+              Earn Certificates. Prove Your Skills.
+            </h2>
+            <p className="text-lg text-gray-200 max-w-2xl mx-auto">
+              Get recognized for your learning by earning certificates upon
+              course completion.
+            </p>
+          </div>
+        </div>
+      </motion.div>
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-14 mt-16">
@@ -174,9 +172,7 @@ function FeatureCard({
   description: string;
 }) {
   return (
-    <Card
-      className="shadow-md border border-gray-200 transition-transform duration-300 ease-in-out hover:scale-105"
-    >
+    <Card className="shadow-md border border-gray-200 transition-transform duration-300 ease-in-out hover:scale-105">
       <CardContent className="p-6">
         <div className="mb-4 flex justify-center">{icon}</div>
         <h3 className="text-lg font-semibold text-center text-gray-800 mb-2">
@@ -187,4 +183,3 @@ function FeatureCard({
     </Card>
   );
 }
-
