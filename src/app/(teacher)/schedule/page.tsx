@@ -190,12 +190,12 @@ export default function SchedulePage() {
         >
           ← Back
         </Button>
-        <h1 className="text-3xl font-bold text-blue-700">
+        <h1 className="text-3xl font-bold text-black-700">
           Schedule Management
         </h1>
         <Button
           onClick={() => setShowForm(!showForm)} // Toggle form visibility
-          className="bg-blue-600 hover:bg-blue-700 text-white"
+          className="bg-black-600 hover:bg-black-700 text-white"
         >
           {showForm ? "Cancel" : "+ New Session"}
         </Button>
@@ -237,7 +237,7 @@ export default function SchedulePage() {
             <ul className="text-sm space-y-3">
               {events.slice(0, 5).map((event, i) => (
                 <li key={i}>
-                  <span className="font-medium text-blue-800">
+                  <span className="font-medium text-black-800">
                     {event.title}
                   </span>
                   <br />
@@ -251,7 +251,7 @@ export default function SchedulePage() {
         </div>
 
         <div className="lg:col-span-2 border p-6 rounded-xl shadow-sm bg-white">
-          <h2 className="text-lg font-semibold mb-4 text-blue-700">
+          <h2 className="text-lg font-semibold mb-4 text-black-700">
             Calendar View
           </h2>
           <Calendar
@@ -281,7 +281,7 @@ export default function SchedulePage() {
 
       {/* Table Overview */}
       <div className="bg-white p-6 rounded-xl shadow-sm">
-        <h2 className="text-lg font-semibold mb-4 text-blue-700">
+        <h2 className="text-lg font-semibold mb-4 text-black-700">
           Session Overview
         </h2>
         <Table>
