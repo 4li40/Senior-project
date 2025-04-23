@@ -91,14 +91,16 @@ export default function MyCoursesPage() {
           </Button>
         </div>
 
-        <div className="flex justify-center items-center gap-6 mb-6">
-  <h2 className="text-4xl font-bold text-blue-700">My Courses</h2>
+        <div className="flex flex-col items-center text-center mb-8">
+        <h2 className="text-3xl md:text-4xl font-semibold text-black tracking-tight mb-2">
+    My Courses
+  </h2>
   <img
     src="/images/courses.svg"
     alt="Courses Illustration"
-    className="w-24 h-24 md:w-32 md:h-32"
+    className="w-20 h-20 md:w-28 md:h-28 object-contain"
   />
-</div>
+        </div>
 
         {loading && (
           <p className="text-gray-600 text-center">Loading courses...</p>

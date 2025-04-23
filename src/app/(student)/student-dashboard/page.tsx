@@ -264,9 +264,10 @@ export default function StudentDashboard() {
       : activities.filter((a) => a.type === activityFilter);
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-white-100 via-white to-blue-50 animate-fade-in">
+
       <main className="flex-grow px-4 md:px-8 lg:px-16 space-y-12 mt-10">
-        <h2 className="text-center text-3xl font-extrabold text-blue-800 mb-8 tracking-tight drop-shadow-sm">
+        <h2 className="text-center text-3xl font-extrabold text-black-800 mb-8 tracking-tight drop-shadow-sm">
           Welcome to Your Dashboard
         </h2>
         <div className="border-b border-gray-200 mb-6"></div>
@@ -274,28 +275,28 @@ export default function StudentDashboard() {
         {/* Top 3-column layout */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* My Courses */}
-          <Card className="w-full shadow-xl rounded-2xl transition-transform hover:scale-[1.02] bg-white/90">
+          <Card className="w-full shadow-lg rounded-xl border border-blue-100 hover:shadow-2xl hover:scale-105 transition-all duration-300 bg-white/95 backdrop-blur-sm">
             <CardHeader>
-              <CardTitle className="text-center text-purple-700 text-xl font-bold">
+              <CardTitle className="text-center text-blue-700 text-xl font-bold">
                 My Courses
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {loadingCourses ? (
                 <div className="animate-pulse space-y-2">
-                  <div className="h-5 bg-purple-100 rounded w-2/3 mx-auto" />
-                  <div className="h-3 bg-purple-50 rounded w-1/2 mx-auto" />
-                  <div className="h-3 bg-purple-50 rounded w-1/3 mx-auto" />
+                  <div className="h-5 bg-blue-100 rounded w-2/3 mx-auto" />
+                  <div className="h-3 bg-blue-50 rounded w-1/2 mx-auto" />
+                  <div className="h-3 bg-blue-50 rounded w-1/3 mx-auto" />
                 </div>
               ) : courses.length > 0 ? (
                 courses.map((course) => (
                   <div
                     key={course.id}
-                    className="flex items-start gap-4 border-b pb-3 hover:bg-purple-50/70 rounded-lg transition-all cursor-pointer active:scale-95"
+                    className="flex items-start gap-4 border-b pb-3 hover:bg-blue-50/70 rounded-lg transition-all cursor-pointer active:scale-95"
                     onClick={() => router.push(`/MyCourses/${course.id}`)}
                   >
-                    <div className="p-2 bg-purple-100 rounded-full shadow">
-                      <GraduationCap className="w-6 h-6 text-purple-700" />
+                    <div className="p-2 bg-blue-100 rounded-full shadow">
+                      <GraduationCap className="w-6 h-6 text-blue-700" />
                     </div>
                     <div className="flex-grow">
                       <h3 className="font-semibold text-gray-800 text-lg">
@@ -307,7 +308,7 @@ export default function StudentDashboard() {
                       <p className="text-sm text-gray-500">
                         Price: ${course.price}
                       </p>
-                      <Progress value={course.progress ?? 0} className="h-2" />
+                      <Progress value={course.progress ?? 0} className="h-2 transition-all duration-500 ease-in-out rounded-full" />
                       <span className="text-xs text-gray-500">
                         Progress: {course.progress ?? 0}%
                       </span>
@@ -320,7 +321,7 @@ export default function StudentDashboard() {
                 </p>
               )}
               <Button
-                className="w-full mt-4 font-semibold shadow-md bg-purple-600 hover:bg-purple-700 text-white transition-colors"
+                className="w-full mt-4 font-semibold shadow-md bg-blue-600 hover:bg-blue-700 text-white transition-colors"
                 onClick={() => router.push("/MyCourses")}
               >
                 View All Courses

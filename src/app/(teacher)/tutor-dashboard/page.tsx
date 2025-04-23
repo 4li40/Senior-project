@@ -85,7 +85,7 @@ export default function TutorDashboard() {
             <CardContent className="flex flex-col items-center justify-center p-6">
               <Icon className="w-8 h-8 mb-2 text-gray-700" />
               <h2 className="text-xl font-semibold">{value}</h2>
-              <p className="text-sm text-gray-600">{label}</p>
+              <p className="text-sm text-black-600">{label}</p>
             </CardContent>
           </Card>
         ))}
