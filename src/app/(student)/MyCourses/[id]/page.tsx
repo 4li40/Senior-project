@@ -268,22 +268,54 @@ export default function CourseDetailPage() {
                             {isUnlocked ? (
                               <>
                                 <ul className="space-y-2">
-                                  {section.files.map((file) => (
-                                    <li
-                                      key={file.id}
-                                      className="flex items-center gap-2"
-                                    >
-                                      <FileText className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                                      <a
-                                        href={file.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-blue-600 hover:underline hover:text-blue-800 text-sm"
+                                  {section.files.map((file) => {
+                                    // Check if the file is a video based on name or URL
+                                    const isVideo =
+                                      file.name
+                                        .toLowerCase()
+                                        .match(
+                                          /\.(mp4|webm|mov|avi|wmv|flv|mkv)$/
+                                        ) ||
+                                      file.url.toLowerCase().includes("video");
+
+                                    return (
+                                      <li
+                                        key={file.id}
+                                        className="flex items-center gap-2"
                                       >
-                                        {file.name}
-                                      </a>
-                                    </li>
-                                  ))}
+                                        <FileText
+                                          className={`w-4 h-4 ${
+                                            isVideo
+                                              ? "text-red-600"
+                                              : "text-blue-600"
+                                          } flex-shrink-0`}
+                                        />
+                                        {isVideo ? (
+                                          // For video files, link to the video player page
+                                          <a
+                                            onClick={() =>
+                                              router.push(
+                                                `/MyCourses/${id}/video/${file.id}`
+                                              )
+                                            }
+                                            className="text-red-600 hover:underline hover:text-red-800 text-sm cursor-pointer"
+                                          >
+                                            {file.name} (Video)
+                                          </a>
+                                        ) : (
+                                          // For non-video files, keep the current behavior
+                                          <a
+                                            href={file.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-blue-600 hover:underline hover:text-blue-800 text-sm"
+                                          >
+                                            {file.name}
+                                          </a>
+                                        )}
+                                      </li>
+                                    );
+                                  })}
                                 </ul>
                                 {/* Show quiz for all unlocked sections */}
                                 <Button
