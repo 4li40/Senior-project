@@ -214,7 +214,7 @@ export default function TeacherSignup() {
               {/* Experience & Certifications */}
               <FormField name="certifications" control={form.control} render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Certifications</FormLabel>
+                  <FormLabel>Certifications (Link)</FormLabel>
                   <FormControl><Input {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
