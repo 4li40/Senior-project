@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar, User, DollarSign, BookOpen } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function ExplorePage() {
   interface Course {
@@ -22,6 +23,7 @@ export default function ExplorePage() {
   const [error, setError] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -147,16 +149,34 @@ export default function ExplorePage() {
 
                   {/* 🔐 Enroll Button */}
                   {!isLoggedIn ? (
-                    <div className="bg-gray-100 text-center text-gray-400 py-2 rounded">
-                      🔒 Please log in to enroll
+                    <div className="flex flex-col gap-2">
+                      <div className="bg-gray-100 text-center text-gray-400 py-2 rounded">
+                        🔒 Please log in to enroll
+                      </div>
+                      <Button
+                        variant="outline"
+                        onClick={() => router.push(`/MyCourses/${course.id}`)}
+                        className="w-full"
+                      >
+                        👁️ Preview Course
+                      </Button>
                     </div>
                   ) : (
-                    <Button
-                      onClick={() => handleEnroll(course.id)}
-                      className="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white"
-                    >
-                      Enroll Now
-                    </Button>
+                    <div className="flex flex-col gap-2">
+                      <Button
+                        onClick={() => handleEnroll(course.id)}
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                      >
+                        Enroll Now
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => router.push(`/MyCourses/${course.id}`)}
+                        className="w-full"
+                      >
+                        👁️ Preview Course
+                      </Button>
+                    </div>
                   )}
                 </CardContent>
               </Card>

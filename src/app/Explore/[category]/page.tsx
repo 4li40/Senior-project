@@ -180,22 +180,40 @@ export default function CategoryPage() {
                 </p>
 
                 {!isLoggedIn ? (
-                  <div className="bg-gray-100 text-center text-gray-400 py-2 rounded">
-                    🔒 Please log in to enroll
+                  <div className="flex flex-col gap-2">
+                    <div className="bg-gray-100 text-center text-gray-400 py-2 rounded">
+                      🔒 Please log in to enroll
+                    </div>
+                    <Button
+                      variant="outline"
+                      onClick={() => router.push(`/MyCourses/${course.id}`)}
+                      className="w-full"
+                    >
+                      👁️ Preview Course
+                    </Button>
                   </div>
                 ) : isEnrolled ? (
                   <div className="bg-gray-100 p-2 rounded flex items-center justify-center text-green-600">
                     ✅ Enrolled
                   </div>
                 ) : (
-                  <Button
-                    onClick={() => handleCheckoutOrEnroll(course)}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    {parseFloat(course.price) === 0
-                      ? "Enroll for Free"
-                      : "Buy Course"}
-                  </Button>
+                  <div className="flex flex-col gap-2">
+                    <Button
+                      onClick={() => handleCheckoutOrEnroll(course)}
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      {parseFloat(course.price) === 0
+                        ? "Enroll for Free"
+                        : "Buy Course"}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => router.push(`/MyCourses/${course.id}`)}
+                      className="w-full"
+                    >
+                      👁️ Preview Course
+                    </Button>
+                  </div>
                 )}
               </CardContent>
             </Card>
