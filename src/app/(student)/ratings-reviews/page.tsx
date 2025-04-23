@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Star, User, CheckCircle, BookOpen } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
@@ -14,8 +20,10 @@ export default function RatingsReviewsPage() {
   const [reviews, setReviews] = useState<Reviews>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [reviewedCourses, setReviewedCourses] = useState<{[key: string]: boolean}>({});
-  const [submitting, setSubmitting] = useState<{[key: string]: boolean}>({});
+  const [reviewedCourses, setReviewedCourses] = useState<{
+    [key: string]: boolean;
+  }>({});
+  const [submitting, setSubmitting] = useState<{ [key: string]: boolean }>({});
 
   // ✅ Fetch courses the student has completed
   useEffect(() => {
@@ -34,7 +42,7 @@ export default function RatingsReviewsPage() {
         setCourses(data);
 
         // Check review status for each course
-        const reviewStatuses: {[key: string]: boolean} = {};
+        const reviewStatuses: { [key: string]: boolean } = {};
         for (const course of data) {
           const statusResponse = await fetch(
             `http://localhost:5003/api/reviews/check/${course.id}`,
@@ -111,7 +119,7 @@ export default function RatingsReviewsPage() {
       return;
     }
 
-    setSubmitting(prev => ({ ...prev, [courseId]: true }));
+    setSubmitting((prev) => ({ ...prev, [courseId]: true }));
 
     try {
       const response = await fetch("http://localhost:5003/api/reviews", {
@@ -126,14 +134,13 @@ export default function RatingsReviewsPage() {
       });
 
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.message || "Error submitting review");
       }
 
       // Update the reviewed courses state
-      setReviewedCourses(prev => ({ ...prev, [courseId]: true }));
-      alert("🎉 Review submitted successfully!");
+      setReviewedCourses((prev) => ({ ...prev, [courseId]: true }));
     } catch (error) {
       console.error("❌ Review Error:", error);
       if (error instanceof Error) {
@@ -142,7 +149,7 @@ export default function RatingsReviewsPage() {
         alert("Error submitting review");
       }
     } finally {
-      setSubmitting(prev => ({ ...prev, [courseId]: false }));
+      setSubmitting((prev) => ({ ...prev, [courseId]: false }));
     }
   };
 
@@ -173,7 +180,8 @@ export default function RatingsReviewsPage() {
             Course Reviews
           </h1>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Share your experience with the courses you've completed. Your feedback helps other students and instructors improve.
+            Share your experience with the courses you've completed. Your
+            feedback helps other students and instructors improve.
           </p>
         </div>
 
@@ -189,16 +197,26 @@ export default function RatingsReviewsPage() {
         ) : courses.length === 0 ? (
           <div className="bg-white rounded-lg shadow-md p-8 text-center">
             <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-medium text-gray-900 mb-2">No Courses Available</h3>
-            <p className="text-gray-600 mb-4">You don't have any completed courses to review yet.</p>
-            <Button variant="outline" onClick={() => window.location.href = "/MyCourses"}>
+            <h3 className="text-xl font-medium text-gray-900 mb-2">
+              No Courses Available
+            </h3>
+            <p className="text-gray-600 mb-4">
+              You don't have any completed courses to review yet.
+            </p>
+            <Button
+              variant="outline"
+              onClick={() => (window.location.href = "/MyCourses")}
+            >
               View My Courses
             </Button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {courses.map((course) => (
-              <Card key={course.id} className="border rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+              <Card
+                key={course.id}
+                className="border rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
+              >
                 <div className="bg-gradient-to-r from-blue-600 to-blue-800 h-2"></div>
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-start">
@@ -212,8 +230,13 @@ export default function RatingsReviewsPage() {
                       </CardDescription>
                     </div>
                     {course.progress !== undefined && (
-                      <Badge variant={course.progress >= 100 ? "success" : "outline"} className="ml-2">
-                        {course.progress >= 100 ? "Completed" : `${course.progress}% Complete`}
+                      <Badge
+                        variant={course.progress >= 100 ? "success" : "outline"}
+                        className="ml-2"
+                      >
+                        {course.progress >= 100
+                          ? "Completed"
+                          : `${course.progress}% Complete`}
                       </Badge>
                     )}
                   </div>
@@ -223,19 +246,27 @@ export default function RatingsReviewsPage() {
                     <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center">
                       <CheckCircle className="h-5 w-5 text-green-600 mr-2 flex-shrink-0" />
                       <div>
-                        <p className="text-green-800 font-medium">Review Submitted</p>
-                        <p className="text-green-700 text-sm">Thank you for your feedback!</p>
+                        <p className="text-green-800 font-medium">
+                          Review Submitted
+                        </p>
+                        <p className="text-green-700 text-sm">
+                          Thank you for your feedback!
+                        </p>
                       </div>
                     </div>
                   ) : (
                     <>
                       <div className="space-y-2">
-                        <p className="text-sm font-medium text-gray-700">Your Rating</p>
+                        <p className="text-sm font-medium text-gray-700">
+                          Your Rating
+                        </p>
                         <div className="flex items-center gap-1">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <button
                               key={star}
-                              onClick={() => handleRatingChange(course.id, star)}
+                              onClick={() =>
+                                handleRatingChange(course.id, star)
+                              }
                               className={`text-2xl transition ${
                                 ratings[course.id] >= star
                                   ? "text-yellow-500"
@@ -252,7 +283,9 @@ export default function RatingsReviewsPage() {
                       <Separator />
 
                       <div className="space-y-2">
-                        <p className="text-sm font-medium text-gray-700">Your Review</p>
+                        <p className="text-sm font-medium text-gray-700">
+                          Your Review
+                        </p>
                         <textarea
                           value={reviews[course.id] || ""}
                           onChange={(e) =>
@@ -271,9 +304,25 @@ export default function RatingsReviewsPage() {
                       >
                         {submitting[course.id] ? (
                           <span className="flex items-center">
-                            <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            <svg
+                              className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                              ></circle>
+                              <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                              ></path>
                             </svg>
                             Submitting...
                           </span>
