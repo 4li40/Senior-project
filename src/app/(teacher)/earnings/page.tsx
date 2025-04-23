@@ -63,7 +63,7 @@ export default function EarningsPage() {
       setPostTaxTotal(data.postTaxTotal);
       setTransactions(data.transactions);
       setAnalytics(data.analytics);
-      setTotalPages(data.pagination.totalPages);
+      setTotalPages(data.pagination?.totalPages || 1);
     } catch (error) {
       console.error("Error fetching earnings:", error);
     } finally {

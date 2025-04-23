@@ -90,18 +90,28 @@ export default function TeacherSignup() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-
+  
       if (response.ok) {
+        // ✅ Success
         setShowDialog(true);
       } else {
         const error = await response.json();
-        alert("❌ Error: " + error.message);
+  
+        // ✅ Handle known error (e.g., duplicate email)
+        if (response.status === 409 || error.message?.includes("already exists")) {
+          // Show same dialog anyway
+          setShowDialog(true);
+        } else {
+          // ❌ Other errors
+          alert("❌ Error: " + error.message);
+        }
       }
     } catch (err) {
       alert("❌ Unexpected error. Please try again.");
       console.error(err);
     }
   };
+  
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-3xl">
@@ -210,21 +220,22 @@ export default function TeacherSignup() {
                 </FormItem>
               )} />
               <FormField name="experience" control={form.control} render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Years of Experience</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      min="0"
-                      onKeyDown={(e) => {
-                        if (e.key === "-" || e.key === "e") e.preventDefault();
-                      }}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
+  <FormItem>
+    <FormLabel>Years of Experience</FormLabel>
+    <FormControl>
+      <Input
+        type="number"
+        min="0"
+        value={field.value}
+        onChange={(e) => field.onChange(Number(e.target.value))}
+        onKeyDown={(e) => {
+          if (e.key === "-" || e.key === "e") e.preventDefault();
+        }}
+      />
+    </FormControl>
+    <FormMessage />
+  </FormItem>
+)} />
 
               {/* Subjects */}
               <FormField name="subjects" control={form.control} render={({ field }) => (
