@@ -322,9 +322,7 @@ export default function TeacherSignup() {
       {/* ✅ Dialog */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
         <DialogContent>
-          <DialogHeader>
-            <DialogTitle>🎉 Account Created!</DialogTitle>
-          </DialogHeader>
+          <DialogTitle>🎉 Account Created!</DialogTitle>
           <p>Please verify your email before logging in.</p>
           <div className="flex justify-end mt-4">
             <Button onClick={() => {
