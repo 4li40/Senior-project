@@ -46,10 +46,21 @@ export default function SchedulePageStudent() {
   };
 
   const fetchSessions = async () => {
-    const res = await fetch("http://localhost:5003/api/courses/sessions", {
-      credentials: "include",
-    });
+    const res = await fetch(
+      "http://localhost:5003/api/courses/student/schedule",
+      {
+        credentials: "include",
+      }
+    );
     const data = await res.json();
+
+    console.log("📦 Received sessions data:", data); // 🔍
+
+    if (!Array.isArray(data)) {
+      console.error("❌ Expected an array but got:", data);
+      return;
+    }
+
     interface Session {
       scheduled_at: string;
       duration_minutes?: number;
@@ -75,6 +86,7 @@ export default function SchedulePageStudent() {
         duration: session.duration_minutes || 60,
       };
     });
+
     setEvents(formatted);
   };
 
@@ -163,6 +175,7 @@ export default function SchedulePageStudent() {
             startAccessor="start"
             endAccessor="end"
             style={{ height: 500 }}
+            defaultView="month"
             views={["month", "week", "day", "agenda"]}
             eventPropGetter={(event) => {
               const bgColor = event.type === "live" ? "#c7d2fe" : "#fef08a";
