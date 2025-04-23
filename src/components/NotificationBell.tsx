@@ -31,16 +31,26 @@ export default function NotificationBell() {
   const fetchNotifications = async () => {
     try {
       setIsLoading(true);
-      const res = await fetch("http://localhost:5003/api/notifications", {
+      const res = await fetch("http://localhost:5003/api/auth/status", {
         credentials: "include",
       });
 
+      // If not authenticated, don't try to fetch notifications
       if (!res.ok) {
-        // If response is not ok, throw an error with the status
-        throw new Error(`Failed to fetch notifications: ${res.status}`);
+        setNotifications([]);
+        setError(null);
+        return;
       }
 
-      const data = await res.json();
+      const notificationsRes = await fetch("http://localhost:5003/api/notifications", {
+        credentials: "include",
+      });
+
+      if (!notificationsRes.ok) {
+        throw new Error(`Failed to fetch notifications: ${notificationsRes.status}`);
+      }
+
+      const data = await notificationsRes.json();
       console.log("📥 Notifications fetched from backend:", data);
 
       // ✅ Make sure it's an array before setting it

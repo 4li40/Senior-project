@@ -149,17 +149,8 @@ export default function ExplorePage() {
 
                   {/* 🔐 Enroll Button */}
                   {!isLoggedIn ? (
-                    <div className="flex flex-col gap-2">
-                      <div className="bg-gray-100 text-center text-gray-400 py-2 rounded">
-                        🔒 Please log in to enroll
-                      </div>
-                      <Button
-                        variant="outline"
-                        onClick={() => router.push(`/MyCourses/${course.id}`)}
-                        className="w-full"
-                      >
-                        👁️ Preview Course
-                      </Button>
+                    <div className="bg-gray-100 text-center text-gray-400 py-2 rounded">
+                      🔒 Please log in to view course details
                     </div>
                   ) : (
                     <div className="flex flex-col gap-2">
